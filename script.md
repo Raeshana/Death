@@ -25,9 +25,12 @@ DIARY CONTENTS:
 
 Player: "It is time."
 Henry: "'It is time'...? Ah, are you death? I can't go. I am not ready. Everyone still needs me"
-P:  >[1]"Stacy, Jack, and Alice have each other. Andrew will support them as they go" 
-    >[2]"Dee is waiting for you"
-H:  [1] "Well... hes always been a hard worker" [Battle, light difficulty]
-    [2] "...Im sure she wouldn't mind if I spent more time with the young'uns" [Battle, light med difficulty]
+P:  
+- [1]"Stacy, Jack, and Alice have each other. Andrew will support them as they go" 
+- [2]"Dee is waiting for you"
+
+H:  
+- [1] "Well... hes always been a hard worker" [Battle, light difficulty]
+- [2] "...Im sure she wouldn't mind if I spent more time with the young'uns" [Battle, light med difficulty]
 
 
