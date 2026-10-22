@@ -149,21 +149,21 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.pressed = true;
 			return true;
 		} else if (evt.key.key == SDLK_SPACE){
+			curr_line = ""; // restart line
 			// can the runner continue?
 			// yes - get the next line
 			// no - at choice or end
 			if ( thread->can_continue() )
 				curr_line = thread->getline();
 			// are we at a choice?
-			else if (thread->has_choices()) {
+			else if (thread->has_choices()) { // display as 3 different choices
 				// iterate choices
 				int id = 0;
 				for ( const ink::runtime::choice c : *thread )
 				{
 					id++;
-					curr_line = "., %s ", c.text(); // check string library
+					curr_line.append(c.text());
 				}
-				thread->choose(id);
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
@@ -179,6 +179,12 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.key == SDLK_S) {
 			down.pressed = false;
 			return true;
+		} else if (evt.key.key == SDLK_1) {
+			thread->choose(0);
+			curr_line = thread->getline();
+		} else if (evt.key.key == SDLK_2) {
+			thread->choose(1);
+			curr_line = thread->getline();
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
 		if (SDL_GetWindowRelativeMouseMode(Mode::window) == false) {
