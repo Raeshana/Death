@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\compiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\command.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{DAC446B7-C614-3D69-B32B-22FB657B321F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DB57B4FA-8C8A-3878-B874-AD4C3C659ABC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

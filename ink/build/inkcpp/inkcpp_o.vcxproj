@@ -1,0 +1,374 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D687B15A-4AD2-335F-81EC-5B2C81B9FE74}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>inkcpp_o</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">inkcpp_o.dir\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">inkcpp_o.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">inkcpp_o</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">inkcpp_o.dir\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">inkcpp_o.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">inkcpp_o</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">inkcpp_o.dir\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">inkcpp_o.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">inkcpp_o</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">inkcpp_o.dir\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">inkcpp_o.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">inkcpp_o</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INKCPP_BUILD_CLIB;INKCPP_NO_EXCEPTIONS;INKCPP_NO_RTTI;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\avl_array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\casting.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\choice.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\executioner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functional.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\header.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\choice.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\functional.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\globals.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\list.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\runner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\snapshot.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story_ptr.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\traits.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\types.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operation_bases.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\platform.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\random.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\simple_restorable_stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_interface.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_ptr.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_utils.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\system.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\tuple.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\avl_array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\casting.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\choice.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\executioner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functional.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\header.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\choice.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\functional.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\globals.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\list.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\runner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\snapshot.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story_ptr.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\traits.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\types.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operation_bases.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\platform.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\random.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\simple_restorable_stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_interface.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_ptr.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_utils.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\system.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\tuple.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\avl_array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\casting.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\choice.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\executioner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functional.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\header.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\choice.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\functional.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\globals.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\list.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\runner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\snapshot.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story_ptr.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\traits.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\types.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operation_bases.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\platform.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\random.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\simple_restorable_stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_interface.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_ptr.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_utils.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\system.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\tuple.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\avl_array.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\casting.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\choice.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\executioner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functional.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\header.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\choice.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\functional.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\globals.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\list.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\runner.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\snapshot.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\story_ptr.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\traits.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\include\types.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operation_bases.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\platform.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\random.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\simple_restorable_stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_interface.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_ptr.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_utils.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\system.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\tuple.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\array.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\choice.cpp" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functional.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\platform.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\simple_restorable_stack.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_interface.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_ptr.cpp" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\system.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\tuple.hpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operations.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operation_bases.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\casting.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\executioner.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_utils.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\header.cpp" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\random.h" />
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.h" />
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.cpp" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\ZERO_CHECK.vcxproj">
+      <Project>{AF04B5C7-0018-3E9B-B52D-7726BD443881}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

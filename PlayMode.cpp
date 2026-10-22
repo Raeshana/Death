@@ -24,27 +24,6 @@
 // Referenced PPU466.cpp from project 1 to render bitmap textures
 // Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
 
-const char *story[] = {
-    "The interrogation room smells like potatoes.",
-    "Across from you sits Mr. Peeler...",
-	"...prime suspect in the murder of Mr. Potato Knishes.",
-    "You slide a photograph across the table.",
-    "\"Recognize him?\"",
-    "Mr. Peeler sighs.",
-    "\"Of course I recognize him--he owed me $20.\"",
-    "\"And where were you that night?\"",
-    "\"At home.\"",
-    "\"Doing what?\"",
-    "\"Peeling.\"",
-	"\"[1. So you admit you peeled Mr. Potato Knishes?]\"",
-	"\"[2. How a-peeling.]\"",
-	"\"[3. WHERE IS THE PROOF?!]",
-	"[Choose 1, 2, or 3]",
-	"You ask questions until you get all the evidence you need.",
-	"You hit it off with Mr. Peeler, you are going on a date tomorrow.",
-	"You were too rude, Mr. Peeler stabbed you."
-};
-
 // text vertex shader
 const char *text_vertex_shader = R"(
 #version 330
@@ -137,17 +116,11 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	// Create hb-ft font
     hb_font = hb_ft_font_create(ft_face, NULL);
 	std::cout << "Font created\n";
-	
-	// refer to inky c++ example: https://github.com/JBenda/inkcpp
-	// std::unique_ptr<ink::runtime::story> myInk{
-	// 	ink::runtime::story::from_file(data_path("story.bin").c_str())
-	// };
-	// ink::runtime::runner thread = myInk->new_runner();
-	// try {
-	// 	printf("%s\n", thread->getline().c_str());
-	// } catch (std::exception e) {
-	// 	std::cerr << e.what() << std::endl;
-	// } 
+
+	// inky
+	ink::compiler::run("test.json", "test.bin");
+	myInk = ink::runtime::story::from_file(data_path("test.bin").c_str());
+	thread = myInk->new_runner();
 }
 
 PlayMode::~PlayMode() {
@@ -175,17 +148,23 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.downs += 1;
 			down.pressed = true;
 			return true;
-		} else if (evt.key.key == SDLK_SPACE && current_line < 14) {
-			current_line++;
-		} else if (evt.key.key == SDLK_1 && current_line == 14) {
-			current_line = 15;
-			return true;
-		} else if (evt.key.key == SDLK_2 && current_line == 14) {
-			current_line = 16;
-			return true;
-		} else if (evt.key.key == SDLK_3 && current_line == 14) {
-			current_line = 17;
-			return true;
+		} else if (evt.key.key == SDLK_SPACE){
+			// can the runner continue?
+			// yes - get the next line
+			// no - at choice or end
+			if ( thread->can_continue() )
+				curr_line = thread->getline();
+			// are we at a choice?
+			else if (thread->has_choices()) {
+				// iterate choices
+				int id = 0;
+				for ( const ink::runtime::choice c : *thread )
+				{
+					id++;
+					curr_line = "., %s ", c.text(); // check string library
+				}
+				thread->choose(id);
+			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
 		if (evt.key.key == SDLK_A) {
@@ -280,13 +259,10 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	glDepthFunc(GL_LESS); //this is the default depth comparison function, but FYI you can change it.
 
 	scene.draw(*camera);
-	
-	// TEST RENDERING 1 STRING
-	const char *text = story[current_line];
 
 	// Create hb-buffer and populate
 	hb_buffer_t *hb_buffer = hb_buffer_create();
-	hb_buffer_add_utf8 (hb_buffer, text, -1, 0, -1);
+	hb_buffer_add_utf8 (hb_buffer, curr_line.c_str(), -1, 0, -1);
     hb_buffer_guess_segment_properties (hb_buffer);
 
     // Shape text

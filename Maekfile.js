@@ -36,6 +36,8 @@ if (maek.OS === "windows") {
 		`/I${NEST_LIBS}/libogg/include`,
 		`/I${NEST_LIBS}/harfbuzz/include`,
 		`/I${NEST_LIBS}/freetype/include`,
+		`/Iink/include`,
+		`/Iink/inkcpp_compiler/include`,
 		//#disable a few warnings:
 		`/wd4146`, //-1U is still unsigned
 		`/wd4297`, //unforunately SDLmain is nothrow
@@ -52,6 +54,8 @@ if (maek.OS === "windows") {
 		`/LIBPATH:${NEST_LIBS}/libogg/lib`, `libogg.lib`,
 		`/LIBPATH:${NEST_LIBS}/harfbuzz/lib`, `harfbuzz.lib`,
 		`/LIBPATH:${NEST_LIBS}/freetype/lib`, `freetype.lib`,
+		`/LIBPATH:ink/build/inkcpp/Release`, `inkcpp.lib`,
+		`/LIBPATH:ink/build/inkcpp_compiler/Release`, `inkcpp_compiler.lib`,
 		`/MANIFEST:EMBED`, `/MANIFESTINPUT:set-utf8-code-page.manifest`
 	);
 } else if (maek.OS === "linux") {

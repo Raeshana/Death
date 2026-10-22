@@ -2,6 +2,7 @@
 
 #include "Scene.hpp"
 #include "Sound.hpp"
+#include "data_path.hpp"
 
 #include <glm/glm.hpp>
 
@@ -17,6 +18,13 @@
 
 #include <iostream>
 #include <string>
+
+#include <globals.h>
+#include <story.h>
+#include <runner.h>
+#include <choice.h>
+#include <memory.h>
+#include <compiler.h>
 
 #define FONT_SIZE 36
 #define MARGIN (FONT_SIZE * 0.5)
@@ -44,6 +52,8 @@ struct PlayMode : Mode {
 	//camera:
 	Scene::Camera *camera = nullptr;
 
+	//----- font stuff -----
+
 	// Initialize library and load font face
     FT_Library ft_library = nullptr; // handle to library
     FT_Face ft_face = nullptr;       // handle to face object
@@ -51,6 +61,16 @@ struct PlayMode : Mode {
 	// Create hb-ft font
     hb_font_t *hb_font = nullptr;
 
+	//----- story stuff -----
+
 	// Story variables
-	int current_line = 0;
+	// int current_line = 0; // hard-coded
+
+	// Load ink binary story, generated from the inkCPP compiler
+	ink::runtime::story* myInk;
+
+	// Create a new thread
+	ink::runtime::runner thread;
+
+	std::string curr_line;
 };

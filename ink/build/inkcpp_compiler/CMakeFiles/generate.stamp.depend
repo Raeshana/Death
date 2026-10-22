@@ -1,0 +1,19 @@
+# CMake generation dependency list for this directory.
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/CMakeLists.txt
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/binary_emitter.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/binary_emitter.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/binary_stream.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/binary_stream.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/command.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/compiler.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/emitter.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/emitter.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/include/compilation_results.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/include/compiler.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/json.hpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/json_compiler.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/json_compiler.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/list_data.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/list_data.h
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/reporter.cpp
+C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/reporter.h

@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\choice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functional.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_ptr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.cpp">
+      <Filter>Collections</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\globals_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\runner_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\simple_restorable_stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\stack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\story_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\snapshot_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\tuple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\operation_bases.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\list_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\container_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\numeric_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\hungarian_solver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\casting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\executioner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\string_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\collections\restorable.h">
+      <Filter>Collections</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Collections">
+      <UniqueIdentifier>{6AD8FB94-E361-3FAA-973E-FDEB3C4AF1ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{DAC446B7-C614-3D69-B32B-22FB657B321F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{DB57B4FA-8C8A-3878-B874-AD4C3C659ABC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
