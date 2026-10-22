@@ -4,6 +4,25 @@
 #include <glm/glm.hpp>
 
 #include <vector>
+#include "Mode.hpp"
+
+#include "Scene.hpp"
+#include "Sound.hpp"
+
+#include <deque>
+
+// text pipeline
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#include <hb.h>
+#include <hb-ft.h>
+
+#include <iostream>
+#include <string>
+
+#define FONT_SIZE 36
+#define MARGIN (FONT_SIZE * 0.5)
 #include <string>
 
 struct PlayMode : Mode {
@@ -21,7 +40,23 @@ struct PlayMode : Mode {
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, up, down, interact;
+	} left, right, down, up, interact;
+
+	//local copy of the game scene (so code can change it during gameplay):
+	Scene scene;
+	
+	//camera:
+	Scene::Camera *camera = nullptr;
+
+	// Initialize library and load font face
+    FT_Library ft_library = nullptr; // handle to library
+    FT_Face ft_face = nullptr;       // handle to face object
+
+	// Create hb-ft font
+    hb_font_t *hb_font = nullptr;
+
+	// Story variables
+	int current_line = 0;
 
 	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
 	float hover_time = 0.0f;

@@ -1,5 +1,6 @@
 #include "PlayMode.hpp"
 #include "data_path.hpp"
+#include "gl_compile_program.hpp"
 
 #include <iostream>
 #include <cmath>
