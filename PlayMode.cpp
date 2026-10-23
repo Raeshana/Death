@@ -118,7 +118,7 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	std::cout << "Font created\n";
 
 	// inky
-	ink::compiler::run("test.json", "test.bin");
+	// ink::compiler::run("test.json", "test.bin");
 	myInk = ink::runtime::story::from_file(data_path("test.bin").c_str());
 	thread = myInk->new_runner();
 }
@@ -338,16 +338,18 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 		// need to account for the bitmap starting points
 		float pen_x_offset = pen_x + pos[i].x_offset / 64.0f + slot->bitmap_left; // left
-		float pen_y_offset = pen_y - pos[i].y_offset / 64.0f + slot->bitmap_top; // bottom
+		float pen_y_offset = pen_y - pos[i].y_offset / 64.0f + slot->bitmap_top - slot->bitmap.rows; // top
 
 		// build rectangle representing background and sprites (of bitmap):
 		std::vector<Vertex> vertices = {
+			// triangle 1
 			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
 			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset), glm::vec2(1.0f, 1.0f)},
 			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset + slot->bitmap.rows), glm::vec2(1.0f, 0.0f)},
+			// triangle 2
 			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
-			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset + slot->bitmap.rows), glm::vec2(1.0f, 0.0f)},
-			{glm::vec2(pen_x_offset, pen_y_offset + slot->bitmap.rows), glm::vec2(0.0f, 0.0f)}
+			{glm::vec2(pen_x_offset, pen_y_offset + slot->bitmap.rows), glm::vec2(0.0f, 0.0f)},
+			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset + slot->bitmap.rows), glm::vec2(1.0f, 0.0f)}
 		};
 
 		//vertex_buffer will (eventually) hold vertex data for drawing:
