@@ -12,9 +12,10 @@ dist/game.pdb
 dist/SDL3.dll
 dist/game
 dist/game.exe
-freetype-test*
 scenes/SDL3.dll
 scenes/show-meshes*
 scenes/show-scene*
 *.blend[0-9]
 maek-cache.json
+freetype-test.exe
+freetype-test.pdb
