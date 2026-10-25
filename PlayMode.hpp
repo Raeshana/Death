@@ -26,6 +26,8 @@
 #include <memory.h>
 #include <compiler.h>
 
+#include "text-pipeline.hpp"
+
 #define FONT_SIZE 36
 #define MARGIN (FONT_SIZE * 0.5)
 
@@ -54,12 +56,7 @@ struct PlayMode : Mode {
 
 	//----- font stuff -----
 
-	// Initialize library and load font face
-    FT_Library ft_library = nullptr; // handle to library
-    FT_Face ft_face = nullptr;       // handle to face object
-
-	// Create hb-ft font
-    hb_font_t *hb_font = nullptr;
+	TextProcessor text_pipeline;
 
 	//----- story stuff -----
 

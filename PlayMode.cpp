@@ -97,26 +97,6 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
 
-	// text pipeline
-	// Abort if files not found/ not working
-    if (FT_Init_FreeType( &ft_library )) {
-        fprintf (stderr, "Could not find library\n");
-        abort();
-    }
-	const char *fontfile = "C:\\Windows\\Fonts\\Arial.ttf";
-    if (FT_New_Face(ft_library, fontfile, 0, &ft_face)) {
-        fprintf (stderr, "Font file could be opened and read, but font format is unsupported\n");
-        abort();
-    }
-    if ((FT_Set_Char_Size (ft_face, FONT_SIZE*64, FONT_SIZE*64, 0, 0))){   
-        fprintf (stderr, "Font size could not be set\n");
-        abort();
-    }
-
-	// Create hb-ft font
-    hb_font = hb_ft_font_create(ft_face, NULL);
-	std::cout << "Font created\n";
-
 	// inky
 	// ink::compiler::run("test.json", "test.bin");
 	myInk = ink::runtime::story::from_file(data_path("test.bin").c_str());
@@ -155,6 +135,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			// no - at choice or end
 			if ( thread->can_continue() )
 				curr_line = thread->getline();
+				// handle_curr_line(); //
 			// are we at a choice?
 			else if (thread->has_choices()) { // display as 3 different choices
 				// iterate choices
@@ -164,6 +145,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 					id++;
 					curr_line.append(c.text());
 				}
+				handle_curr_line();
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
