@@ -1,4 +1,6 @@
+#pragma once
 #include "Mode.hpp"
+
 
 #include "Scene.hpp"
 #include "Sound.hpp"
@@ -56,7 +58,7 @@ struct PlayMode : Mode {
 
 	//----- font stuff -----
 
-	TextProcessor text_pipeline;
+	TextProcessor text_processor;
 
 	//----- story stuff -----
 

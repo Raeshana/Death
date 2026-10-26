@@ -1,3 +1,4 @@
+#pragma once
 #include "data_path.hpp"
 
 #include <glm/glm.hpp>
@@ -22,7 +23,7 @@
 #include <memory.h>
 #include <compiler.h>
 
-#include <list>
+#include <vector>
 
 #define FONT_SIZE 36
 #define MARGIN (FONT_SIZE * 0.5)
@@ -33,27 +34,26 @@ struct TextProcessor {
     ~TextProcessor();
 
     // Initialize library and load font face
-    FT_Library ft_library; // handle to library
-    FT_Face ft_face;       // handle to face object 
-    FT_Error ft_error;     // handle to error
-
+    FT_Library ft_library = nullptr; // handle to library
+    FT_Face ft_face = nullptr;       // handle to face object 
     // Create hb-font
     hb_font_t *hb_font = nullptr;
 
     struct Character {
-        FT_Face ft_face;    // handle to face object 
+        std::vector<unsigned char> pixels; // width*rows bytes, tightly packed
+        unsigned int width = 0;
+        unsigned int rows = 0;
+        int bitmap_left = 0;
+        int bitmap_top = 0;
+        float x = 0.0f;   
+        float y = 0.0f;
         char character;     // sanity check (is the char the same?)
     };
 
     struct Line {
        
-        std::list <Character> characters; 
+        std::vector <Character> characters; 
 
-        const float pen_x_start = 100.0f;
-        const float pen_y_start = 100.0f;
-
-        float pen_x = pen_x_start; // current x location
-        float pen_y = pen_y_start; // current y location
         
 
     };

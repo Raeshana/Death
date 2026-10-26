@@ -8,6 +8,7 @@
 #include "gl_errors.hpp"
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
+#include "text-pipeline.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -133,10 +134,10 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			// can the runner continue?
 			// yes - get the next line
 			// no - at choice or end
-			if ( thread->can_continue() )
+			if ( thread->can_continue() ){
 				curr_line = thread->getline();
-				// handle_curr_line(); //
-			// are we at a choice?
+				text_processor.handle_curr_line(curr_line); //
+			}
 			else if (thread->has_choices()) { // display as 3 different choices
 				// iterate choices
 				int id = 0;
@@ -145,7 +146,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 					id++;
 					curr_line.append(c.text());
 				}
-				handle_curr_line();
+				text_processor.handle_curr_line(curr_line);
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
@@ -164,9 +165,13 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.key == SDLK_1) {
 			thread->choose(0);
 			curr_line = thread->getline();
+			text_processor.handle_curr_line(curr_line);
+
 		} else if (evt.key.key == SDLK_2) {
 			thread->choose(1);
 			curr_line = thread->getline();
+			text_processor.handle_curr_line(curr_line);
+
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
 		if (SDL_GetWindowRelativeMouseMode(Mode::window) == false) {
@@ -248,43 +253,61 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	scene.draw(*camera);
 
-	// Create hb-buffer and populate
-	hb_buffer_t *hb_buffer = hb_buffer_create();
-	hb_buffer_add_utf8 (hb_buffer, curr_line.c_str(), -1, 0, -1);
-    hb_buffer_guess_segment_properties (hb_buffer);
+	// // Create hb-buffer and populate
+	// hb_buffer_t *hb_buffer = hb_buffer_create();
+	// hb_buffer_add_utf8 (hb_buffer, curr_line.c_str(), -1, 0, -1);
+    // hb_buffer_guess_segment_properties (hb_buffer);
 
-    // Shape text
-    hb_shape(hb_font, hb_buffer, NULL, 0);
+    // // Shape text
+    // hb_shape(hb_font, hb_buffer, NULL, 0);
 
-	// Get glyph info and pos out of the buffer
-    unsigned int num_chars = hb_buffer_get_length (hb_buffer);
-    hb_glyph_info_t *info = hb_buffer_get_glyph_infos (hb_buffer, NULL);
-    hb_glyph_position_t *pos = hb_buffer_get_glyph_positions (hb_buffer, NULL);
+	// // Get glyph info and pos out of the buffer
+    // unsigned int num_chars = hb_buffer_get_length (hb_buffer);
+    // hb_glyph_info_t *info = hb_buffer_get_glyph_infos (hb_buffer, NULL);
+    // hb_glyph_position_t *pos = hb_buffer_get_glyph_positions (hb_buffer, NULL);
 
-	float pen_x = 100.0f;
-	float pen_y = 100.0f;
+	// float pen_x = 100.0f;
+	// float pen_y = 100.0f;
 
-	for (unsigned int i = 0; i < num_chars; i++) {
-		FT_UInt glyph_index = info[i].codepoint;
+	static GLuint text_program = 0;
+	if (text_program == 0) {
+		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vs, 1, &text_vertex_shader, nullptr);
+		glCompileShader(vs);
+		GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fs, 1, &text_fragment_shader, nullptr);
+		glCompileShader(fs);
+		text_program = glCreateProgram();
+		glAttachShader(text_program, vs);
+		glAttachShader(text_program, fs);
+		glLinkProgram(text_program);
+		glDeleteShader(vs);
+		glDeleteShader(fs);
+	}
+
+	
+
+	for (unsigned int i = 0; i < text_processor.curr_line.characters.size(); i++) {
+		// FT_UInt glyph_index = info[i].codepoint;
 		
-		// Load glyph image into the slot (erase prev)
-		if (FT_Load_Glyph (ft_face, glyph_index, FT_LOAD_DEFAULT)) {
-			fprintf (stderr, "Error loading glyph image into slot\n");
-			abort();
-		}
+		// // Load glyph image into the slot (erase prev)
+		// if (FT_Load_Glyph (ft_face, glyph_index, FT_LOAD_DEFAULT)) {
+		// 	fprintf (stderr, "Error loading glyph image into slot\n");
+		// 	abort();
+		// }
 
-		// Convert to an anti-aliased bitmap
-		if (FT_Render_Glyph( ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
-			fprintf (stderr, "Error converting glyph to an anti-aliased bitmap\n");
-			abort();
-		}
+		// // Convert to an anti-aliased bitmap
+		// if (FT_Render_Glyph( ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
+		// 	fprintf (stderr, "Error converting glyph to an anti-aliased bitmap\n");
+		// 	abort();
+		// }
 
-		// Glyph slot for easier access
-		FT_GlyphSlot slot = ft_face->glyph;
+		auto const &character = text_processor.curr_line.characters.at(i);
+		if (character.pixels.empty()) continue; 
 
 		// // For testing
 		// printf("glyph index: %u\n", glyph_index);
-		// printf("bitmap: %d x %d\n", slot->bitmap.width, slot->bitmap.rows);
+		// printf("bitmap: %d x %d\n", character.width, character.rows);
 		// printf("pitch: %d\n", slot->bitmap.pitch);
 		// printf("pixel mode: %d\n", slot->bitmap.pixel_mode);
 		// printf("bitmap_left: %d, bitmap_top: %d\n", slot->bitmap_left, slot->bitmap_top);
@@ -303,7 +326,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		//passing 'nullptr' to TexImage says "allocate memory but don't store anything there":
 		// (textures will be uploaded later)
 		// GL_RGBA8 to GL_R8 b/c 1 colour channel instead of 4
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, slot->bitmap.width, slot->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, slot->bitmap.buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, character.width, character.rows, 0, GL_RED, GL_UNSIGNED_BYTE, character.pixels.data());
 		//make the texture have sharp pixels when magnified:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -318,20 +341,21 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			glm::vec2 TexCoord;
 		};
 
+		
 		// need to account for the bitmap starting points
-		float pen_x_offset = pen_x + pos[i].x_offset / 64.0f + slot->bitmap_left; // left
-		float pen_y_offset = pen_y - pos[i].y_offset / 64.0f + slot->bitmap_top - slot->bitmap.rows; // top
+		float pen_x_offset = character.x + character.bitmap_left;
+		float pen_y_offset = character.y + character.bitmap_top - float(character.rows);
 
 		// build rectangle representing background and sprites (of bitmap):
 		std::vector<Vertex> vertices = {
 			// triangle 1
 			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
-			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset), glm::vec2(1.0f, 1.0f)},
-			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset + slot->bitmap.rows), glm::vec2(1.0f, 0.0f)},
+			{glm::vec2(pen_x_offset + character.width, pen_y_offset), glm::vec2(1.0f, 1.0f)},
+			{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)},
 			// triangle 2
 			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
-			{glm::vec2(pen_x_offset, pen_y_offset + slot->bitmap.rows), glm::vec2(0.0f, 0.0f)},
-			{glm::vec2(pen_x_offset + slot->bitmap.width, pen_y_offset + slot->bitmap.rows), glm::vec2(1.0f, 0.0f)}
+			{glm::vec2(pen_x_offset, pen_y_offset + character.rows), glm::vec2(0.0f, 0.0f)},
+			{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)}
 		};
 
 		//vertex_buffer will (eventually) hold vertex data for drawing:
@@ -360,20 +384,6 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
-		// vertex shader
-		GLuint text_vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(text_vertex_shader_id, 1, &text_vertex_shader, nullptr);
-		glCompileShader(text_vertex_shader_id);
-
-		// fragment shader
-		GLuint text_fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(text_fragment_shader_id, 1, &text_fragment_shader, nullptr);
-		glCompileShader(text_fragment_shader_id);
-
-		GLuint text_program = glCreateProgram();
-		glAttachShader(text_program, text_vertex_shader_id);
-		glAttachShader(text_program, text_fragment_shader_id);
-		glLinkProgram(text_program);
 
 		glUseProgram(text_program);
 
@@ -401,10 +411,14 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
+		
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDeleteVertexArrays(1, &vertex_array);
+		glDeleteBuffers(1, &vertex_buffer);
+		glDeleteTextures(1, &glyph_tex);
 
-		// update pen location
-		pen_x += pos[i].x_advance / 64.0f;
-		pen_y += pos[i].y_advance / 64.0f;
+		
+		
 	}
 
 	GL_ERRORS();
