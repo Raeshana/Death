@@ -1199,7 +1199,7 @@ x : \
   ../nest-libs/macos/glm/include/glm/vector_relational.hpp \
   ../nest-libs/macos/glm/include/glm/integer.hpp \
   ../nest-libs/macos/glm/include/glm/detail/func_integer.inl \
-  PlayMode.hpp PPU466.hpp Load.hpp GL.hpp load_save_png.hpp \
+  PlayMode.hpp Sprites.hpp GL.hpp Load.hpp load_save_png.hpp \
   ../nest-libs/macos/SDL3/include/SDL3/SDL_main.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/chrono \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/file_clock.h \

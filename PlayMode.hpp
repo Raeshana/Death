@@ -1,5 +1,5 @@
-#include "PPU466.hpp"
 #include "Mode.hpp"
+#include "Sprites.hpp"
 
 #include <glm/glm.hpp>
 
@@ -14,12 +14,19 @@ struct PlayMode : Mode {
 	virtual void update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
+	static constexpr float ScreenWidth = 176.0f;
+	static constexpr float ScreenHeight = 160.0f;
+
+
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
 	} left, right, up, down, interact;
 
 	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
+	float hover_time = 0.0f;
+
+	std::vector<std::string> room;
 
 	struct Interactable {
 		std::string name;
@@ -33,7 +40,11 @@ struct PlayMode : Mode {
 	bool can_move_to(glm::vec2 pos);
 	void on_interact(Interactable const &thing);
 
-	PPU466 ppu;
-
-	float hover_time = 0.0f;
+	Sprites sprites;
+	Sprites::Texture reaper_tex;
+	Sprites::Texture bed_tex;
+	glm::vec2 bed_pos = glm::vec2(0.0f);
+	Sprites::Texture desk_tex;
+	glm::vec2 desk_pos = glm::vec2(0.0f);
+	Sprites::Texture floor_tex;
 };
