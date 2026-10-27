@@ -132,15 +132,47 @@ void DrawLines::draw_text(std::string const &text, glm::vec3 const &anchor_in, g
 	if (anchor_out) *anchor_out = anchor;
 }
 
+void DrawLines::fill_triangle(glm::vec3 const &a, glm::vec3 const &b, glm::vec3 const &c, glm::u8vec4 const &color) {
+	triangle_attribs.emplace_back(a, color);
+	triangle_attribs.emplace_back(b, color);
+	triangle_attribs.emplace_back(c, color);
+}
+
+void DrawLines::fill_polygon(std::vector< glm::vec3 > const &points, glm::u8vec4 const &color) {
+	for (size_t i = 1; i + 1 < points.size(); ++i) {
+		fill_triangle(points[0], points[i], points[i+1], color);
+	}
+}
+
+void DrawLines::fill_rect(glm::vec2 const &min, glm::vec2 const &max, glm::u8vec4 const &color) {
+	fill_polygon({
+		glm::vec3(min.x, min.y, 0.0f), glm::vec3(max.x, min.y, 0.0f),
+		glm::vec3(max.x, max.y, 0.0f), glm::vec3(min.x, max.y, 0.0f)
+	}, color);
+}
+
+void DrawLines::fill_line(glm::vec2 const &a, glm::vec2 const &b, float width, glm::u8vec4 const &color) {
+	if (a == b) return;
+	glm::vec2 n = 0.5f * width * glm::normalize(glm::vec2(a.y - b.y, b.x - a.x));
+	fill_polygon({
+		glm::vec3(a - n, 0.0f), glm::vec3(b - n, 0.0f),
+		glm::vec3(b + n, 0.0f), glm::vec3(a + n, 0.0f)
+	}, color);
+}
+
+void DrawLines::fill_circle(glm::vec2 const &center, float radius, glm::u8vec4 const &color, uint32_t segments) {
+	std::vector< glm::vec3 > points;
+	for (uint32_t i = 0; i < segments; ++i) {
+		float a = i / float(segments) * 2.0f * float(M_PI);
+		points.emplace_back(center.x + radius * std::cos(a), center.y + radius * std::sin(a), 0.0f);
+	}
+	fill_polygon(points, color);
+}
+
 DrawLines::~DrawLines() {
-	if (attribs.empty()) return;
+	if (attribs.empty() && triangle_attribs.empty()) return;
 
 	//based on DrawSprites.cpp :
-
-	//upload vertices to vertex_buffer:
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer); //set vertex_buffer as current
-	glBufferData(GL_ARRAY_BUFFER, attribs.size() * sizeof(attribs[0]), attribs.data(), GL_STREAM_DRAW); //upload attribs array
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//set color_program as current program:
 	glUseProgram(color_program->program);
@@ -151,8 +183,17 @@ DrawLines::~DrawLines() {
 	//use the mapping vertex_buffer_for_color_program to fetch vertex data:
 	glBindVertexArray(vertex_buffer_for_color_program);
 
-	//run the OpenGL pipeline:
-	glDrawArrays(GL_LINES, 0, GLsizei(attribs.size()));
+	auto draw_array = [](std::vector< Vertex > const &verts, GLenum mode) {
+		if (verts.empty()) return;
+		//upload vertices to vertex_buffer:
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer); //set vertex_buffer as current
+		glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(verts[0]), verts.data(), GL_STREAM_DRAW); //upload attribs array
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		//run the OpenGL pipeline:
+		glDrawArrays(mode, 0, GLsizei(verts.size()));
+	};
+	draw_array(triangle_attribs, GL_TRIANGLES);
+	draw_array(attribs, GL_LINES);
 
 	//reset vertex array to none:
 	glBindVertexArray(0);
@@ -160,5 +201,3 @@ DrawLines::~DrawLines() {
 	//reset current program to none:
 	glUseProgram(0);
 }
-
-

@@ -4,6 +4,9 @@
 //The 'PlayMode' mode plays the game:
 #include "PlayMode.hpp"
 
+// The 'RoomMode' mode starts the game in a patient room:
+#include "RoomMode.hpp"
+
 //For asset loading:
 #include "Load.hpp"
 
@@ -67,7 +70,7 @@ int main(int argc, char **argv) {
 
 	//create window:
 	Mode::window = SDL_CreateWindow(
-		"gp26 game4: choice-based game", //TODO: remember to set a title for your game!
+		"Death", //TODO: remember to set a title for your game!
 		1280, 720, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
 		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
@@ -115,7 +118,7 @@ int main(int argc, char **argv) {
 	call_load_functions();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >());
+	Mode::set_current(std::make_shared< RoomMode >());
 
 	//------------ main loop ------------
 
