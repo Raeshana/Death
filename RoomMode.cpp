@@ -240,6 +240,12 @@ bool RoomMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 				}
 				text_processor.handle_curr_line(curr_line);
 			}
+			else { // at the end
+				auto self = shared_from_this();
+				capture = std::make_shared< SoulCaptureMode >(read_diary ? SoulCaptureMode::normal() : SoulCaptureMode::hard());
+				capture->return_to = self;
+				Mode::set_current(capture);
+			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
 		if (evt.key.key == SDLK_A) {
@@ -315,10 +321,7 @@ bool RoomMode::can_move_to(glm::vec2 pos) {
 
 void RoomMode::on_interact(Interactable const &thing) {
 	if (thing.name == "patient" && !capture) {
-		auto self = shared_from_this();
-		capture = std::make_shared< SoulCaptureMode >(read_diary ? SoulCaptureMode::normal() : SoulCaptureMode::hard());
-		capture->return_to = self;
-		Mode::set_current(capture);
+		talked_patient ? hint = "Space to capture soul" : hint = "Space to talk";
 	} else if (thing.name == "diary") {
 		read_diary = true;
 		hint = "You read the diary. The patient seems calmer now.";
@@ -562,9 +565,6 @@ void RoomMode::draw(glm::uvec2 const &drawable_size) {
 		glDeleteVertexArrays(1, &vertex_array);
 		glDeleteBuffers(1, &vertex_buffer);
 		glDeleteTextures(1, &glyph_tex);
-
-		
-		
 	}
 
 	GL_ERRORS();

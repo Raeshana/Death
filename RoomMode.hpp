@@ -86,4 +86,6 @@ struct RoomMode : Mode {
 	ink::runtime::runner thread;
 
 	std::string curr_line;
+
+	bool talked_patient = false;
 };

@@ -41,8 +41,7 @@ struct DrawLines {
 
 	//Finish drawing (push attribs to GPU):
 	~DrawLines();
-
-
+	
 	glm::mat4 world_to_clip;
 	struct Vertex {
 		Vertex(glm::vec3 const &Position_, glm::u8vec4 const &Color_) : Position(Position_), Color(Color_) { }
