@@ -85,8 +85,16 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
 
 
 
-    for (unsigned int i = 0; i < num_chars; i++) {
+    for (unsigned int i = 0; i < num_chars; i++) { 
+        // ignoring the null character
+        // if i make i < num_chars-1 in the loopguard it crashes on comments in the ink file. 
+        
+        if (i == num_chars-1) continue;
+
         Character character;
+        if (i == 0){
+            // if guard for parsing 
+        }
 
         FT_UInt glyph_index = info[i].codepoint;
         
@@ -114,6 +122,7 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
         character.pixels.resize(character.width*character.rows);
         
         for (unsigned int row = 0; row < character.rows; row++) {
+            
             const unsigned char* src = slot->bitmap.buffer + row*slot->bitmap.pitch;
             std::copy(src, src + character.width, character.pixels.begin() + row*character.width);
         }

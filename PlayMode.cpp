@@ -100,7 +100,7 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 
 	// inky
 	// ink::compiler::run("test.json", "test.bin");
-	myInk = ink::runtime::story::from_file(data_path("test.bin").c_str());
+	myInk = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
 	thread = myInk->new_runner();
 }
 
@@ -136,10 +136,24 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			// no - at choice or end
 			if ( thread->can_continue() ){
 				curr_line = thread->getline();
+				if (thread->has_tags()){
+					std::cout << "tag avalible: " << "\n" << std::endl;
+
+					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
+						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
+					}
+				}
 				text_processor.handle_curr_line(curr_line); //
 			}
 			else if (thread->has_choices()) { // display as 3 different choices
 				// iterate choices
+				if (thread->has_tags()){
+					std::cout << "tag avalible: " << "\n" << std::endl;
+
+					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
+						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
+					}
+				}
 				int id = 0;
 				for ( const ink::runtime::choice c : *thread )
 				{
@@ -163,14 +177,20 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.pressed = false;
 			return true;
 		} else if (evt.key.key == SDLK_1) {
-			thread->choose(0);
-			curr_line = thread->getline();
-			text_processor.handle_curr_line(curr_line);
+			if(thread->has_choices()){
+				thread->choose(0);
+				curr_line = thread->getline();
+				text_processor.handle_curr_line(curr_line);
+			}
+			
 
 		} else if (evt.key.key == SDLK_2) {
-			thread->choose(1);
-			curr_line = thread->getline();
-			text_processor.handle_curr_line(curr_line);
+			if(thread->has_choices()){
+				thread->choose(1);
+				curr_line = thread->getline();
+				text_processor.handle_curr_line(curr_line);
+			}
+			
 
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -411,7 +431,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
-		
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glDeleteVertexArrays(1, &vertex_array);
 		glDeleteBuffers(1, &vertex_buffer);

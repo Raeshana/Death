@@ -38,6 +38,7 @@ struct TextProcessor {
     FT_Face ft_face = nullptr;       // handle to face object 
     // Create hb-font
     hb_font_t *hb_font = nullptr;
+    bool pause = false; 
 
     struct Character {
         std::vector<unsigned char> pixels; // width*rows bytes, tightly packed
