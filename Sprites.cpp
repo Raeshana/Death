@@ -136,6 +136,7 @@ void Sprites::begin(glm::uvec2 const &drawable_size) {
 }
 
 void Sprites::draw(Texture const &tex, glm::vec2 pos, glm::vec2 size, glm::vec4 color, float angle) {
+  //switching textures: draw everything queued
 	if (tex.id != batch_tex) {
 		flush();
 		batch_tex = tex.id;
