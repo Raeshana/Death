@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- from: https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page -->
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
-<<<<<<< HEAD
   <assemblyIdentity type="win32" name="gp22.small.game1" version="0.0.0.1"/>
-=======
-  <assemblyIdentity type="win32" name="gp23.small.game1" version="0.0.0.1"/>
->>>>>>> b2a3ae2e5616ef4bf73441d36de33bd097974fb7
   <application>
     <windowsSettings>
       <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">UTF-8</activeCodePage>
