@@ -157,11 +157,13 @@ const game_names = [
 	maek.CPP('DialogueMode.cpp'),
 	maek.CPP('SoulCaptureMode.cpp'),
 	maek.CPP('RoomMode.cpp'),
+	maek.CPP('PlayMode.cpp'),
 	maek.CPP('PPU466.cpp'),
 	maek.CPP('PixelCanvas.cpp'),
 	maek.CPP('main.cpp'),
 	maek.CPP('LitColorTextureProgram.cpp'),
 	maek.CPP('text-pipeline.cpp'),
+	maek.CPP('Sprites.cpp'),
 	//maek.CPP('ColorTextureProgram.cpp'),  //not used right now, but you might want it
 	maek.CPP('Sound.cpp'),
 	maek.CPP('load_wav.cpp'),

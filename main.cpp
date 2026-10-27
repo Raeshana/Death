@@ -3,6 +3,7 @@
 
 // The 'RoomMode' mode starts the game in a patient room:
 #include "RoomMode.hpp"
+#include "PlayMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
