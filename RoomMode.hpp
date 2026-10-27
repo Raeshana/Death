@@ -10,6 +10,30 @@
 #include <vector>
 #include <string>
 
+// text pipeline
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#include <hb.h>
+#include <hb-ft.h>
+
+#include <iostream>
+#include <string>
+
+#include <globals.h>
+#include <story.h>
+#include <runner.h>
+#include <choice.h>
+#include <memory.h>
+#include <compiler.h>
+
+#include "text-pipeline.hpp"
+
+// Referenced https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
+// Referenced https://freetype.org/freetype2/docs/tutorial/step1.html
+// Referenced PPU466.cpp from project 1 to render bitmap textures
+// Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
+
 struct RoomMode : Mode {
 	RoomMode();
 	virtual ~RoomMode();
@@ -45,4 +69,21 @@ struct RoomMode : Mode {
 	std::string hint = "WASD+E. Read the diary first, or just reap the patient.";
 	bool read_diary = false;
 	std::shared_ptr< SoulCaptureMode > capture;
+
+	//----- font stuff -----
+
+	TextProcessor text_processor;
+
+	//----- story stuff -----
+
+	// Story variables
+	// int current_line = 0; // hard-coded
+
+	// Load ink binary story, generated from the inkCPP compiler
+	ink::runtime::story* myInk;
+
+	// Create a new thread
+	ink::runtime::runner thread;
+
+	std::string curr_line;
 };

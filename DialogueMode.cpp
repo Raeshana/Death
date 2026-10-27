@@ -1,0 +1,447 @@
+// #include "PlayMode.hpp"
+
+// #include "LitColorTextureProgram.hpp"
+
+// #include "DrawLines.hpp"
+// #include "Mesh.hpp"
+// #include "Load.hpp"
+// #include "gl_errors.hpp"
+// #include "data_path.hpp"
+// #include "gl_compile_program.hpp"
+// #include "text-pipeline.hpp"
+
+// #include <glm/gtc/type_ptr.hpp>
+
+// #include <random>
+
+// #include <iostream>
+// #include <string>
+
+// #define FONT_SIZE 36
+// #define MARGGIN (FONT_SIZE * 0.5)
+
+// // Referenced https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
+// // Referenced https://freetype.org/freetype2/docs/tutorial/step1.html
+// // Referenced PPU466.cpp from project 1 to render bitmap textures
+// // Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
+
+// // text vertex shader
+// const char *text_vertex_shader = R"(
+// #version 330
+
+// layout(location = 0) in vec2 Position;
+// layout(location = 1) in vec2 TexCoord;
+
+// out vec2 texCoord;
+
+// uniform mat4 OBJECT_TO_CLIP;
+
+// void main() {
+//     gl_Position = OBJECT_TO_CLIP * vec4(Position, 0.0, 1.0);
+//     texCoord = TexCoord;
+// }
+// )";
+
+// // text fragment shader
+// const char *text_fragment_shader = R"(
+// #version 330
+
+// in vec2 texCoord;
+
+// uniform sampler2D glyphTexture;
+
+// out vec4 fragColor;
+
+// void main() {
+//     float alpha = texture(glyphTexture, texCoord).r;
+//     fragColor = vec4(1.0, 1.0, 1.0, alpha);
+// }
+// )";
+
+// GLuint hexapod_meshes_for_lit_color_texture_program = 0;
+// Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+// 	MeshBuffer const *ret = new MeshBuffer(data_path("hexapod.pnct"));
+// 	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
+// 	return ret;
+// });
+
+// Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
+// 	return new Scene(data_path("hexapod.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+// 		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
+
+// 		scene.drawables.emplace_back(transform);
+// 		Scene::Drawable &drawable = scene.drawables.back();
+
+// 		drawable.pipeline = lit_color_texture_program_pipeline;
+
+// 		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
+// 		drawable.pipeline.type = mesh.type;
+// 		drawable.pipeline.start = mesh.start;
+// 		drawable.pipeline.count = mesh.count;
+
+// 	});
+// });
+
+// Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
+// 	return new Sound::Sample(data_path("dusty-floor.opus"));
+// });
+
+
+// Load< Sound::Sample > honk_sample(LoadTagDefault, []() -> Sound::Sample const * {
+// 	return new Sound::Sample(data_path("honk.wav"));
+// });
+
+
+// PlayMode::PlayMode() : scene(*hexapod_scene) {
+
+// 	//get pointer to camera for convenience:
+// 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
+// 	camera = &scene.cameras.front();
+
+// 	// inky
+// 	// ink::compiler::run("test.json", "test.bin");
+// 	myInk = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
+// 	thread = myInk->new_runner();
+// }
+
+// PlayMode::~PlayMode() {
+// }
+
+// bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+
+// 	if (evt.type == SDL_EVENT_KEY_DOWN) {
+// 		if (evt.key.key == SDLK_ESCAPE) {
+// 			SDL_SetWindowRelativeMouseMode(Mode::window, false);
+// 			return true;
+// 		} else if (evt.key.key == SDLK_A) {
+// 			left.downs += 1;
+// 			left.pressed = true;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_D) {
+// 			right.downs += 1;
+// 			right.pressed = true;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_W) {
+// 			up.downs += 1;
+// 			up.pressed = true;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_S) {
+// 			down.downs += 1;
+// 			down.pressed = true;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_SPACE){
+// 			curr_line = ""; // restart line
+// 			// can the runner continue?
+// 			// yes - get the next line
+// 			// no - at choice or end
+// 			if ( thread->can_continue() ){
+// 				curr_line = thread->getline();
+// 				if (thread->has_tags()){
+// 					std::cout << "tag avalible: " << "\n" << std::endl;
+
+// 					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
+// 						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
+// 					}
+// 				}
+// 				text_processor.handle_curr_line(curr_line); //
+// 			}
+// 			else if (thread->has_choices()) { // display as 3 different choices
+// 				// iterate choices
+// 				if (thread->has_tags()){
+// 					std::cout << "tag avalible: " << "\n" << std::endl;
+
+// 					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
+// 						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
+// 					}
+// 				}
+// 				int id = 0;
+// 				for ( const ink::runtime::choice c : *thread )
+// 				{
+// 					id++;
+// 					curr_line.append(c.text());
+// 				}
+// 				text_processor.handle_curr_line(curr_line);
+// 			}
+// 		}
+// 	} else if (evt.type == SDL_EVENT_KEY_UP) {
+// 		if (evt.key.key == SDLK_A) {
+// 			left.pressed = false;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_D) {
+// 			right.pressed = false;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_W) {
+// 			up.pressed = false;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_S) {
+// 			down.pressed = false;
+// 			return true;
+// 		} else if (evt.key.key == SDLK_1) { // choice 1
+// 			if(thread->has_choices()){
+// 				thread->choose(0);
+// 				curr_line = thread->getline();
+// 				text_processor.handle_curr_line(curr_line);
+// 			}
+// 		} else if (evt.key.key == SDLK_2) { // choice 2
+// 			if(thread->has_choices()){
+// 				thread->choose(1);
+// 				curr_line = thread->getline();
+// 				text_processor.handle_curr_line(curr_line);
+// 			}
+// 		} else if (evt.key.key == SDLK_3) { // choice 3
+// 			if(thread->has_choices()){
+// 				thread->choose(2);
+// 				curr_line = thread->getline();
+// 				text_processor.handle_curr_line(curr_line);
+// 			}
+// 		}
+// 	} else if (evt.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+// 		if (SDL_GetWindowRelativeMouseMode(Mode::window) == false) {
+// 			SDL_SetWindowRelativeMouseMode(Mode::window, true);
+// 			return true;
+// 		}
+// 	} else if (evt.type == SDL_EVENT_MOUSE_MOTION) {
+// 		if (SDL_GetWindowRelativeMouseMode(Mode::window) == true) {
+// 			glm::vec2 motion = glm::vec2(
+// 				evt.motion.xrel / float(window_size.y),
+// 				-evt.motion.yrel / float(window_size.y)
+// 			);
+// 			camera->transform->rotation = glm::normalize(
+// 				camera->transform->rotation
+// 				* glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
+// 				* glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
+// 			);
+// 			return true;
+// 		}
+// 	}
+
+// 	return false;
+// }
+
+// void PlayMode::update(float elapsed) {
+// 	//move camera:
+// 	{
+// 		//combine inputs into a move:
+// 		constexpr float PlayerSpeed = 30.0f;
+// 		glm::vec2 move = glm::vec2(0.0f);
+// 		if (left.pressed && !right.pressed) move.x =-1.0f;
+// 		if (!left.pressed && right.pressed) move.x = 1.0f;
+// 		if (down.pressed && !up.pressed) move.y =-1.0f;
+// 		if (!down.pressed && up.pressed) move.y = 1.0f;
+
+// 		//make it so that moving diagonally doesn't go faster:
+// 		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
+
+// 		glm::mat4x3 frame = camera->transform->make_parent_from_local();
+// 		glm::vec3 frame_right = frame[0];
+// 		//glm::vec3 up = frame[1];
+// 		glm::vec3 frame_forward = -frame[2];
+
+// 		camera->transform->position += move.x * frame_right + move.y * frame_forward;
+// 	}
+
+// 	{ //update listener to camera position:
+// 		glm::mat4x3 frame = camera->transform->make_parent_from_local();
+// 		glm::vec3 frame_right = frame[0];
+// 		glm::vec3 frame_at = frame[3];
+// 		Sound::listener.set_position_right(frame_at, frame_right, 1.0f / 60.0f);
+// 	}
+
+// 	//reset button press counters:
+// 	left.downs = 0;
+// 	right.downs = 0;
+// 	up.downs = 0;
+// 	down.downs = 0;
+// }
+
+// void PlayMode::draw(glm::uvec2 const &drawable_size) {
+// 	//update camera aspect ratio for drawable:
+// 	camera->aspect = float(drawable_size.x) / float(drawable_size.y);
+
+// 	//set up light type and position for lit_color_texture_program:
+// 	// TODO: consider using the Light(s) in the scene to do this
+// 	glUseProgram(lit_color_texture_program->program);
+// 	glUniform1i(lit_color_texture_program->LIGHT_TYPE_int, 1);
+// 	glUniform3fv(lit_color_texture_program->LIGHT_DIRECTION_vec3, 1, glm::value_ptr(glm::vec3(0.0f, 0.0f,-1.0f)));
+// 	glUniform3fv(lit_color_texture_program->LIGHT_ENERGY_vec3, 1, glm::value_ptr(glm::vec3(1.0f, 1.0f, 0.95f)));
+// 	glUseProgram(0);
+
+// 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+// 	glClearDepth(1.0f); //1.0 is actually the default value to clear the depth buffer to, but FYI you can change it.
+// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+// 	glEnable(GL_DEPTH_TEST);
+// 	glDepthFunc(GL_LESS); //this is the default depth comparison function, but FYI you can change it.
+
+// 	scene.draw(*camera);
+
+// 	// // Create hb-buffer and populate
+// 	// hb_buffer_t *hb_buffer = hb_buffer_create();
+// 	// hb_buffer_add_utf8 (hb_buffer, curr_line.c_str(), -1, 0, -1);
+//     // hb_buffer_guess_segment_properties (hb_buffer);
+
+//     // // Shape text
+//     // hb_shape(hb_font, hb_buffer, NULL, 0);
+
+// 	// // Get glyph info and pos out of the buffer
+//     // unsigned int num_chars = hb_buffer_get_length (hb_buffer);
+//     // hb_glyph_info_t *info = hb_buffer_get_glyph_infos (hb_buffer, NULL);
+//     // hb_glyph_position_t *pos = hb_buffer_get_glyph_positions (hb_buffer, NULL);
+
+// 	// float pen_x = 100.0f;
+// 	// float pen_y = 100.0f;
+
+// 	static GLuint text_program = 0;
+// 	if (text_program == 0) {
+// 		GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+// 		glShaderSource(vs, 1, &text_vertex_shader, nullptr);
+// 		glCompileShader(vs);
+// 		GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+// 		glShaderSource(fs, 1, &text_fragment_shader, nullptr);
+// 		glCompileShader(fs);
+// 		text_program = glCreateProgram();
+// 		glAttachShader(text_program, vs);
+// 		glAttachShader(text_program, fs);
+// 		glLinkProgram(text_program);
+// 		glDeleteShader(vs);
+// 		glDeleteShader(fs);
+// 	}
+
+	
+
+// 	for (unsigned int i = 0; i < text_processor.curr_line.characters.size(); i++) {
+// 		// FT_UInt glyph_index = info[i].codepoint;
+		
+// 		// // Load glyph image into the slot (erase prev)
+// 		// if (FT_Load_Glyph (ft_face, glyph_index, FT_LOAD_DEFAULT)) {
+// 		// 	fprintf (stderr, "Error loading glyph image into slot\n");
+// 		// 	abort();
+// 		// }
+
+// 		// // Convert to an anti-aliased bitmap
+// 		// if (FT_Render_Glyph( ft_face->glyph, FT_RENDER_MODE_NORMAL)) {
+// 		// 	fprintf (stderr, "Error converting glyph to an anti-aliased bitmap\n");
+// 		// 	abort();
+// 		// }
+
+// 		auto const &character = text_processor.curr_line.characters.at(i);
+// 		if (character.pixels.empty()) continue; 
+
+// 		// // For testing
+// 		// printf("glyph index: %u\n", glyph_index);
+// 		// printf("bitmap: %d x %d\n", character.width, character.rows);
+// 		// printf("pitch: %d\n", slot->bitmap.pitch);
+// 		// printf("pixel mode: %d\n", slot->bitmap.pixel_mode);
+// 		// printf("bitmap_left: %d, bitmap_top: %d\n", slot->bitmap_left, slot->bitmap_top);
+
+// 		// Built off of ideas in PPU466.cpp from project 1 
+// 		// Create texture for glyph
+// 		GLuint glyph_tex = 0;
+
+// 		glGenTextures(1, &glyph_tex);
+// 		glBindTexture(GL_TEXTURE_2D, glyph_tex);
+
+// 		// Freetype's bitmap is one byte per pixel
+// 		// Keep in mind: 1 alpha channel
+// 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+// 		//passing 'nullptr' to TexImage says "allocate memory but don't store anything there":
+// 		// (textures will be uploaded later)
+// 		// GL_RGBA8 to GL_R8 b/c 1 colour channel instead of 4
+// 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, character.width, character.rows, 0, GL_RED, GL_UNSIGNED_BYTE, character.pixels.data());
+// 		//make the texture have sharp pixels when magnified:
+// 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+// 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+// 		//when access past the edge, clamp to the edge:
+// 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+// 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+// 		glBindTexture(GL_TEXTURE_2D, 0);
+
+// 		// vertex
+// 		struct Vertex {
+// 			glm::vec2 Position;
+// 			glm::vec2 TexCoord;
+// 		};
+
+		
+// 		// need to account for the bitmap starting points
+// 		float pen_x_offset = character.x + character.bitmap_left;
+// 		float pen_y_offset = character.y + character.bitmap_top - float(character.rows);
+
+// 		// build rectangle representing background and sprites (of bitmap):
+// 		std::vector<Vertex> vertices = {
+// 			// triangle 1
+// 			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
+// 			{glm::vec2(pen_x_offset + character.width, pen_y_offset), glm::vec2(1.0f, 1.0f)},
+// 			{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)},
+// 			// triangle 2
+// 			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
+// 			{glm::vec2(pen_x_offset, pen_y_offset + character.rows), glm::vec2(0.0f, 0.0f)},
+// 			{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)}
+// 		};
+
+// 		//vertex_buffer will (eventually) hold vertex data for drawing:
+// 		GLuint vertex_buffer = 0;
+// 		glGenBuffers(1, &vertex_buffer);
+// 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+
+// 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STREAM_DRAW);
+// 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+// 		// vao
+// 		GLuint vertex_array = 0;
+// 		glGenVertexArrays(1, &vertex_array);
+// 		glBindVertexArray(vertex_array);
+
+// 		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+
+// 		// attribute array for position
+// 		glEnableVertexAttribArray(0);
+// 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+
+// 		// attribute array for text coords
+// 		glEnableVertexAttribArray(1);
+// 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
+
+// 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+// 		glBindVertexArray(0);
+
+
+// 		glUseProgram(text_program);
+
+// 		// uniforms for shader programs
+// 		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+// 			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
+// 			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
+// 			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+// 			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f)
+// 		);
+// 		GLint object_to_clip = glGetUniformLocation(text_program, "OBJECT_TO_CLIP");
+// 		glUniformMatrix4fv(object_to_clip, 1, GL_FALSE, glm::value_ptr(OBJECT_TO_CLIP));
+
+// 		glActiveTexture(GL_TEXTURE0);
+// 		glBindTexture(GL_TEXTURE_2D, glyph_tex);
+
+// 		GLint glyph_texture = glGetUniformLocation(text_program, "glyphTexture");
+// 		glUniform1i(glyph_texture, 0);
+
+// 		glBindVertexArray(vertex_array);
+
+// 		// enable blending
+// 		glEnable(GL_BLEND);
+// 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+// 		glDrawArrays(GL_TRIANGLES, 0, 6);
+// 		glBindVertexArray(0);
+
+// 		glBindTexture(GL_TEXTURE_2D, 0);
+// 		glDeleteVertexArrays(1, &vertex_array);
+// 		glDeleteBuffers(1, &vertex_buffer);
+// 		glDeleteTextures(1, &glyph_tex);
+
+		
+		
+// 	}
+
+// 	GL_ERRORS();
+// }
