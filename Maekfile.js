@@ -36,6 +36,8 @@ if (maek.OS === "windows") {
 		`/I${NEST_LIBS}/libogg/include`,
 		`/I${NEST_LIBS}/harfbuzz/include`,
 		`/I${NEST_LIBS}/freetype/include`,
+		`/Iink/include`,
+		`/Iink/inkcpp_compiler/include`,
 		//#disable a few warnings:
 		`/wd4146`, //-1U is still unsigned
 		`/wd4297`, //unforunately SDLmain is nothrow
@@ -52,6 +54,8 @@ if (maek.OS === "windows") {
 		`/LIBPATH:${NEST_LIBS}/libogg/lib`, `libogg.lib`,
 		`/LIBPATH:${NEST_LIBS}/harfbuzz/lib`, `harfbuzz.lib`,
 		`/LIBPATH:${NEST_LIBS}/freetype/lib`, `freetype.lib`,
+		`/LIBPATH:ink/build/inkcpp/Release`, `inkcpp.lib`,
+		`/LIBPATH:ink/build/inkcpp_compiler/Release`, `inkcpp_compiler.lib`,
 		`/MANIFEST:EMBED`, `/MANIFESTINPUT:set-utf8-code-page.manifest`
 	);
 } else if (maek.OS === "linux") {
@@ -150,9 +154,14 @@ if (maek.OS === 'windows') {
 // objFileBase (optional): base name object file to produce (if not supplied, set to options.objDir + '/' + cppFile without the extension)
 //returns objFile: objFileBase + a platform-dependant suffix ('.o' or '.obj')
 const game_names = [
-	maek.CPP('PlayMode.cpp'),
+	maek.CPP('DialogueMode.cpp'),
+	maek.CPP('SoulCaptureMode.cpp'),
+	maek.CPP('RoomMode.cpp'),
+	maek.CPP('PPU466.cpp'),
+	maek.CPP('PixelCanvas.cpp'),
 	maek.CPP('main.cpp'),
 	maek.CPP('LitColorTextureProgram.cpp'),
+	maek.CPP('text-pipeline.cpp'),
 	//maek.CPP('ColorTextureProgram.cpp'),  //not used right now, but you might want it
 	maek.CPP('Sound.cpp'),
 	maek.CPP('load_wav.cpp'),

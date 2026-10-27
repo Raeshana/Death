@@ -1,0 +1,10 @@
+^C:\USERS\RAESH\15466\15-466-F26-BASE4\INK\INKCPP\BUILD\CMAKEFILES\D677E4E05595BC776FB14DCBD564F026\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp.slnx
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

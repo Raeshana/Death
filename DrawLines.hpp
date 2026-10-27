@@ -33,10 +33,15 @@ struct DrawLines {
 		glm::u8vec4 const &color = glm::u8vec4(0xff),
 		glm::vec3 *anchor_out = nullptr);
 
+	void fill_triangle(glm::vec3 const &a, glm::vec3 const &b, glm::vec3 const &c, glm::u8vec4 const &color = glm::u8vec4(0xff));
+	void fill_polygon(std::vector< glm::vec3 > const &points, glm::u8vec4 const &color = glm::u8vec4(0xff));
+	void fill_rect(glm::vec2 const &min, glm::vec2 const &max, glm::u8vec4 const &color = glm::u8vec4(0xff));
+	void fill_line(glm::vec2 const &a, glm::vec2 const &b, float width, glm::u8vec4 const &color = glm::u8vec4(0xff));
+	void fill_circle(glm::vec2 const &center, float radius, glm::u8vec4 const &color = glm::u8vec4(0xff), uint32_t segments = 48);
+
 	//Finish drawing (push attribs to GPU):
 	~DrawLines();
-
-
+	
 	glm::mat4 world_to_clip;
 	struct Vertex {
 		Vertex(glm::vec3 const &Position_, glm::u8vec4 const &Color_) : Position(Position_), Color(Color_) { }
@@ -44,5 +49,6 @@ struct DrawLines {
 		glm::u8vec4 Color;
 	};
 	std::vector< Vertex > attribs;
+	std::vector< Vertex > triangle_attribs;
 
 };

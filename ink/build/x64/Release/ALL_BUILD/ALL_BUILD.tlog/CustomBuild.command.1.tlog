@@ -1,0 +1,10 @@
+^C:\USERS\RAESH\15466\15-466-F26-BASE4\INK\INKCPP\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

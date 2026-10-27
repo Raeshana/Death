@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\compiler.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\binary_stream.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\json_compiler.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\emitter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\reporter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\binary_emitter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\list_data.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\command.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{6AABD518-363B-3286-9D6C-5B1F0B56196B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
