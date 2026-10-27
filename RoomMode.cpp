@@ -7,6 +7,7 @@
 #include <cstring>
 
 #include "gl_errors.hpp"
+#include "Load.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -105,6 +106,18 @@ static PPU466::Tile solid_tile(uint8_t color) {
 	return t;
 }
 
+Load< Sound::Sample > after_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("after_soul_loop.wav"));
+});
+
+Load< Sound::Sample > during_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("during_soul_loop.wav"));
+});
+
+Load< Sound::Sample > before_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("before_soul_loop.wav"));
+});
+
 RoomMode::RoomMode() {
 	//--- palettes ---
 	ppu.palette_table[ROOM_PALETTE] = {
@@ -178,6 +191,9 @@ RoomMode::RoomMode() {
 	// ink::compiler::run("test.json", "test.bin");
 	myInk = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
 	thread = myInk->new_runner();
+
+	// music - loop before soul capture
+	Sound::loop(*before_soul_capture, 1.0f, 0.0f);
 }
 
 RoomMode::~RoomMode() {
@@ -242,9 +258,16 @@ bool RoomMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			}
 			else { // at the end
 				auto self = shared_from_this();
+				// loop during soul capture after stopping all sound
+				Sound::stop_all_samples();
+				Sound::loop(*during_soul_capture, 1.0f, 0.0f);
 				capture = std::make_shared< SoulCaptureMode >(read_diary ? SoulCaptureMode::normal() : SoulCaptureMode::hard());
 				capture->return_to = self;
 				Mode::set_current(capture);
+
+				// loop after soul capture after stopping all sound
+				Sound::stop_all_samples();
+				Sound::loop(*after_soul_capture, 1.0f, 0.0f);
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {

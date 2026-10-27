@@ -43,7 +43,9 @@ TextProcessor::TextProcessor(){
         abort();
     }
 
-	const char *fontfile = "C:\\Windows\\Fonts\\Arial.ttf";
+    // https://www.1001fonts.com/lower-pixel-font.html
+    // credit to IrbaCreative
+	const char *fontfile = "ByteBounce.ttf";
     if (FT_New_Face(ft_library, fontfile, 0, &ft_face)) {
         fprintf (stderr, "Font file could be opened and read, but font format is unsupported\n");
         abort();

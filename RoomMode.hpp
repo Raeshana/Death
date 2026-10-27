@@ -4,6 +4,7 @@
 #include "Mode.hpp"
 #include "PixelCanvas.hpp"
 #include "SoulCaptureMode.hpp"
+#include "Sound.hpp"
 
 #include <glm/glm.hpp>
 
@@ -88,4 +89,9 @@ struct RoomMode : Mode {
 	std::string curr_line;
 
 	bool talked_patient = false;
+
+	//sounds:
+	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
+	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
+	std::shared_ptr< Sound::PlayingSample > after_soul_loop;
 };
