@@ -5,9 +5,9 @@
 #include "PixelCanvas.hpp"
 #include "SoulCaptureMode.hpp"
 #include "Sound.hpp"
+#include "Sprites.hpp"
 
 #include <glm/glm.hpp>
-
 #include <vector>
 #include <string>
 
@@ -43,13 +43,16 @@ struct RoomMode : Mode {
 	virtual void update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
+	static constexpr float ScreenWidth = 176.0f;
+	static constexpr float ScreenHeight = 160.0f;
+
+	//----- movement stuff -----
+
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
 	} left, right, up, down, interact;
-
-	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
-
+	
 	struct Interactable {
 		std::string name;
 		glm::vec2 pos;
@@ -62,18 +65,27 @@ struct RoomMode : Mode {
 	bool can_move_to(glm::vec2 pos);
 	void on_interact(Interactable const &thing);
 
-	PPU466 ppu;
-
-	float hover_time = 0.0f;
-
-	PixelCanvas canvas;
-	std::string hint = "WASD+E. Read the diary first, or just reap the patient.";
+	// PixelCanvas canvas;
+	// std::string hint = "WASD+E. Read the diary first, or just reap the patient.";
 	bool read_diary = false;
 	std::shared_ptr< SoulCaptureMode > capture;
 
 	//----- font stuff -----
 
 	TextProcessor text_processor;
+
+	//----- sprite stuff -----
+
+	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
+	float hover_time = 0.0f;
+	std::vector<std::string> room;
+	Sprites sprites;
+	Sprites::Texture reaper_tex;
+	Sprites::Texture bed_tex;
+	glm::vec2 bed_pos = glm::vec2(0.0f);
+	Sprites::Texture desk_tex;
+	glm::vec2 desk_pos = glm::vec2(0.0f);
+	Sprites::Texture floor_tex;
 
 	//----- story stuff -----
 
