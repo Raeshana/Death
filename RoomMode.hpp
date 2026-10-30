@@ -72,7 +72,7 @@ struct RoomMode : Mode {
 
 	//----- font stuff -----
 
-	TextProcessor text_processor;
+	TextProcessor dialogue_processor;
 
 	//----- sprite stuff -----
 
@@ -88,9 +88,8 @@ struct RoomMode : Mode {
 	Sprites::Texture floor_tex;
 
 	//----- story stuff -----
-
-	// Story variables
-	// int current_line = 0; // hard-coded
+	//tags 
+    bool pause = false;             // pause tag
 
 	// Load ink binary story, generated from the inkCPP compiler
 	ink::runtime::story* myInk;
@@ -98,7 +97,8 @@ struct RoomMode : Mode {
 	// Create a new thread
 	ink::runtime::runner thread;
 
-	std::string curr_line;
+	std::string dialogue_line;
+	std::string hint_line;
 
 	bool talked_patient = false;
 
