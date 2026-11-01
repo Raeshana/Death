@@ -29,6 +29,7 @@
 #include <compiler.h>
 
 #include "text-pipeline.hpp"
+#include "DialogueMode.hpp"
 
 // Referenced https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
 // Referenced https://freetype.org/freetype2/docs/tutorial/step1.html
@@ -65,17 +66,11 @@ struct RoomMode : Mode {
 	bool can_move_to(glm::vec2 pos);
 	void on_interact(Interactable const &thing);
 
-	// PixelCanvas canvas;
 	// std::string hint = "WASD+E. Read the diary first, or just reap the patient.";
 	bool read_diary = false;
 	std::shared_ptr< SoulCaptureMode > capture;
 
-	//----- font stuff -----
-
-	TextProcessor dialogue_processor;
-
 	//----- sprite stuff -----
-
 	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
 	float hover_time = 0.0f;
 	std::vector<std::string> room;
@@ -87,9 +82,14 @@ struct RoomMode : Mode {
 	glm::vec2 desk_pos = glm::vec2(0.0f);
 	Sprites::Texture floor_tex;
 
-	//----- story stuff -----
+	//----- text stuff -----
+	TextProcessor hint_processor;
+	std::shared_ptr< DialogueMode > dialogue;
+
 	//tags 
     bool pause = false;             // pause tag
+	bool dialogue_started = false;
+	bool can_battle = false;
 
 	// Load ink binary story, generated from the inkCPP compiler
 	ink::runtime::story* myInk;
@@ -102,7 +102,7 @@ struct RoomMode : Mode {
 
 	bool talked_patient = false;
 
-	//sounds:
+	//----- sound stuff -----
 	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
 	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
 	std::shared_ptr< Sound::PlayingSample > after_soul_loop;

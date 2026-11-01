@@ -29,18 +29,23 @@
 #include <compiler.h>
 
 #include "text-pipeline.hpp"
+#include "PixelCanvas.hpp"
+#include "DrawLines.hpp"
 
-#define FONT_SIZE 36
-#define MARGIN (FONT_SIZE * 0.5)
+#define MARGIN (FONT_SIZE * 2)
 
-struct PlayMode : Mode {
-	PlayMode();
-	virtual ~PlayMode();
+struct DialogueMode : Mode {
+	DialogueMode();
+	virtual ~DialogueMode();
 
 	//functions called by main loop:
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
 	virtual void update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
+
+	// virtual bool handle_dialogue(SDL_Event const &, glm::uvec2 const &window_size);
+	// virtual void update_dialogue(float elapsed);
+	// virtual void draw_dialogue(glm::uvec2 const &drawable_size);
 
 	//----- game state -----
 
@@ -48,28 +53,33 @@ struct PlayMode : Mode {
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up;
+	} talk;
 
-	//local copy of the game scene (so code can change it during gameplay):
-	Scene scene;
-	
-	//camera:
-	Scene::Camera *camera = nullptr;
+	//----- text stuff -----
 
-	//----- font stuff -----
+	PixelCanvas canvas;
+	TextProcessor dialogue_processor;
+	// textbox width scales with screen size
+	static constexpr float dialogue_textbox_height = 200.0f;
+    static constexpr float dialogue_pen_x_start = MARGIN;
+    static constexpr float dialogue_pen_y_start = MARGIN;
 
-	TextProcessor text_processor;
+	//----- hint stuff -----
+	TextProcessor hint_processor;
+
+	//----- tags stuff -----
+	bool can_battle;
 
 	//----- story stuff -----
 
-	// Story variables
-	// int current_line = 0; // hard-coded
-
 	// Load ink binary story, generated from the inkCPP compiler
-	ink::runtime::story* myInk;
+	ink::runtime::story* inkDialogue;
 
 	// Create a new thread
 	ink::runtime::runner thread;
 
+	// Keep track of current line
 	std::string curr_line;
+
+	std::shared_ptr< Mode > return_to;
 };

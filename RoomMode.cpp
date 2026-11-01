@@ -152,53 +152,8 @@ bool RoomMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			interact.downs += 1;
 			interact.pressed = true;
 			return true;
-		} else if (evt.key.key == SDLK_SPACE){ // progress dialogue
-			dialogue_line = ""; // restart line
-			// can the runner continue?
-			// yes - get the next line
-			// no - at choice or end
-			if ( thread->can_continue() ){
-				dialogue_line = thread->getline();
-				if (thread->has_tags()){
-					std::cout << "tag avalible: " << "\n" << std::endl;
+		} 
 
-					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
-						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
-					}
-				}
-				dialogue_processor.handle_curr_line(dialogue_line); //
-			}
-			else if (thread->has_choices()) { // display as 3 different choices
-				// iterate choices
-				if (thread->has_tags()){
-					std::cout << "tag avalible: " << "\n" << std::endl;
-
-					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
-						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
-					}
-				}
-				int id = 0;
-				for ( const ink::runtime::choice c : *thread )
-				{
-					id++;
-					dialogue_line.append(c.text());
-				}
-				dialogue_processor.handle_curr_line(dialogue_line);
-			}
-			else { // at the end
-				auto self = shared_from_this();
-				// loop during soul capture after stopping all sound
-				Sound::stop_all_samples();
-				Sound::loop(*during_soul_capture, 1.0f, 0.0f);
-				capture = std::make_shared< SoulCaptureMode >(read_diary ? SoulCaptureMode::normal() : SoulCaptureMode::hard());
-				capture->return_to = self;
-				Mode::set_current(capture);
-
-				// loop after soul capture after stopping all sound
-				Sound::stop_all_samples();
-				Sound::loop(*after_soul_capture, 1.0f, 0.0f);
-			}
-		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
 		if (evt.key.key == SDLK_A) {
 			left.pressed = false;
@@ -215,27 +170,8 @@ bool RoomMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.key == SDLK_E) { // interaction
 			interact.pressed = false;
 			return true;
-		} else if (evt.key.key == SDLK_1) { // dialogue choice 1
-			if(thread->has_choices()){
-				thread->choose(0);
-				dialogue_line = thread->getline();
-				dialogue_processor.handle_curr_line(dialogue_line);
-			}
-		} else if (evt.key.key == SDLK_2) { // dialogue choice 2
-			if(thread->has_choices()){
-				thread->choose(1);
-				dialogue_line = thread->getline();
-				dialogue_processor.handle_curr_line(dialogue_line);
-			}
-		} else if (evt.key.key == SDLK_3) { // dialogue choice 3
-			if(thread->has_choices()){
-				thread->choose(2);
-				dialogue_line = thread->getline();
-				dialogue_processor.handle_curr_line(dialogue_line);
-			}
 		}
 	}
-
 	return false;
 }
 
@@ -272,7 +208,31 @@ bool RoomMode::can_move_to(glm::vec2 pos) {
 }
 
 void RoomMode::on_interact(Interactable const &thing) {
-	if (thing.name == "patient" && !capture) {
+	if (thing.name == "patient" && !dialogue) {
+		// interacting with patient started dialogue
+		// dialogue will be handled using dialogue_started
+		if (!can_battle) {
+			auto self = shared_from_this();
+			dialogue = std::make_shared< DialogueMode >();
+			dialogue->return_to = self;
+			Mode::set_current(dialogue);
+		}
+
+		// interacting with patient after exhausting dialogue
+		// enters minigame battle
+		if (can_battle){
+			auto self = shared_from_this();
+			// loop during soul capture after stopping all sound
+			Sound::stop_all_samples();
+			Sound::loop(*during_soul_capture, 1.0f, 0.0f);
+			capture = std::make_shared< SoulCaptureMode >(read_diary ? SoulCaptureMode::normal() : SoulCaptureMode::hard());
+			capture->return_to = self;
+			Mode::set_current(capture);
+
+			// loop after soul capture after stopping all ssound
+			Sound::stop_all_samples();
+			Sound::loop(*after_soul_capture, 1.0f, 0.0f);
+		}
 		// talked_patient ? hint = "Space to capture soul" : hint = "Space to talk";
 	} else if (thing.name == "diary") {
 		read_diary = true;
@@ -372,10 +332,6 @@ void RoomMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	sprites.end(drawable_size);
-
-	// dialogue --------------------------------------------------------------------------------------------
-
-	dialogue_processor.draw_curr_line(drawable_size);
 
 	// soul capture --------------------------------------------------------------------------------------------
 

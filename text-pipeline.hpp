@@ -26,7 +26,6 @@
 #include <vector>
 
 #define FONT_SIZE 32
-#define MARGIN (FONT_SIZE * 0.5)
 
 struct Character {
     std::vector<unsigned char> pixels; // width*rows bytes, tightly packed
@@ -40,7 +39,6 @@ struct Character {
 };
 
 struct Line {
-    
     std::vector <Character> characters; 
 };
 
@@ -49,10 +47,13 @@ struct TextProcessor {
     ~TextProcessor();
 
     // Textbox sizes
-    static constexpr float textbox_width = 500.0f;
-	static constexpr float textbox_height = 500.0f;
-    static constexpr float pen_x_start = 100.0f;
-    static constexpr float pen_y_start = 100.0f;
+    // don't want these to be fixed in case we want text to change
+    // in different circumstances
+    // e.g. dialogue vs. hints
+    float textbox_width;
+	float textbox_height;
+    float pen_x_start;
+    float pen_y_start;
 
     // Freetype and Harbuff 
     FT_Library ft_library = nullptr; // handle to library
