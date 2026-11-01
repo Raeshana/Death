@@ -141,6 +141,22 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 	dialogue_processor.pen_y_start = dialogue_pen_y_start + dialogue_textbox_height - MARGIN;
 	dialogue_processor.draw_curr_line(drawable_size);
 
+	// draw current speaker
+	speaker_processor.pen_x_start = dialogue_pen_x_start;
+	speaker_processor.pen_y_start = dialogue_textbox_height + MARGIN;
+	speaker_processor.textbox_width = FONT_SIZE*20;
+	speaker_processor.textbox_height = FONT_SIZE*5;
+
+	lines.fill_rect(
+		glm::vec2(speaker_processor.pen_x_start, speaker_processor.pen_y_start), // min
+		glm::vec2(speaker_processor.pen_x_start + speaker_processor.textbox_width, 
+					speaker_processor.pen_x_start + speaker_processor.textbox_height), // max
+		glm::u8vec4(0, 0, 0, 0) // colour
+	);
+	
+	speaker_processor.handle_curr_line("SOMEBODYY"); // idk what's going on here with the last char!!!!
+	speaker_processor.draw_curr_line(drawable_size);
+
 	// draw hint (bottom-right)
 	hint_processor.handle_curr_line("SPACE TO CONTINUEE"); // idk what's going on here with the E
 	hint_processor.textbox_width = FONT_SIZE*20;

@@ -64,8 +64,8 @@ struct DialogueMode : Mode {
     static constexpr float dialogue_pen_x_start = MARGIN;
     static constexpr float dialogue_pen_y_start = MARGIN;
 
-	//----- hint stuff -----
 	TextProcessor hint_processor;
+	TextProcessor speaker_processor;
 
 	//----- tags stuff -----
 	bool can_battle;
