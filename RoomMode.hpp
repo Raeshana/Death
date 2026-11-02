@@ -87,9 +87,7 @@ struct RoomMode : Mode {
 	std::shared_ptr< DialogueMode > dialogue;
 
 	//tags 
-    bool pause = false;             // pause tag
-	bool dialogue_started = false;
-	bool can_battle = false;
+    bool pause;            // pause tag
 
 	// Load ink binary story, generated from the inkCPP compiler
 	ink::runtime::story* myInk;

@@ -14,7 +14,7 @@ DialogueMode::DialogueMode() {
 	inkDialogue = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
 	thread = inkDialogue->new_runner();
 
-    can_battle = false;
+    // can_battle = false;
 }
 
 DialogueMode::~DialogueMode() {
@@ -42,12 +42,13 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 					std::cout << "tag avalible: " << "\n" << std::endl;
 
 					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
-						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
+						std::string tag = thread->get_tag(i);
+						std::cout << "tag: " << tag << "\n" << std::endl;
 
                         // set can battle status to true
-                        const char *tag = "battle";
-                        if (thread->get_tag(i) == tag) {
+                        if (tag == "battle") {
                             can_battle = true;
+							std::cout << "can battle: " << can_battle << std::endl;
                         }
 					}
 				}
@@ -60,12 +61,13 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 					std::cout << "tag avalible: " << "\n" << std::endl;
 
 					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
-						std::cout << "tag: " << thread->get_tag(i) << "\n" << std::endl;
+						std::string tag = thread->get_tag(i);
+						std::cout << "tag: " << tag << "\n" << std::endl;
 
                         // set can battle status to true
-                        const char *tag = "battle";
-                        if (thread->get_tag(i) == tag) {
+                        if (tag == "battle") {
                             can_battle = true;
+							std::cout << "can battle: " << can_battle << std::endl;
                         }
 					}
 				}
@@ -77,6 +79,14 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 				}
 				dialogue_processor.handle_curr_line(curr_line);
                 return true;
+			}
+			else { // at end
+				// this will be moved under choices
+				std::cout << "I AM IN THE ELSE\n" << can_battle << std::endl;
+				if (can_battle) {
+					Mode::set_current(std::move(return_to));
+					std::cout << "I AM IN THE IF STATEMENT\n" << can_battle << std::endl;
+				}
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
@@ -154,11 +164,11 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 		glm::u8vec4(0, 0, 0, 0) // colour
 	);
 	
-	speaker_processor.handle_curr_line("SOMEBODY\n"); // idk what's going on here with the last char!!!!
+	speaker_processor.handle_curr_line("SOMEBODY\n"); 
 	speaker_processor.draw_curr_line(drawable_size);
 
 	// draw hint (bottom-right)
-	hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); // idk what's going on here with the E
+	hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); 
 	hint_processor.textbox_width = FONT_SIZE*20;
 	hint_processor.textbox_height = FONT_SIZE*5;
 	hint_processor.pen_x_start = MARGIN + MARGIN/2;

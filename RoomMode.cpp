@@ -208,10 +208,11 @@ bool RoomMode::can_move_to(glm::vec2 pos) {
 }
 
 void RoomMode::on_interact(Interactable const &thing) {
-	if (thing.name == "patient" && !dialogue) {
+	if (thing.name == "patient") {
+		// std::cout << "can battle room mode: " << can_battle << std::endl;
 		// interacting with patient started dialogue
 		// dialogue will be handled using dialogue_started
-		if (!can_battle) {
+		if (!dialogue) {
 			auto self = shared_from_this();
 			dialogue = std::make_shared< DialogueMode >();
 			dialogue->return_to = self;
@@ -220,7 +221,7 @@ void RoomMode::on_interact(Interactable const &thing) {
 
 		// interacting with patient after exhausting dialogue
 		// enters minigame battle
-		if (can_battle){
+		if (dialogue && dialogue->can_battle){
 			auto self = shared_from_this();
 			// loop during soul capture after stopping all sound
 			Sound::stop_all_samples();
