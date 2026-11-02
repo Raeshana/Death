@@ -14,23 +14,23 @@ const float ReaperSize = 16.0f;
 static const char *ROOM_MAP[MapHeight] = {
 	"################################",
 	"#..............................#",
+	"#..........................WWW.#",
+	"#.........................NWWW.#",
+	"#..........................WWW.#",
 	"#..............................#",
-	"#.............BBBB.............#",
-	"#...........P.BBBB.............#",
-	"#.............BBBB..TT.........#",
-	"#.............BBBB..TT.........#",
-	"#.............BBBB...D.........#",
-	"#.............BBBB.............#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
+	"#....BBBB...||....||...BBBB....#",
+	"#..IIBBBBCC.||....||.IIBBBBCC..#",
+	"#..IIBBBBCC.||....||.IIBBBBCC..#",
+	"#....BBBB.P.||....||.P.BBBB....#",
+	"#..TTBBBB...||....||...BBBBTT..#",
+	"#..TTBBBB...||....||...BBBBTT..#",
+	"#..D........||....||........D..#",
+	"#...........||....||...........#",
+	"#...........||....||...........#",
+	"#MMM........||....||...........#",
+	"#MMM........||....||...........#",
+	"#MMM........||....||...........#",
+	"#.F............................#",
 	"#..............................#",
 	"#..............................#",
 	"#..............................#",
@@ -68,29 +68,78 @@ PlayMode::PlayMode() {
 				diary.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
 				diary.radius = 10.0f;
 				interactables.push_back(diary);
+			} else if (c == 'F') {
+				Interactable father;
+				father.name = "father";
+				father.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
+				father.radius = 10.0f;
+				interactables.push_back(father);
+			} else if (c == 'N') {
+				Interactable nurse;
+				nurse.name = "nurse";
+				nurse.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
+				nurse.radius = 10.0f;
+				interactables.push_back(nurse);
 			}
 		}
 	}
 
 	reaper_tex = sprites.load(data_path("reaper.png"));
-	bed_tex = sprites.load(data_path("bed.png"));
-	bool found_bed = false;
-		for (int y = 0; y < MapHeight && !found_bed; y++) {
-		for (int x = 0; x < MapWidth && !found_bed; x++) {
-			if (room[y][x] == 'B') {
-				bed_pos = glm::vec2(x * TileSize, y * TileSize);
-				found_bed = true;
-			}
-		}
-	}
-
+	
+	patient1_tex = sprites.load(data_path("patient1.png"));
+	man1_tex = sprites.load(data_path("man1.png"));
+	woman1_tex = sprites.load(data_path("woman1.png"));
+	partition_tex = sprites.load(data_path("partition.png"));
+	cardiogram_tex = sprites.load(data_path("cardiogram.png"));
+	iv_tex = sprites.load(data_path("IV.png"));
 	desk_tex = sprites.load(data_path("desk.png"));
-	bool found_desk = false;
-	for (int y = 0; y < MapHeight && !found_desk; y++) {
-		for (int x = 0; x < MapWidth && !found_desk; x++) {			if (room[y][x] == 'T') {
-				desk_pos = glm::vec2(x * TileSize, y * TileSize);
-				found_desk = true;
+	interact_tex = sprites.load(data_path("interact.png"));
+
+	for (int y = 0; y < MapHeight; y++) {
+		for (int x = 0; x < MapWidth; x++) {
+			char c = room[y][x];
+
+			Sprites::Texture tex;
+			if (c == 'B') {
+				tex = patient1_tex;
+			} else if (c == 'M') {
+				tex = man1_tex;
+			} else if (c == 'W') {
+				tex = woman1_tex;
+			} else if (c == '|') {
+				tex = partition_tex;
+			} else if (c == 'C') {
+				tex = cardiogram_tex;
+			} else if (c == 'I') {
+				tex = iv_tex;
+			} else if (c == 'T') {
+				tex = desk_tex;
+			} else {
+				continue;
 			}
+
+			int block_left = x;
+			while (block_left > 0 && room[y][block_left - 1] == c) {
+				block_left = block_left - 1;
+			}
+			int block_bottom = y;
+			while (block_bottom > 0 && room[block_bottom - 1][x] == c) {
+				block_bottom = block_bottom - 1;
+			}
+
+			int image_w = int(tex.size.x) / int(TileSize);
+			int image_h = int(tex.size.y) / int(TileSize);
+			if ((x - block_left) % image_w != 0) {
+				continue;
+			}
+			if ((y - block_bottom) % image_h != 0) {
+				continue;
+			}
+
+			Prop prop;
+			prop.tex = tex;
+			prop.pos = glm::vec2(x * TileSize, y * TileSize);
+			props.push_back(prop);
 		}
 	}
 
@@ -152,7 +201,7 @@ bool PlayMode::tile_is_solid(int tx, int ty) {
 		return true;
 	}
 	char c = room[ty][tx];
-	if (c == '#' || c == 'B' || c == 'T' || c == '=') {
+	if (c == '#' || c == 'B' || c == 'T' || c == '=' || c == '|' || c == 'C' || c == 'I' || c == 'M' || c == 'W') {
 		return true;
 	}
 	return false;
@@ -184,6 +233,10 @@ void PlayMode::on_interact(Interactable const &thing) {
 		std::cout << "You approach the patient. (TODO: Reap / Talk choice)" << std::endl;
 	} else if (thing.name == "diary") {
 		std::cout << "You open the diary. (TODO: show diary text)" << std::endl;
+	} else if (thing.name == "father") {
+		std::cout << "You talked to the father. (TODO: tell story)" << std::endl;
+	} else if (thing.name == "nurse") {
+		std::cout << "You talked to the nurse. (TODO: tell story)" << std::endl;
 	}
 }
 
@@ -268,13 +321,14 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	float hover = 2.0f * std::sin(hover_time * 3.0f);
 	sprites.draw(reaper_tex, glm::vec2(player_at.x, player_at.y + hover), glm::vec2(ReaperSize));
-	sprites.draw(bed_tex, bed_pos, glm::vec2(bed_tex.size));
-	sprites.draw(desk_tex, desk_pos, glm::vec2(desk_tex.size));
+	for (size_t i = 0; i < props.size(); i++) {
+		sprites.draw(props[i].tex, props[i].pos, glm::vec2(props[i].tex.size));
+	}
 
 	if (nearby != -1) {
-		glm::vec4 alert_color = glm::vec4(1.0f, 0xd0 / 255.0f, 0x20 / 255.0f, 1.0f);
-		glm::vec2 alert_pos = glm::vec2(player_at.x + 6.0f, player_at.y + ReaperSize + 3.0f + hover);
-		sprites.draw(sprites.white, alert_pos, glm::vec2(4.0f, 6.0f), alert_color);
+		glm::vec2 marker_size = glm::vec2(interact_tex.size);
+		glm::vec2 marker_pos = glm::vec2(player_at.x + (ReaperSize - marker_size.x) * 0.5f, player_at.y + ReaperSize + 2.0f + hover);
+		sprites.draw(interact_tex, marker_pos, marker_size);
 	}
 
 	sprites.end(drawable_size);

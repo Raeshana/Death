@@ -42,9 +42,19 @@ struct PlayMode : Mode {
 
 	Sprites sprites;
 	Sprites::Texture reaper_tex;
-	Sprites::Texture bed_tex;
-	glm::vec2 bed_pos = glm::vec2(0.0f);
-	Sprites::Texture desk_tex;
-	glm::vec2 desk_pos = glm::vec2(0.0f);
 	Sprites::Texture floor_tex;
+	Sprites::Texture patient1_tex;
+	Sprites::Texture man1_tex;
+	Sprites::Texture woman1_tex;
+	Sprites::Texture partition_tex;
+	Sprites::Texture cardiogram_tex;
+	Sprites::Texture iv_tex;
+	Sprites::Texture desk_tex;
+	Sprites::Texture interact_tex;
+
+	struct Prop {
+		Sprites::Texture tex;
+		glm::vec2 pos;
+	};
+	std::vector<Prop> props;
 };

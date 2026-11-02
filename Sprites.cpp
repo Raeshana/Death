@@ -19,6 +19,7 @@
 
 Sprites::Sprites() {
 	program = gl_compile_program(
+		//vertex shader
 		"#version 330\n"
 		"uniform mat4 OBJECT_TO_CLIP;\n"
 		"layout(location=0) in vec2 Position;\n"
@@ -32,7 +33,7 @@ Sprites::Sprites() {
 		"	color = Color;\n"
 		"}\n"
 		,
-
+		//fragment shader
 		"#version 330\n"
 		"uniform sampler2D Tex;\n"
 		"in vec2 texCoord;\n"
@@ -46,6 +47,7 @@ Sprites::Sprites() {
 		"}\n"
 	);
 
+	// vertex buffer
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	glGenBuffers(1, &vbo);
@@ -59,6 +61,7 @@ Sprites::Sprites() {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	// white texture
 	glm::u8vec4 white_pixel = glm::u8vec4(255, 255, 255, 255);
 	glGenTextures(1, &white.id);
 	glBindTexture(GL_TEXTURE_2D, white.id);
@@ -81,6 +84,7 @@ Sprites::~Sprites() {
 	glDeleteProgram(program);
 }
 
+//load a PNG
 Sprites::Texture Sprites::load(std::string const &filename) {
 	Texture tex;
 	std::vector<glm::u8vec4> data;
@@ -99,6 +103,7 @@ Sprites::Texture Sprites::load(std::string const &filename) {
 	return tex;
 }
 
+//start a frame
 void Sprites::begin(glm::uvec2 const &drawable_size) {
 	glViewport(0, 0, drawable_size.x, drawable_size.y);
 	glClearColor(0.05f, 0.05f, 0.08f, 1.0f);
@@ -135,6 +140,7 @@ void Sprites::begin(glm::uvec2 const &drawable_size) {
 	batch_tex = 0;
 }
 
+//queue one rectangle
 void Sprites::draw(Texture const &tex, glm::vec2 pos, glm::vec2 size, glm::vec4 color, float angle) {
   //switching textures: draw everything queued
 	if (tex.id != batch_tex) {
@@ -165,6 +171,7 @@ void Sprites::draw(Texture const &tex, glm::vec2 pos, glm::vec2 size, glm::vec4 
 	batch.push_back({ tl, glm::vec2(0.0f, 1.0f), color });
 }
 
+//finish a frame
 void Sprites::end(glm::uvec2 const &drawable_size) {
 	flush();
 	batch_tex = 0;
