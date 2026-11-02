@@ -154,11 +154,11 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 		glm::u8vec4(0, 0, 0, 0) // colour
 	);
 	
-	speaker_processor.handle_curr_line("SOMEBODYY"); // idk what's going on here with the last char!!!!
+	speaker_processor.handle_curr_line("SOMEBODY\n"); // idk what's going on here with the last char!!!!
 	speaker_processor.draw_curr_line(drawable_size);
 
 	// draw hint (bottom-right)
-	hint_processor.handle_curr_line("SPACE TO CONTINUEE"); // idk what's going on here with the E
+	hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); // idk what's going on here with the E
 	hint_processor.textbox_width = FONT_SIZE*20;
 	hint_processor.textbox_height = FONT_SIZE*5;
 	hint_processor.pen_x_start = MARGIN + MARGIN/2;
