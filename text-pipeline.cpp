@@ -32,6 +32,7 @@
 
 // Referenced https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
 // Referenced https://freetype.org/freetype2/docs/tutorial/step1.html
+// Referenced PPU466.cpp from project 1 to render bitmap textures
 
 TextProcessor::TextProcessor(){
     // Abort if files not found/ not working
@@ -42,7 +43,7 @@ TextProcessor::TextProcessor(){
 
     // https://www.1001fonts.com/lower-pixel-font.html
     // credit to IrbaCreative
-	const char *fontfile = "dist/ByteBounce.ttf";
+	const char *fontfile = "dist/LowresPixel-Regular.otf";
     FT_Error error = FT_New_Face(ft_library, fontfile, 0, &ft_face);
     
     if (error) {
@@ -128,7 +129,8 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
         character.x = pen_x + pos[i].x_offset/64.0f;
         character.y = pen_y + pos[i].y_offset/64.0f;
 
-        if (character.x >= textbox_width) {
+		// really bad text wrapping attempt
+        if (character.x >= pen_x + textbox_width) {
             pen_x = pen_x_start;
             pen_y = pen_y_start - (pen_y_start/2);
         }

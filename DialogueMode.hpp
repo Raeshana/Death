@@ -59,10 +59,12 @@ struct DialogueMode : Mode {
 
 	PixelCanvas canvas;
 	TextProcessor dialogue_processor;
-	// textbox width scales with screen size
-	static constexpr float dialogue_textbox_height = 200.0f;
-    static constexpr float dialogue_pen_x_start = MARGIN;
-    static constexpr float dialogue_pen_y_start = MARGIN;
+	// textbox size scales with screen size
+	// pen position dependent on textbox
+	float textbox_width;
+	float textbox_height;
+    float dialogue_pen_x_start; 
+	float dialogue_pen_y_start;
 
 	TextProcessor hint_processor;
 	TextProcessor speaker_processor;

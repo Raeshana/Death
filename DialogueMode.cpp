@@ -3,9 +3,6 @@
 #include <iostream>
 #include <string>
 
-// Referenced https://github.com/harfbuzz/harfbuzz-tutorial/blob/master/hello-harfbuzz-freetype.c
-// Referenced https://freetype.org/freetype2/docs/tutorial/step1.html
-// Referenced PPU466.cpp from project 1 to render bitmap textures
 // Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
 
 DialogueMode::DialogueMode() {
@@ -14,19 +11,13 @@ DialogueMode::DialogueMode() {
 	inkDialogue = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
 	thread = inkDialogue->new_runner();
 
-    // can_battle = false;
+    can_battle = false;
 }
 
 DialogueMode::~DialogueMode() {
 }
 
 bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-    // if (return_to) {
-    //     auto self = shared_from_this();
-    //     Mode::set_current(std::move(return_to));
-    //     return true;
-    // }
-
 	if (evt.type == SDL_EVENT_KEY_DOWN) {
 		if (evt.key.key == SDLK_SPACE){ // process dialogue
             talk.pressed = true;
@@ -38,6 +29,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 			// no - at choice or end
 			if ( thread->can_continue() ){ 
 				curr_line = thread->getline();
+				// check for tags
 				if (thread->has_tags()){
 					std::cout << "tag avalible: " << "\n" << std::endl;
 
@@ -56,7 +48,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
                 return true;
 			}
 			else if (thread->has_choices()) { // display as 3 different choices
-				// iterate choices
+				// check for tags
 				if (thread->has_tags()){
 					std::cout << "tag avalible: " << "\n" << std::endl;
 
@@ -71,6 +63,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
                         }
 					}
 				}
+				// iterate choices
 				int id = 0;
 				for ( const ink::runtime::choice c : *thread )
 				{
@@ -81,11 +74,12 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
                 return true;
 			}
 			else { // at end
-				// this will be moved under choices
-				std::cout << "I AM IN THE ELSE\n" << can_battle << std::endl;
+				// this will be moved under the actual choices
+				// depending on tags
+				// e.g. choice 1 will end in tag "battle", triggers battle
+				// choice 2 will end in tag "acceptance", increases patient acceptance of death
 				if (can_battle) {
 					Mode::set_current(std::move(return_to));
-					std::cout << "I AM IN THE IF STATEMENT\n" << can_battle << std::endl;
 				}
 			}
 		}
@@ -124,54 +118,122 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 void DialogueMode::update(float elapsed) {
 	//reset button press counters:
 	talk.downs = 0;
+
+	// keep ghost floating
+	return_to->update(elapsed);
 }
 
-void DialogueMode::draw(glm::uvec2 const &drawable_size) {
+void DialogueMode::draw(glm::uvec2 const &drawable_size) {	
+	// draw background sprites
+	if (!can_battle) return_to->draw(drawable_size);
+
+	float textbox_x_start = MARGIN;
+	float textbox_y_start = MARGIN;
+	float textbox_x_end = textbox_x_start + drawable_size.x - 2*MARGIN;
+	float textbox_y_end = textbox_y_start + drawable_size.y/4;
+
 	// draw textbox
-	glm::mat4 OBJECT_TO_CLIP = glm::mat4(
-		glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
-		glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
-		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
-		glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
-	);
+	{
+		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f), // x
+			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f), // y
+			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), // z
+			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
+		);
 
-	DrawLines lines(OBJECT_TO_CLIP);
+		DrawLines lines(OBJECT_TO_CLIP);
 
-	lines.fill_rect(
-		glm::vec2(dialogue_pen_x_start, dialogue_pen_y_start), // min
-		glm::vec2(dialogue_pen_x_start + drawable_size.x - 2*MARGIN, 
-					dialogue_pen_y_start + dialogue_textbox_height), // max
-		glm::u8vec4(20, 20, 30, 100) // colour
-	);
+		lines.fill_rect(
+			glm::vec2(textbox_x_start, textbox_y_start), // min
+			glm::vec2(textbox_x_end, textbox_y_end), // max
+			glm::u8vec4(20, 20, 30, 255) // colour
+		);
+
+		float line_thickness = 5.0f;
+
+		// bottom line
+		lines.fill_line( 
+			glm::vec2(textbox_x_start, textbox_y_start), // point a
+			glm::vec2(textbox_x_end, textbox_y_start), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// top line
+		lines.fill_line( 
+			glm::vec2(textbox_x_start, textbox_y_end), // point a
+			glm::vec2(textbox_x_end, textbox_y_end), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// left line
+		lines.fill_line( 
+			glm::vec2(textbox_x_start, textbox_y_start), // point a
+			glm::vec2(textbox_x_start, textbox_y_end), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// right line
+		lines.fill_line( 
+			glm::vec2(textbox_x_end, textbox_y_start), // point a
+			glm::vec2(textbox_x_end, textbox_y_end), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+	}
 
 	// draw dialogue line
-	dialogue_processor.textbox_width = (float)drawable_size.x - 4*MARGIN;
-	dialogue_processor.textbox_height = dialogue_textbox_height - 2*MARGIN;
-	dialogue_processor.pen_x_start = dialogue_pen_x_start + MARGIN;
-	dialogue_processor.pen_y_start = dialogue_pen_y_start + dialogue_textbox_height - MARGIN;
+	dialogue_processor.textbox_width = textbox_x_end - textbox_x_start;
+	dialogue_processor.textbox_height = textbox_y_end - textbox_y_start;
+	dialogue_processor.pen_x_start = textbox_x_start + MARGIN;
+	dialogue_processor.pen_y_start = textbox_y_end - MARGIN;
 	dialogue_processor.draw_curr_line(drawable_size);
 
 	// draw current speaker
-	speaker_processor.pen_x_start = dialogue_pen_x_start;
-	speaker_processor.pen_y_start = dialogue_textbox_height + MARGIN;
-	speaker_processor.textbox_width = FONT_SIZE*20;
-	speaker_processor.textbox_height = FONT_SIZE*5;
+	speaker_processor.textbox_width = 10*FONT_SIZE;
+	speaker_processor.textbox_height = 2*FONT_SIZE;
+	speaker_processor.pen_x_start = textbox_x_start;
+	speaker_processor.pen_y_start = textbox_y_end;
 
-	lines.fill_rect(
-		glm::vec2(speaker_processor.pen_x_start, speaker_processor.pen_y_start), // min
-		glm::vec2(speaker_processor.pen_x_start + speaker_processor.textbox_width, 
-					speaker_processor.pen_x_start + speaker_processor.textbox_height), // max
-		glm::u8vec4(0, 0, 0, 0) // colour
-	);
+	{
+		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
+			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
+			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
+		);
+
+		DrawLines lines(OBJECT_TO_CLIP);
+
+		float speaker_x_end = speaker_processor.pen_x_start + speaker_processor.textbox_width;
+		float speaker_y_end = speaker_processor.pen_y_start + speaker_processor.textbox_height;
+
+		lines.fill_rect(
+			glm::vec2(speaker_processor.pen_x_start, speaker_processor.pen_y_start), // min
+			glm::vec2(speaker_x_end, speaker_y_end), // max
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		lines.fill_triangle(
+			glm::vec3(speaker_x_end, speaker_processor.pen_y_start, 0), // point a
+			glm::vec3(speaker_x_end + 50.0f, speaker_processor.pen_y_start, 0), // point b
+			glm::vec3(speaker_x_end, speaker_y_end, 0), // point c
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+	}
 	
+	speaker_processor.pen_x_start = textbox_x_start + MARGIN/2;
+	speaker_processor.pen_y_start = textbox_y_end + MARGIN/4;
 	speaker_processor.handle_curr_line("SOMEBODY\n"); 
 	speaker_processor.draw_curr_line(drawable_size);
 
 	// draw hint (bottom-right)
+	hint_processor.textbox_width = 10*FONT_SIZE;
+	hint_processor.textbox_height = FONT_SIZE;
+	hint_processor.pen_x_start = textbox_x_end - hint_processor.textbox_width;
+	hint_processor.pen_y_start = textbox_y_start + hint_processor.textbox_height;
 	hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); 
-	hint_processor.textbox_width = FONT_SIZE*20;
-	hint_processor.textbox_height = FONT_SIZE*5;
-	hint_processor.pen_x_start = MARGIN + MARGIN/2;
-	hint_processor.pen_y_start = MARGIN + MARGIN/2;
 	hint_processor.draw_curr_line(drawable_size);
 }

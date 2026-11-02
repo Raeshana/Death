@@ -334,19 +334,5 @@ void RoomMode::draw(glm::uvec2 const &drawable_size) {
 
 	sprites.end(drawable_size);
 
-	// soul capture --------------------------------------------------------------------------------------------
-
-	// if (capture) hint = "Soul collected in " + std::to_string(int(capture->timer)) + "s with " + std::to_string(capture->misses) + " misses.";
-	// canvas.begin(glm::vec3(0.0f));
-	// glDisable(GL_FRAMEBUFFER_SRGB);
-	// // ppu.draw(glm::uvec2(PixelCanvas::Width, PixelCanvas::Height));
-	// glEnable(GL_FRAMEBUFFER_SRGB);
-	// {
-	// 	DrawLines lines(canvas.world_to_clip());
-	// 	lines.fill_rect(glm::vec2(-PixelCanvas::Aspect, -1.0f), glm::vec2(PixelCanvas::Aspect, -0.86f), glm::u8vec4(0x10, 0x10, 0x18, 0xff));
-	// 	lines.draw_text(hint, glm::vec3(-PixelCanvas::Aspect + 0.05f, -0.97f, 0.0f), glm::vec3(0.075f, 0.0f, 0.0f), glm::vec3(0.0f, 0.075f, 0.0f), glm::u8vec4(0xff, 0xff, 0xff, 0xff));
-	// }
-	// canvas.end(drawable_size);
-
 	GL_ERRORS();
 }
