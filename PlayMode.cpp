@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include <cstring>
+#include "SoulCaptureMode.hpp"
 
 const int MapWidth = 32;
 const int MapHeight = 30;
@@ -229,14 +230,38 @@ bool PlayMode::can_move_to(glm::vec2 pos) {
 }
 
 void PlayMode::on_interact(Interactable const &thing) {
+	
+	int bay = 0;
+	if (thing.pos.x >= 16 * TileSize) {
+		bay = 1;
+	}
+
 	if (thing.name == "patient") {
 		std::cout << "You approach the patient. (TODO: Reap / Talk choice)" << std::endl;
 	} else if (thing.name == "diary") {
-		std::cout << "You open the diary. (TODO: show diary text)" << std::endl;
+		diary_read[bay] = true;
+		std::cout << "You read the diary. The patient seems calmer now." << std::endl;
 	} else if (thing.name == "father") {
 		std::cout << "You talked to the father. (TODO: tell story)" << std::endl;
 	} else if (thing.name == "nurse") {
 		std::cout << "You talked to the nurse. (TODO: tell story)" << std::endl;
+	} else if (thing.name == "patient") {
+		if (soul_taken[bay]) {
+			std::cout << "This soul has already been collected." << std::endl;
+			return;
+		}
+
+		SoulCaptureMode::Difficulty difficulty = SoulCaptureMode::hard();
+		if (diary_read[bay]) {
+			difficulty = SoulCaptureMode::normal();
+		}
+
+		std::shared_ptr< SoulCaptureMode > minigame = std::make_shared< SoulCaptureMode >(difficulty);
+		minigame->return_to = shared_from_this();
+		soul_taken[bay] = true;
+
+		reset_buttons();
+		Mode::set_current(minigame);
 	}
 }
 
@@ -332,4 +357,17 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	sprites.end(drawable_size);
+}
+
+void PlayMode::reset_buttons() {
+	left.pressed = false;
+	right.pressed = false;
+	up.pressed = false;
+	down.pressed = false;
+	interact.pressed = false;
+	left.downs = 0;
+	right.downs = 0;
+	up.downs = 0;
+	down.downs = 0;
+	interact.downs = 0;
 }

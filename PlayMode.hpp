@@ -57,4 +57,9 @@ struct PlayMode : Mode {
 		glm::vec2 pos;
 	};
 	std::vector<Prop> props;
+
+	bool diary_read[2] = { false, false };
+	bool soul_taken[2] = { false, false };
+
+	void reset_buttons();
 };
