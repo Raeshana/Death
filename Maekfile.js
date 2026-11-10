@@ -123,6 +123,12 @@ const game_objs = [
 	maek.CPP('gl_compile_program.cpp'),
 	maek.CPP('GL.cpp'),
 	maek.CPP('Sprites.cpp'),
+	maek.CPP('SoulCaptureMode.cpp'),
+	maek.CPP('PixelCanvas.cpp'),
+	maek.CPP('DrawLines.cpp'),
+	maek.CPP('ColorProgram.cpp'),
+	maek.CPP('PathFont.cpp'),
+	maek.CPP('PathFont-font.cpp'),
 ];
 
 //the '[exeFile =] LINK(objFiles, exeFileBase, [, options])' links an array of objects into an executable:
