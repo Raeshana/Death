@@ -84,23 +84,31 @@ void SoulCaptureMode::slice() {
 			sparks.emplace_back(s);
 		}
 	}
+
+	// message
+	// slice_location = glm::vec2 (slice_a.x, slice_a.y); 
+	actual_slice_pos = actual_mouse_pos;
 	message_time = 2.5f;
 	if (!check.crosses) {
-		message = "Missed the lifeline.";
+		snprintf(message_data, sizeof(message_data), "Miss\n");
 	} else if (!check.hit) {
-		message = "Off by " + std::to_string(int(glm::degrees(check.angle_error))) + " degrees.";
+		snprintf(message_data, sizeof(message_data), 
+			"Off by %s degrees\n", std::to_string(int(glm::degrees(check.angle_error))).c_str());
 	}
-	if (!check.hit && hits > 0) message += " Streak reset.";
+	if (!check.hit && hits > 0) {
+		snprintf(message_data, sizeof(message_data), " Streak reset\n");
+	} 
 
 	if (slice_check.hit) {
 		hits += 1;
 		if (hits >= HitsNeeded) {
 			captured = true;
 			burst_pending = 80;
-			message = return_to ? "Soul captured! Press Space to continue." : "Soul captured!  R: retry   1: normal   2: hard";
+			return_to ? snprintf(message_data, sizeof(message_data), "Soul captured! Press Space to continue.\n") : 
+					snprintf(message_data, sizeof(message_data), "Soul captured!  R: retry   1: normal   2: hard\n");
 		} else {
 			burst_pending = 12;
-			message = "Hit! " + std::to_string(HitsNeeded - hits) + " more to go.";
+			snprintf(message_data, sizeof(message_data), "Hit!");
 		}
 	} else {
 		misses += 1;
@@ -147,6 +155,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_MOTION) {
 		mouse = canvas.from_window(glm::vec2(evt.motion.x, evt.motion.y), window_size);
+		actual_mouse_pos = glm::vec2(evt.motion.x, evt.motion.y);
 		return true;
 	}
 
@@ -239,8 +248,9 @@ void SoulCaptureMode::spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, 
 }
 
 void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
+	// canvas --------------------------------------------------------------------------------------------
 	canvas.begin(Background);
-	float aspect = PixelCanvas::Aspect;
+	// float aspect = PixelCanvas::Aspect;
 	{
 		DrawLines lines(canvas.world_to_clip());
 
@@ -310,25 +320,85 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 			float t = s.age / SparkLifetime;
 			lines.fill_circle(s.position, s.radius * (1.0f - 0.6f * t), fade(slice_check.hit ? Green : Red, t * t), 8);
 		}
-
-		constexpr float H = 0.08f;
-		auto text = [&](std::string const &str, float y, glm::u8vec4 color) {
-			lines.draw_text(str, glm::vec3(-aspect + 0.1f, y, 0.0f), glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f), color);
-		};
-		char buf[128];
-		snprintf(buf, sizeof(buf), "%s soul  misses %u  time %.1fs", difficulty.name, misses, timer);
-		text(buf, 1.0f - 1.5f * H, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
-		snprintf(buf, sizeof(buf), "hits %u/%u", hits, HitsNeeded);
-		lines.draw_text(buf, glm::vec3(aspect - 0.1f - 0.55f * H * std::strlen(buf), 1.0f - 1.5f * H, 0.0f), glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f), streak_broken_time > 0.0f ? Red : Green);
-		if (captured || message_time > 0.0f) {
-			glm::u8vec4 color = slice_check.hit ? Green : Orange;
-			if (!captured) color = fade(color, 1.0f - message_time / 0.5f);
-			text(message, 1.0f - 3.0f * H, color);
-		}
-		//text("Cut ACROSS the yellow lifeline. Mouse moves the scythe, A/D rotate it.", -1.0f + 2.0f * H, glm::u8vec4(0xaa, 0xaa, 0xaa, 0xff));
-		//text("The blade turns green when a slice would hit: then press Space or click.", -1.0f + 0.5f * H, glm::u8vec4(0xaa, 0xaa, 0xaa, 0xff));
 	}
 
 	canvas.end(drawable_size);
+
+	// text --------------------------------------------------------------------------------------------
+
+	// use fade to make message words disappear
+
+	// constexpr float H = 0.08f;
+	// lines.draw_text(buf, glm::vec3(aspect - 0.1f - 0.55f * H * std::strlen(buf), 1.0f - 1.5f * H, 0.0f), glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f), streak_broken_time > 0.0f ? Red : Green);
+	// if (captured || message_time > 0.0f) {
+	// 	glm::u8vec4 color = slice_check.hit ? Green : Orange;
+	// 	if (!captured) color = fade(color, 1.0f - message_time / 0.5f);
+	// 	text(message, 1.0f - 3.0f * H, color);
+	// }
+	text_processor.textbox_width = 10*FONT_SIZE;
+	text_processor.textbox_height = 2*FONT_SIZE;
+
+	// instructions
+	text_processor.pen_x_start = 100.0f;
+	text_processor.pen_y_start = 100.0f;
+	text_processor.handle_curr_line("Mouse moves the scythe, A/D rotates it.\n"); 
+	text_processor.draw_curr_line(drawable_size);
+
+	text_processor.pen_y_start+= 50.0f;
+	text_processor.handle_curr_line("Hit on green: Press Space or click.\n"); 
+	text_processor.draw_curr_line(drawable_size);
+
+	// draw feedback on each slice
+	text_processor.pen_x_start = (float)actual_slice_pos.x;
+	text_processor.pen_y_start = (float)actual_slice_pos.y;
+	text_processor.handle_curr_line(message_data); 
+	text_processor.draw_curr_line(drawable_size);
+	// std::cout << "x: " << actual_slice_pos.x << " y: " << actual_slice_pos.y << std::endl;
+
+	// score
+	text_processor.textbox_width = 350.0f;
+	text_processor.textbox_height = 200.0f;
+
+	glm::uvec2 scorebox_start = glm::uvec2 (MARGIN, drawable_size.y - MARGIN);
+	glm::uvec2 scorebox_end = glm::uvec2 
+		(scorebox_start.x + text_processor.textbox_width,
+		scorebox_start.y - text_processor.textbox_height);
+
+	// score textbox
+	{
+		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f), // x
+			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f), // y
+			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), // z
+			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
+		);
+
+		DrawLines lines(OBJECT_TO_CLIP);
+
+		lines.fill_rect(
+			scorebox_start, // min
+			scorebox_end, // max
+			glm::u8vec4(20, 20, 30, 100) // colour
+		);
+	}
+
+	// score data
+	text_processor.pen_x_start = (float)scorebox_start.x + MARGIN/4;
+	text_processor.pen_y_start = (float)scorebox_start.y - MARGIN;
+
+	snprintf(score_data, sizeof(score_data), "%s\n", difficulty.name);
+	text_processor.handle_curr_line(score_data); 
+	text_processor.draw_curr_line(drawable_size);
+
+	text_processor.pen_y_start-= MARGIN;
+	snprintf(score_data, sizeof(score_data), "Misses: %u  Time Taken: %.1fs\n", misses, timer);
+	text_processor.handle_curr_line(score_data); 
+	text_processor.draw_curr_line(drawable_size);
+
+	text_processor.pen_y_start-= MARGIN;
+	snprintf(score_data, sizeof(score_data), "Hits %u/%u\n", hits, HitsNeeded);
+	text_processor.handle_curr_line(score_data); 
+	text_processor.draw_curr_line(drawable_size);
+
 	GL_ERRORS();
 }

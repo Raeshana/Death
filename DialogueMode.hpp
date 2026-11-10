@@ -32,8 +32,6 @@
 #include "PixelCanvas.hpp"
 #include "DrawLines.hpp"
 
-#define MARGIN (FONT_SIZE * 2)
-
 struct DialogueMode : Mode {
 	DialogueMode();
 	virtual ~DialogueMode();

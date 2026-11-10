@@ -26,6 +26,7 @@
 #include <vector>
 
 #define FONT_SIZE 28
+#define MARGIN (FONT_SIZE * 2)
 
 struct Character {
     std::vector<unsigned char> pixels; // width*rows bytes, tightly packed

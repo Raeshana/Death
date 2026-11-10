@@ -124,15 +124,14 @@ void DialogueMode::update(float elapsed) {
 }
 
 void DialogueMode::draw(glm::uvec2 const &drawable_size) {	
-	// draw background sprites
+	// background --------------------------------------------------------------------------------------------
 	if (!can_battle) return_to->draw(drawable_size);
 
+	// dialogue --------------------------------------------------------------------------------------------
 	float textbox_x_start = MARGIN;
 	float textbox_y_start = MARGIN;
 	float textbox_x_end = textbox_x_start + drawable_size.x - 2*MARGIN;
 	float textbox_y_end = textbox_y_start + drawable_size.y/4;
-
-	// draw textbox
 	{
 		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
 			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f), // x
@@ -183,6 +182,8 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 			glm::u8vec4(0, 0, 0, 255) // colour
 		);
 	}
+
+	// we can put all of this into one texture :3
 
 	// draw dialogue line
 	dialogue_processor.textbox_width = textbox_x_end - textbox_x_start;

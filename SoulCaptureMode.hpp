@@ -2,6 +2,7 @@
 
 #include "Mode.hpp"
 #include "PixelCanvas.hpp"
+#include "text-pipeline.hpp"
 
 #include <glm/glm.hpp>
 
@@ -13,13 +14,13 @@
 
 struct SoulCaptureMode : Mode {
 	struct Difficulty {
-		char const *name = "normal";
+		char const *name = "NORMAL MODE";
 		float lifeline_spin = 0.0f;
 		float wander_radius = 0.05f;
 		float wander_speed = 0.6f;
 	};
-	static Difficulty normal() { return Difficulty{ "normal", 0.0f, 0.05f, 0.6f }; }
-	static Difficulty hard() { return Difficulty{ "hard", 1.2f, 0.12f, 1.3f }; }
+	static Difficulty normal() { return Difficulty{ "NORMAL MODE", 0.0f, 0.05f, 0.6f }; }
+	static Difficulty hard() { return Difficulty{ "HARD MODE", 1.2f, 0.12f, 1.3f }; }
 	static constexpr float AngleTolerance = 0.2618f;
 	static constexpr uint32_t HitsNeeded = 5;
 
@@ -100,7 +101,7 @@ struct SoulCaptureMode : Mode {
 	uint32_t burst_pending = 0;
 	void spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, float spread, glm::vec2 push);
 
-	std::string message;
+	// const char *message;
 	float message_time = 0.0f;
 
 	float cooldown = 0.0f;
@@ -113,4 +114,11 @@ struct SoulCaptureMode : Mode {
 	float reach = 0.6f;
 	float rotate_speed = 3.0f;
 	float slice_cooldown = 0.4f;
+
+	// --------- text -----------
+	TextProcessor text_processor;
+	glm::uvec2 actual_mouse_pos;
+	glm::uvec2 actual_slice_pos;
+	char score_data[128];
+	char message_data[128];
 };
