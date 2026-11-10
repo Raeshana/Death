@@ -1,11 +1,15 @@
 //Mode.hpp declares the "Mode::current" static member variable, which is used to decide where event-handling, updating, and drawing events go:
 #include "Mode.hpp"
 
-//The 'PlayMode' mode plays the game:
+// The 'RoomMode' mode starts the game in a patient room:
+#include "RoomMode.hpp"
 #include "PlayMode.hpp"
 
 //For asset loading:
 #include "Load.hpp"
+
+//For sound init:
+#include "Sound.hpp"
 
 //GL.hpp will include a non-namespace-polluting set of opengl prototypes:
 #include "GL.hpp"
@@ -64,15 +68,15 @@ int main(int argc, char **argv) {
 
 	//create window:
 	Mode::window = SDL_CreateWindow(
-		"gp26 game1: remember to change your title", //TODO: remember to set a title for your game!
-		2*256 + 8, 2*240 + 8,
+		"Death", //TODO: remember to set a title for your game!
+		1280, 720, //TODO: modify window size if you'd like
 		SDL_WINDOW_OPENGL
 		| SDL_WINDOW_RESIZABLE //uncomment to allow resizing
 		| SDL_WINDOW_HIGH_PIXEL_DENSITY //uncomment for full resolution on high-DPI screens
 	);
 
 	//prevent exceedingly tiny windows when resizing:
-	SDL_SetWindowMinimumSize(Mode::window, 256, 240);
+	SDL_SetWindowMinimumSize(Mode::window,100,100);
 
 	if (!Mode::window) {
 		std::cerr << "Error creating SDL window: " << SDL_GetError() << std::endl;
@@ -99,14 +103,20 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	//Set automatic SRGB encoding if framebuffer needs it:
+	glEnable(GL_FRAMEBUFFER_SRGB);
+	
 	//Hide mouse cursor (note: showing can be useful for debugging):
 	//SDL_ShowCursor(SDL_DISABLE);
+
+	//------------ init sound --------------
+	Sound::init();
 
 	//------------ load assets --------------
 	call_load_functions();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >());
+	Mode::set_current(std::make_shared< RoomMode >());
 
 	//------------ main loop ------------
 
@@ -191,6 +201,7 @@ int main(int argc, char **argv) {
 
 
 	//------------  teardown ------------
+	Sound::shutdown();
 
 	SDL_GL_DestroyContext(context);
 	context = 0;

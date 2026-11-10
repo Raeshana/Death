@@ -21,8 +21,8 @@
 #include <iostream>
 #include <string>
 
-#define FONT_SIZE 36
-#define MARGIN (FONT_SIZE * 0.5)
+// #define FONT_SIZE 36
+// #define MARGIN (FONT_SIZE * 0.5)
 #include <string>
 
 struct PlayMode : Mode {

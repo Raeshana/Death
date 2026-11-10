@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BE65E134-FF4C-3617-99AD-61912DDD6A5E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>inkcpp_compiler</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">inkcpp_compiler.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">inkcpp_compiler</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">inkcpp_compiler.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">inkcpp_compiler</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">inkcpp_compiler.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">inkcpp_compiler</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">inkcpp_compiler.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">inkcpp_compiler</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4820;4061</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;INK_EXPOSE_JSON;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\public;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\shared\private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp_compiler/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\command.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compilation_results.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp_compiler/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\command.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compilation_results.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp_compiler/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\command.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compilation_results.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/inkcpp_compiler/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp -BC:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build --check-stamp-file C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp_compiler/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\binary_stream.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\command.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\emitter.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compilation_results.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\include\compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json.hpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\json_compiler.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\list_data.h;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.cpp;C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\inkcpp_compiler\reporter.h;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\compiler.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\binary_stream.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\json_compiler.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\emitter.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\reporter.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\binary_emitter.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\list_data.obj" />
+    <Object Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.dir\$(Configuration)\command.obj" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\ZERO_CHECK.vcxproj">
+      <Project>{AF04B5C7-0018-3E9B-B52D-7726BD443881}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\raesh\15466\15-466-f26-base4\ink\inkcpp\build\inkcpp_compiler\inkcpp_compiler_o.vcxproj">
+      <Project>{A1F499C7-6387-3E0D-9A4C-3CACC35753E1}</Project>
+      <Name>inkcpp_compiler_o</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

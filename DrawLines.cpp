@@ -200,6 +200,10 @@ DrawLines::~DrawLines() {
 
 	//reset current program to none:
 	glUseProgram(0);
+<<<<<<< HEAD
 }
 
 
+=======
+}
+>>>>>>> origin/dialogue-system

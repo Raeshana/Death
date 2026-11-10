@@ -1,0 +1,12 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/cmake_install.cmake",
+		"C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/shared/cmake_install.cmake",
+		"C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp/cmake_install.cmake",
+		"C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp_compiler/cmake_install.cmake",
+		"C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/inkcpp_cl/cmake_install.cmake",
+		"C:/Users/raesh/15466/15-466-f26-base4/ink/inkcpp/build/unreal/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

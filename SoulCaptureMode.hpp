@@ -2,6 +2,10 @@
 
 #include "Mode.hpp"
 #include "PixelCanvas.hpp"
+<<<<<<< HEAD
+=======
+#include "text-pipeline.hpp"
+>>>>>>> origin/dialogue-system
 
 #include <glm/glm.hpp>
 
@@ -11,17 +15,28 @@
 #include <string>
 #include <vector>
 
+<<<<<<< HEAD
 #include "Sprites.hpp"
 
 struct SoulCaptureMode : Mode {
 	struct Difficulty {
 		char const *name = "normal";
+=======
+struct SoulCaptureMode : Mode {
+	struct Difficulty {
+		char const *name = "NORMAL MODE";
+>>>>>>> origin/dialogue-system
 		float lifeline_spin = 0.0f;
 		float wander_radius = 0.05f;
 		float wander_speed = 0.6f;
 	};
+<<<<<<< HEAD
 	static Difficulty normal() { return Difficulty{ "normal", 0.0f, 0.05f, 0.6f }; }
 	static Difficulty hard() { return Difficulty{ "hard", 1.2f, 0.12f, 1.3f }; }
+=======
+	static Difficulty normal() { return Difficulty{ "NORMAL MODE", 0.0f, 0.05f, 0.6f }; }
+	static Difficulty hard() { return Difficulty{ "HARD MODE", 1.2f, 0.12f, 1.3f }; }
+>>>>>>> origin/dialogue-system
 	static constexpr float AngleTolerance = 0.2618f;
 	static constexpr uint32_t HitsNeeded = 5;
 
@@ -48,7 +63,11 @@ struct SoulCaptureMode : Mode {
 	std::mt19937 mt;
 
 	glm::vec2 soul_center = glm::vec2(0.0f);
+<<<<<<< HEAD
 	float soul_radius = 0.12f;
+=======
+	float soul_radius = 0.08f;
+>>>>>>> origin/dialogue-system
 	glm::vec2 soul_offset = glm::vec2(0.0f);
 	glm::vec2 soul_velocity = glm::vec2(0.0f);
 	glm::vec2 wander_phase = glm::vec2(0.0f);
@@ -102,7 +121,11 @@ struct SoulCaptureMode : Mode {
 	uint32_t burst_pending = 0;
 	void spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, float spread, glm::vec2 push);
 
+<<<<<<< HEAD
 	std::string message;
+=======
+	// const char *message;
+>>>>>>> origin/dialogue-system
 	float message_time = 0.0f;
 
 	float cooldown = 0.0f;
@@ -112,6 +135,7 @@ struct SoulCaptureMode : Mode {
 	PixelCanvas canvas;
 	std::shared_ptr< Mode > return_to;
 
+<<<<<<< HEAD
 	Sprites sprites;
 	Sprites::Texture scythe_tex;
 	Sprites::Texture soul_tex;
@@ -119,4 +143,16 @@ struct SoulCaptureMode : Mode {
 	float reach = 0.6f;
 	float rotate_speed = 3.0f;
 	float slice_cooldown = 0.4f;
+=======
+	float reach = 0.6f;
+	float rotate_speed = 3.0f;
+	float slice_cooldown = 0.4f;
+
+	// --------- text -----------
+	TextProcessor text_processor;
+	glm::uvec2 actual_mouse_pos;
+	glm::uvec2 actual_slice_pos;
+	char score_data[128];
+	char message_data[128];
+>>>>>>> origin/dialogue-system
 };

@@ -41,8 +41,12 @@ struct DrawLines {
 
 	//Finish drawing (push attribs to GPU):
 	~DrawLines();
+<<<<<<< HEAD
 
 
+=======
+	
+>>>>>>> origin/dialogue-system
 	glm::mat4 world_to_clip;
 	struct Vertex {
 		Vertex(glm::vec3 const &Position_, glm::u8vec4 const &Color_) : Position(Position_), Color(Color_) { }
@@ -52,4 +56,8 @@ struct DrawLines {
 	std::vector< Vertex > attribs;
 	std::vector< Vertex > triangle_attribs;
 
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> origin/dialogue-system
