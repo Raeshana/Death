@@ -13,26 +13,20 @@ const int MapHeight = 30;
 const float TileSize = 8.0f;
 const float ReaperSize = 16.0f;
 
-static const char *ROOM_MAP[MapHeight] = {
+static const char *ROOM_MAP_1[MapHeight] = {
 	"################################",
 	"#..............................#",
-	"#..........................WWW.#",
-	"#.........................NWWW.#",
-	"#..........................WWW.#",
+	"#...........CCBBBBII...........#",
+	"#...........CCBBBBII...........#",
+	"#...........CCBBBBII...........#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#...............P..............#",
 	"#..............................#",
-	"#....BBBB...||....||...BBBB....#",
-	"#..IIBBBBCC.||....||.IIBBBBCC..#",
-	"#..IIBBBBCC.||....||.IIBBBBCC..#",
-	"#....BBBB.P.||....||.P.BBBB....#",
-	"#..TTBBBB...||....||...BBBBTT..#",
-	"#..TTBBBB...||....||...BBBBTT..#",
-	"#..D........||....||........D..#",
-	"#...........||....||...........#",
-	"#...........||....||...........#",
-	"#MMM........||....||...........#",
-	"#MMM........||....||...........#",
-	"#MMM........||....||...........#",
-	"#.F............................#",
+	"#.....TT.......................#",
+	"#.....TT.......................#",
+	"#.....D........................#",
 	"#..............................#",
 	"#..............................#",
 	"#..............................#",
@@ -43,21 +37,173 @@ static const char *ROOM_MAP[MapHeight] = {
 	"#..............................#",
 	"#..............................#",
 	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............X...............#",
 	"###############==###############",
 };
 
-PlayMode::PlayMode() {
+static const char *ROOM_MAP_2[MapHeight] = {
+	"################################",
+	"#..............................#",
+	"#.CCBBBBII.....................#",
+	"#.CCBBBBII.....................#",
+	"#.CCBBBBII.................TT..#",
+	"#...BBBB...................TT..#",
+	"#...BBBB...................D...#",
+	"#...BBBB.......................#",
+	"#.....P........................#",
+	"#..............................#",
+	"#..............................#",
+	"#....................MMM.......#",
+	"#....................MMM.......#",
+	"#....................MMM.......#",
+	"#..............................#",
+	"#..............................#",
+	"#....................WWW.......#",
+	"#....................WWW.......#",
+	"#....................WWW.......#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............X...............#",
+	"###############==###############",
+};
+
+static const char *ROOM_MAP_3[MapHeight] = {
+	"################################",
+	"#..............................#",
+	"#...........CCBBBBII...........#",
+	"#...........CCBBBBII...........#",
+	"#...........CCBBBBII...........#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#...............P..............#",
+	"#..............................#",
+	"#.....TT.......................#",
+	"#.....TT.......................#",
+	"#.....D........................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............X...............#",
+	"###############==###############",
+};
+
+static const char *ROOM_MAP_4[MapHeight] = {
+	"################################",
+	"#..............................#",
+	"#.CCBBBBII.....................#",
+	"#.CCBBBBII.....................#",
+	"#.CCBBBBII.................TT..#",
+	"#...BBBB...................TT..#",
+	"#...BBBB...................D...#",
+	"#...BBBB.......................#",
+	"#.....P........................#",
+	"#..............................#",
+	"#..............................#",
+	"#....................MMM.......#",
+	"#....................MMM.......#",
+	"#....................MMM.......#",
+	"#..............................#",
+	"#..............................#",
+	"#....................WWW.......#",
+	"#....................WWW.......#",
+	"#....................WWW.......#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............X...............#",
+	"###############==###############",
+};
+
+static const char *ROOM_MAP_5[MapHeight] = {
+	"################################",
+	"#..............................#",
+	"#.CCBBBBII.....................#",
+	"#.CCBBBBII.....................#",
+	"#.CCBBBBII.................TT..#",
+	"#...BBBB...................TT..#",
+	"#...BBBB...................D...#",
+	"#...BBBB.......................#",
+	"#.....P........................#",
+	"#..............................#",
+	"#..............................#",
+	"#....................MMM.......#",
+	"#....................MMM.......#",
+	"#....................MMM.......#",
+	"#..............................#",
+	"#..............................#",
+	"#....................WWW.......#",
+	"#....................WWW.......#",
+	"#....................WWW.......#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............X...............#",
+	"###############==###############",
+};
+
+static const char **ROOM_MAPS[5] = {
+	ROOM_MAP_1,
+	ROOM_MAP_2,
+	ROOM_MAP_3,
+	ROOM_MAP_4,
+	ROOM_MAP_5,
+};
+
+PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
+	if (room_number < 1 || room_number > 5) {
+		throw std::runtime_error("No map for room " + std::to_string(room_number));
+	}
+	const char **room_map = ROOM_MAPS[room_number - 1];
+
 	room.resize(MapHeight);
+
 	for (int row = 0; row < MapHeight; row++) {
-		if (std::strlen(ROOM_MAP[row]) != MapWidth) {
+		if (std::strlen(room_map[row]) != MapWidth) {
 			throw std::runtime_error("ROOM_MAP row " + std::to_string(row) + " is not " + std::to_string(MapWidth) + " characters long.");
 		}
 
 		int y = MapHeight - 1 - row;
-		room[y] = ROOM_MAP[row];
+		room[y] = room_map[row];
 
 		for (int x = 0; x < MapWidth; x++) {
-			char c = ROOM_MAP[row][x];
+			char c = room_map[row][x];
 			if (c == 'P') {
 				Interactable patient;
 				patient.name = "patient";
@@ -82,13 +228,19 @@ PlayMode::PlayMode() {
 				nurse.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
 				nurse.radius = 10.0f;
 				interactables.push_back(nurse);
+			} else if (c == 'X') {
+				Interactable exit;
+				exit.name = "exit";
+				exit.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
+				exit.radius = 20.0f;
+				interactables.push_back(exit);
 			}
 		}
 	}
 
 	reaper_tex = sprites.load(data_path("reaper.png"));
 	
-	patient1_tex = sprites.load(data_path("patient1.png"));
+	patient1_tex = sprites.load(data_path("patient" + std::to_string(room_number) + ".png"));
 	man1_tex = sprites.load(data_path("man1.png"));
 	woman1_tex = sprites.load(data_path("woman1.png"));
 	partition_tex = sprites.load(data_path("partition.png"));
@@ -231,42 +383,43 @@ bool PlayMode::can_move_to(glm::vec2 pos) {
 }
 
 void PlayMode::on_interact(Interactable const &thing) {
-	
-	int bay = 0;
-	if (thing.pos.x >= 16 * TileSize) {
-		bay = 1;
-	}
-
 	if (thing.name == "patient") {
-		std::cout << "You approach the patient. (TODO: Reap / Talk choice)" << std::endl;
+		if (soul_taken) {
+			std::cout << "This soul has already been collected." << std::endl;
+			return;
+		}
+
+		std::shared_ptr< DialogueMode > dialogue = std::make_shared< DialogueMode >("prototype_script.bin");
+		dialogue->return_to = shared_from_this();
+		active_dialogue = dialogue;
+
+		reset_buttons();
+		Mode::set_current(dialogue);
 	} else if (thing.name == "diary") {
-		diary_read[bay] = true;
+		diary_read = true;
 		std::cout << "You read the diary. The patient seems calmer now." << std::endl;
 	} else if (thing.name == "father") {
 		std::cout << "You talked to the father. (TODO: tell story)" << std::endl;
 	} else if (thing.name == "nurse") {
 		std::cout << "You talked to the nurse. (TODO: tell story)" << std::endl;
-	} else if (thing.name == "patient") {
-		if (soul_taken[bay]) {
-			std::cout << "This soul has already been collected." << std::endl;
-			return;
-		}
-
-		SoulCaptureMode::Difficulty difficulty = SoulCaptureMode::hard();
-		if (diary_read[bay]) {
-			difficulty = SoulCaptureMode::normal();
-		}
-
-		std::shared_ptr< SoulCaptureMode > minigame = std::make_shared< SoulCaptureMode >(difficulty);
-		minigame->return_to = shared_from_this();
-		soul_taken[bay] = true;
-
+	} else if (thing.name == "exit") {
 		reset_buttons();
-		Mode::set_current(minigame);
+		std::shared_ptr< Mode > back = return_to;
+		Mode::set_current(back);
 	}
 }
 
 void PlayMode::update(float elapsed) {
+
+	if (active_dialogue && Mode::current.get() == this) {
+		bool battle = active_dialogue->can_battle;
+		active_dialogue.reset();
+		if (battle) {
+			start_minigame();
+			return;
+		}
+	}
+
 	hover_time = hover_time + elapsed;
 	if (hover_time > 1000.0f) {
 		hover_time = hover_time - 1000.0f;
@@ -371,4 +524,18 @@ void PlayMode::reset_buttons() {
 	up.downs = 0;
 	down.downs = 0;
 	interact.downs = 0;
+}
+
+void PlayMode::start_minigame() {
+	SoulCaptureMode::Difficulty difficulty = SoulCaptureMode::hard();
+	if (diary_read) {
+		difficulty = SoulCaptureMode::normal();
+	}
+
+	std::shared_ptr< SoulCaptureMode > minigame = std::make_shared< SoulCaptureMode >(difficulty);
+	minigame->return_to = shared_from_this();
+	soul_taken = true;
+
+	reset_buttons();
+	Mode::set_current(minigame);
 }

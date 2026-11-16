@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Mode.hpp"
 #include "Sprites.hpp"
 
@@ -20,6 +22,8 @@
 
 #include <iostream>
 #include <string>
+
+#include "DialogueMode.hpp"
 
 // #define FONT_SIZE 36
 // #define MARGIN (FONT_SIZE * 0.5)
@@ -93,8 +97,14 @@ struct PlayMode : Mode {
 	};
 	std::vector<Prop> props;
 
-	bool diary_read[2] = { false, false };
-	bool soul_taken[2] = { false, false };
+    bool diary_read = false;         
+	bool soul_taken = false;
+	std::shared_ptr< DialogueMode > active_dialogue;
+	void start_minigame();
 
 	void reset_buttons();
+
+	PlayMode(int room_number);
+	int room_number = 1;
+	std::shared_ptr< Mode > return_to;
 };
