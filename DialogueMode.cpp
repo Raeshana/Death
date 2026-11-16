@@ -65,6 +65,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 				}
 				// iterate choices
 				int id = 0;
+				(void)id;
 				for ( const ink::runtime::choice c : *thread )
 				{
 					id++;
