@@ -164,14 +164,6 @@ const game_names = [
 	maek.CPP('LitColorTextureProgram.cpp'),
 	maek.CPP('text-pipeline.cpp'),
 	maek.CPP('Sprites.cpp'),
-<<<<<<< HEAD
-	maek.CPP('SoulCaptureMode.cpp'),
-	maek.CPP('PixelCanvas.cpp'),
-	maek.CPP('DrawLines.cpp'),
-	maek.CPP('ColorProgram.cpp'),
-	maek.CPP('PathFont.cpp'),
-	maek.CPP('PathFont-font.cpp'),
-=======
 	//maek.CPP('ColorTextureProgram.cpp'),  //not used right now, but you might want it
 	maek.CPP('Sound.cpp'),
 	maek.CPP('load_wav.cpp'),
@@ -207,7 +199,6 @@ const show_scene_names = [
 
 const freetype_test_names = [
 	maek.CPP('freetype-test.cpp')
->>>>>>> origin/dialogue-system
 ];
 
 //the '[exeFile =] LINK(objFiles, exeFileBase, [, options])' links an array of objects into an executable:
