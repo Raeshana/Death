@@ -1,17 +1,29 @@
 // TAG LIST:
 // pause: stop until prompted to. 
 
+// IDEAS: 
+// can the patient talk to the player during minigame? 
+
+
+VAR speaker = "someone"
 
 VAR start_abigail = false
 VAR start_sherry = false
 VAR start_keith = false
+VAR start_person_d = false
+VAR start_person_e = false
+
+
 
 VAR complete_abigail = false
 VAR complete_sherry = false
 VAR complete_keith = false
+VAR complete_person_d = false
+VAR complete_person_e = false
+
+
 
 VAR battle_difficulty = 3
-
 
 
 Welcome to your first day on the job.
@@ -63,6 +75,17 @@ I think that you'll do just fine out there.
 Good luck.
 
 -> home
+
+=== tutorial ==
+// tutorial section 
+// have player try to capture it, they cant
+// player leaves. 
+//teaches player about recon feature
+// player uses recon 
+// player can capture.
+
+
+-> home 
 === home ===
 -> sherry
 # pause
@@ -73,6 +96,10 @@ Good luck.
         -> keith
     - start_sherry && not complete_sherry:
         -> sherry
+    - start_person_d && not complete_person_d:
+        -> person_d
+    - start_person_e && not complete_person_e:
+        -> person_e
 }
 
 
@@ -197,16 +224,120 @@ Good luck.
         * "Well - no - you're just unwell, and need help and I cannot give you that."
         - "... how persumptuous of you to think you know what I need."
         - "Just leave me be."
-    ~complete_keith = true
+    ~ complete_keith = true
     -> home
+
+
+=== person_d ===
+    ~ temp checked_diary = false
+    ~ battle_difficulty = 4
+    { checked_diary: 
+       DIARY CONTENTS:
+       I knew I shouldnt have drank and drove.
+       I deserve this.
+    }
+    * "It is time." 
+    - "Yes, it is. "
+    * "Your ."
+    - "You... are not my savior."
+    - "The way you are dressed..."
+    - "... and that ferioucios weapon..!"
+    - "You... must be Satan. God cannot look like this"
+    { checked_diary: 
+        * "success".
+            -> success
+        * weak
+            -> weak
+        * fail
+            -> fail
+        - else:
+            -> fight
+    }
+    = success
+        "success"
+        ~ battle_difficulty = 1
+        # battle 
+        -> fight
+
+    = weak
+        "weak"
+        ~ battle_difficulty = 3
+        # battle
+        -> fight
+
+        
+    = fail
+        "fail"
+        ~ battle_difficulty = 5
+        # battle
+        -> fight
     
+    = fight
+        # battle
+        ~ complete_person_d = true
+        -> home
     
     
 
-  
+=== person_e ===
+    ~ temp checked_diary = false
+    ~ battle_difficulty = 4
+    { checked_diary: 
+        I have fought a good fight, 
+        I have finished my course, 
+        I have kept the faith:
+        henceforth there is laid up for me a crown of righteousness, 
+        which the Lord, the righteous judge, 
+        shall give me at that day: 
+        and not to me only, 
+        but unto all them also that love his appearing.
+        \-- 2 Timothy 4:7-8.
+        Every day I grow more weary. 
+        It may be time for this ol' Sherry to join the rest of my friends.
+    }
+    * "It is time." 
+    - "Ahhh my Lord, my God. The Father, Son, and The Holy Spirit."
+    - "Have you come to lead me to the afterlife?"
+    * "One can say that."
+    - "You... are not my savior."
+    - "The way you are dressed..."
+    - "... and that ferioucios weapon..!"
+    - "You... must be Satan. God cannot look like this"
+    { checked_diary: 
+        * You cannot see my face, for no one may see me and live.
+            -> success
+        * The Lord may take many forms, Sherry. This is the one I choose for you.
+            -> weak
+        * I am both, yet neither, God nor Satan.
+            -> fail
+    }
+    = success
+        "Exodus 33:20... What the Lord said to Moses before he led the people to Isreal"
+        "I understand that is is you my Lord,"
+        "and that I was wrong to doubt you."
+        ~ battle_difficulty = 1
+        # battle 
+        -> fight
 
+    = weak
+        "The form for me? That is peculiar."
+        "But I shouldn't doubt God's plan..."
+        ~ battle_difficulty = 3
+        # battle
+        -> fight
+
+        
+    = fail
+        "That is absolutely sacriligious."
+        "Only a demon of Satan would conflate God and the Devil."
+        ~ battle_difficulty = 5
+        # battle
+        -> fight
     
-
+    = fight
+        # battle
+        ~ complete_person_e = true
+        -> home
 
 
 
