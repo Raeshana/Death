@@ -62,7 +62,7 @@ struct PlayMode : Mode {
 	// Story variables
 	int current_line = 0;
 
-	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
+	glm::vec2 player_at = glm::vec2(120.0f, 20.0f);
 	float hover_time = 0.0f;
 
 	std::vector<std::string> room;
@@ -90,6 +90,9 @@ struct PlayMode : Mode {
 	Sprites::Texture iv_tex;
 	Sprites::Texture desk_tex;
 	Sprites::Texture interact_tex;
+	Sprites::Texture vignette_tex;
+	Sprites::Texture light_tex;
+	std::vector< glm::vec2 > lights;
 
 	struct Prop {
 		Sprites::Texture tex;
@@ -107,4 +110,10 @@ struct PlayMode : Mode {
 	PlayMode(int room_number);
 	int room_number = 1;
 	std::shared_ptr< Mode > return_to;
+
+	float fade_out = 0.0f;
+	std::shared_ptr< Mode > leaving_to;
+	void start_leaving(std::shared_ptr< Mode > next);
+
+	float bed_center_x = 128.0f;
 };
