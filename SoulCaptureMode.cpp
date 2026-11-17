@@ -386,6 +386,7 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 		};
 		
 		glm::vec3 const grey = glm::vec3(0.67f);
+		(void)grey;
 		glm::vec3 const green = glm::vec3(Green) / 255.0f;
 		glm::vec3 const orange = glm::vec3(Orange) / 255.0f;
 
