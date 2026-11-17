@@ -8,7 +8,7 @@
 
 #include <glm/glm.hpp>
 
-#include <vector>
+#include <vector> 
 #include <deque>
 
 // text pipeline
@@ -32,10 +32,8 @@
 #include "PixelCanvas.hpp"
 #include "DrawLines.hpp"
 
-#define MARGIN (FONT_SIZE * 2)
-
 struct DialogueMode : Mode {
-	DialogueMode();
+	DialogueMode(std::string const &script_file);
 	virtual ~DialogueMode();
 
 	//functions called by main loop:

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Mode.hpp"
 #include "Sprites.hpp"
 
@@ -10,6 +12,13 @@
 #include "Sound.hpp"
 
 #include <deque>
+#include <runner.h>
+#include <choice.h>
+#include <memory.h>
+#include <compiler.h>
+
+#include "text-pipeline.hpp"
+#include "DialogueMode.hpp"
 
 // text pipeline
 #include <ft2build.h>
@@ -20,6 +29,11 @@
 
 #include <iostream>
 #include <string>
+
+#include "DialogueMode.hpp"
+#include "text-pipeline.hpp"
+#include "PixelCanvas.hpp"
+#include "DrawLines.hpp"
 
 // #define FONT_SIZE 36
 // #define MARGIN (FONT_SIZE * 0.5)
@@ -36,7 +50,9 @@ struct PlayMode : Mode {
 	static constexpr float ScreenWidth = 176.0f;
 	static constexpr float ScreenHeight = 160.0f;
 
+	//----- game state -----
 
+	//input tracking:
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
@@ -47,16 +63,6 @@ struct PlayMode : Mode {
 	
 	//camera:
 	Scene::Camera *camera = nullptr;
-
-	// Initialize library and load font face
-    FT_Library ft_library = nullptr; // handle to library
-    FT_Face ft_face = nullptr;       // handle to face object
-
-	// Create hb-ft font
-    hb_font_t *hb_font = nullptr;
-
-	// Story variables
-	int current_line = 0;
 
 	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
 	float hover_time = 0.0f;
@@ -75,11 +81,57 @@ struct PlayMode : Mode {
 	bool can_move_to(glm::vec2 pos);
 	void on_interact(Interactable const &thing);
 
+	//----- sprite things -----
 	Sprites sprites;
 	Sprites::Texture reaper_tex;
-	Sprites::Texture bed_tex;
-	glm::vec2 bed_pos = glm::vec2(0.0f);
-	Sprites::Texture desk_tex;
-	glm::vec2 desk_pos = glm::vec2(0.0f);
 	Sprites::Texture floor_tex;
+	Sprites::Texture patient1_tex;
+	Sprites::Texture man1_tex;
+	Sprites::Texture woman1_tex;
+	Sprites::Texture partition_tex;
+	Sprites::Texture cardiogram_tex;
+	Sprites::Texture iv_tex;
+	Sprites::Texture desk_tex;
+	Sprites::Texture interact_tex;
+
+	struct Prop {
+		Sprites::Texture tex;
+		glm::vec2 pos;
+	};
+	std::vector<Prop> props;
+
+    bool diary_read = false;         
+	bool soul_taken = false;
+	void start_minigame();
+
+	void reset_buttons();
+
+	PlayMode(int room_number);
+	int room_number = 1;
+	std::shared_ptr< Mode > return_to;
+
+	//----- text stuff -----
+	TextProcessor hint_processor;
+	std::shared_ptr< DialogueMode > active_dialogue;
+
+	//tags 
+    bool pause;            // pause tag
+
+	// Load ink binary story, generated from the inkCPP compiler
+	ink::runtime::story* myInk;
+
+	// Create a new thread
+	ink::runtime::runner thread;
+
+	std::string dialogue_line;
+	std::string hint_line;
+
+	bool talked_patient = false;
+
+	//----- sound stuff -----
+	//swap the background track, fading the old one out and the new one in:
+	void play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot);
+	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
+	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
+	std::shared_ptr< Sound::PlayingSample > after_soul_loop;
 };

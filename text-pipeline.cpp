@@ -192,12 +192,13 @@ void TextProcessor:: draw_curr_line(glm::uvec2 const &drawable_size){
         in vec2 texCoord;
 
         uniform sampler2D glyphTexture;
+		uniform vec3 textColor;
 
         out vec4 fragColor;
 
         void main() {
             float alpha = texture(glyphTexture, texCoord).r;
-            fragColor = vec4(1.0, 1.0, 1.0, alpha);
+            fragColor = vec4(textColor, alpha);
         }
     )";
 

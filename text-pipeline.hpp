@@ -26,6 +26,7 @@
 #include <vector>
 
 #define FONT_SIZE 28
+#define MARGIN (FONT_SIZE * 2)
 
 struct Character {
     std::vector<unsigned char> pixels; // width*rows bytes, tightly packed
@@ -54,6 +55,9 @@ struct TextProcessor {
 	float textbox_height;
     float pen_x_start;
     float pen_y_start;
+
+    // drawing colour; defaults to white so existing callers are unaffected
+    glm::vec3 color = glm::vec3(1.0f);
 
     // Freetype and Harbuff 
     FT_Library ft_library = nullptr; // handle to library

@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
+#include "HallwayMode.hpp"
 
 #ifdef _WIN32
 extern "C" { uint32_t GetACP(); }
@@ -116,8 +117,7 @@ int main(int argc, char **argv) {
 	call_load_functions();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< RoomMode >());
-
+	Mode::set_current(std::make_shared< HallwayMode >());
 	//------------ main loop ------------
 
 	//this inline function will be called whenever the window is resized,
