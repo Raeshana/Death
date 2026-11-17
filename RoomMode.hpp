@@ -68,6 +68,7 @@ struct RoomMode : Mode {
 
 	// std::string hint = "WASD+E. Read the diary first, or just reap the patient.";
 	bool read_diary = false;
+	bool soul_taken = false;
 	std::shared_ptr< SoulCaptureMode > capture;
 
 	//----- sprite stuff -----
@@ -76,11 +77,15 @@ struct RoomMode : Mode {
 	std::vector<std::string> room;
 	Sprites sprites;
 	Sprites::Texture reaper_tex;
-	Sprites::Texture bed_tex;
-	glm::vec2 bed_pos = glm::vec2(0.0f);
-	Sprites::Texture desk_tex;
-	glm::vec2 desk_pos = glm::vec2(0.0f);
 	Sprites::Texture floor_tex;
+	Sprites::Texture interact_tex;
+
+	//furniture placed from the map: one entry per image, not per tile
+	struct Prop {
+		Sprites::Texture tex;
+		glm::vec2 pos;
+	};
+	std::vector< Prop > props;
 
 	//----- text stuff -----
 	TextProcessor hint_processor;
@@ -101,6 +106,8 @@ struct RoomMode : Mode {
 	bool talked_patient = false;
 
 	//----- sound stuff -----
+	//swap the background track, fading the old one out and the new one in:
+	void play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot);
 	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
 	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
 	std::shared_ptr< Sound::PlayingSample > after_soul_loop;

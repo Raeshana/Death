@@ -21,15 +21,15 @@ static const char *ROOM_MAP[MapHeight] = {
 	"################################",
 	"#..............................#",
 	"#..............................#",
-	"#.............BBBB.............#",
-	"#...........P.BBBB.............#",
-	"#.............BBBB..TT.........#",
-	"#.............BBBB..TT.........#",
-	"#.............BBBB...D.........#",
-	"#.............BBBB.............#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
+	"#..II.BBBB.CC.||...............#",
+	"#..II.BBBB.CC.||...............#",
+	"#..II.BBBB.CC.||...............#",
+	"#.....BBBB....||...............#",
+	"#.....BBBB....||...............#",
+	"#.....BBBB....||...............#",
+	"#......P...TT..................#",
+	"#..........TT..................#",
+	"#..........D...................#",
 	"#..............................#",
 	"#..............................#",
 	"#..............................#",
@@ -51,15 +51,15 @@ static const char *ROOM_MAP[MapHeight] = {
 };
 
 Load< Sound::Sample > after_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("after_soul_loop.wav"));
+	return new Sound::Sample(data_path("Hospital_Theme.wav"));
 });
 
 Load< Sound::Sample > during_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("during_soul_loop.wav"));
+	return new Sound::Sample(data_path("soul_capture.wav"));
 });
 
 Load< Sound::Sample > before_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("before_soul_loop.wav"));
+	return new Sound::Sample(data_path("Hospital_Theme.wav"));
 });
 
 RoomMode::RoomMode() {
@@ -92,32 +92,63 @@ RoomMode::RoomMode() {
 	}
 
 	reaper_tex = sprites.load(data_path("reaper.png"));
-	bed_tex = sprites.load(data_path("bed.png"));
-	bool found_bed = false;
-		for (int y = 0; y < MapHeight && !found_bed; y++) {
-		for (int x = 0; x < MapWidth && !found_bed; x++) {
-			if (room[y][x] == 'B') {
-				bed_pos = glm::vec2(x * TileSize, y * TileSize);
-				found_bed = true;
-			}
-		}
-	}
-
-	desk_tex = sprites.load(data_path("desk.png"));
-	bool found_desk = false;
-	for (int y = 0; y < MapHeight && !found_desk; y++) {
-		for (int x = 0; x < MapWidth && !found_desk; x++) {			if (room[y][x] == 'T') {
-				desk_pos = glm::vec2(x * TileSize, y * TileSize);
-				found_desk = true;
-			}
-		}
-	}
-
 	floor_tex = sprites.load(data_path("tiles.png"));
+	interact_tex = sprites.load(data_path("interact.png"));
 
+	Sprites::Texture patient_tex = sprites.load(data_path("patient1.png"));
+	Sprites::Texture cardiogram_tex = sprites.load(data_path("cardiogram.png"));
+	Sprites::Texture iv_tex = sprites.load(data_path("IV.png"));
+	Sprites::Texture partition_tex = sprites.load(data_path("partition.png"));
+	Sprites::Texture desk_tex = sprites.load(data_path("desk.png"));
+
+	//walk the map and place one image per block of identical tiles:
+	for (int y = 0; y < MapHeight; y++) {
+		for (int x = 0; x < MapWidth; x++) {
+			char c = room[y][x];
+
+			Sprites::Texture tex;
+			if (c == 'B') {
+				tex = patient_tex;
+			} else if (c == 'C') {
+				tex = cardiogram_tex;
+			} else if (c == 'I') {
+				tex = iv_tex;
+			} else if (c == '|') {
+				tex = partition_tex;
+			} else if (c == 'T') {
+				tex = desk_tex;
+			} else {
+				continue;
+			}
+
+			int block_left = x;
+			while (block_left > 0 && room[y][block_left - 1] == c) {
+				block_left = block_left - 1;
+			}
+			int block_bottom = y;
+			while (block_bottom > 0 && room[block_bottom - 1][x] == c) {
+				block_bottom = block_bottom - 1;
+			}
+
+			int image_w = int(tex.size.x) / int(TileSize);
+			int image_h = int(tex.size.y) / int(TileSize);
+			if ((x - block_left) % image_w != 0) {
+				continue;
+			}
+			if ((y - block_bottom) % image_h != 0) {
+				continue;
+			}
+
+			Prop prop;
+			prop.tex = tex;
+			prop.pos = glm::vec2(x * TileSize, y * TileSize);
+			props.push_back(prop);
+		}
+	}
 
 	// text --------------------------------------------------------------------------------------------
 	// ink::compiler::run("test.json", "test.bin");
+	hint_line = "WASD MOVE   E INTERACT   Talk to the patient first.\n";
 	myInk = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
 	thread = myInk->new_runner();
 
@@ -180,7 +211,7 @@ bool RoomMode::tile_is_solid(int tx, int ty) {
 		return true;
 	}
 	char c = room[ty][tx];
-	if (c == '#' || c == 'B' || c == 'T' || c == '=') {
+	if (c == '#' || c == 'B' || c == 'T' || c == '=' || c == 'C' || c == 'I' || c == '|') {
 		return true;
 	}
 	return false;
@@ -207,7 +238,20 @@ bool RoomMode::can_move_to(glm::vec2 pos) {
 	return true;
 }
 
+void RoomMode::play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot) {
+	for (auto *other : { &before_soul_loop, &during_soul_loop, &after_soul_loop }) {
+		if (*other) {
+			(*other)->stop(1.0f);
+			*other = nullptr;
+		}
+	}
+	slot = Sound::loop(sample, 0.0f, 0.0f);
+	slot->set_volume(1.0f, 1.0f);
+}
+
 void RoomMode::on_interact(Interactable const &thing) {
+	if (soul_taken) return;
+
 	if (thing.name == "patient") {
 		// std::cout << "can battle room mode: " << can_battle << std::endl;
 		// interacting with patient started dialogue
@@ -224,24 +268,33 @@ void RoomMode::on_interact(Interactable const &thing) {
 		if (dialogue && dialogue->can_battle){
 			auto self = shared_from_this();
 			// loop during soul capture after stopping all sound
-			Sound::stop_all_samples();
-			Sound::loop(*during_soul_capture, 1.0f, 0.0f);
+			play_music(*during_soul_capture, during_soul_loop);
 			capture = std::make_shared< SoulCaptureMode >(read_diary ? SoulCaptureMode::normal() : SoulCaptureMode::hard());
 			capture->return_to = self;
 			Mode::set_current(capture);
-
-			// loop after soul capture after stopping all ssound
-			Sound::stop_all_samples();
-			Sound::loop(*after_soul_capture, 1.0f, 0.0f);
 		}
 		// talked_patient ? hint = "Space to capture soul" : hint = "Space to talk";
+		// hint_line = "E TO INTERACT";
 	} else if (thing.name == "diary") {
 		read_diary = true;
+		hint_line = "THE PATIENT SEEMS CALMER   GO TALK TO HIM\n";
 		// hint = "You read the diary. The patient seems calmer now.";
 	}
 }
 
 void RoomMode::update(float elapsed) {
+	//keep the music and the hint in step with what has happened:
+	if (capture && capture->captured) {
+		if (!soul_taken) {
+			soul_taken = true;
+			hint_line = "TODAY'S QUOTA IS MET.  THANK YOU FOR PLAYING.\n";
+		}
+		if (!after_soul_loop) play_music(*after_soul_capture, after_soul_loop);
+	} else if (!before_soul_loop) {
+		//the player backed out of the capture, so the ward music comes back:
+		play_music(*before_soul_capture, before_soul_loop);
+	}
+	
 	hover_time = hover_time + elapsed;
 	if (hover_time > 1000.0f) {
 		hover_time = hover_time - 1000.0f;
@@ -321,18 +374,30 @@ void RoomMode::draw(glm::uvec2 const &drawable_size) {
 		}
 	}
 
+	for (size_t i = 0; i < props.size(); i++) {
+		sprites.draw(props[i].tex, props[i].pos, glm::vec2(props[i].tex.size));
+	}
+
 	float hover = 2.0f * std::sin(hover_time * 3.0f);
 	sprites.draw(reaper_tex, glm::vec2(player_at.x, player_at.y + hover), glm::vec2(ReaperSize));
-	sprites.draw(bed_tex, bed_pos, glm::vec2(bed_tex.size));
-	sprites.draw(desk_tex, desk_pos, glm::vec2(desk_tex.size));
 
 	if (nearby != -1) {
-		glm::vec4 alert_color = glm::vec4(1.0f, 0xd0 / 255.0f, 0x20 / 255.0f, 1.0f);
-		glm::vec2 alert_pos = glm::vec2(player_at.x + 6.0f, player_at.y + ReaperSize + 3.0f + hover);
-		sprites.draw(sprites.white, alert_pos, glm::vec2(4.0f, 6.0f), alert_color);
+		glm::vec2 marker_size = glm::vec2(interact_tex.size);
+		glm::vec2 marker_pos = glm::vec2(player_at.x + (ReaperSize - marker_size.x) * 0.5f, player_at.y + ReaperSize + 2.0f + hover);
+		sprites.draw(interact_tex, marker_pos, marker_size);
 	}
 
 	sprites.end(drawable_size);
+
+	// text --------------------------------------------------------------------------------------------
+	
+	//controls hint along the bottom of the screen:
+	hint_processor.textbox_width = float(drawable_size.x);
+	hint_processor.textbox_height = FONT_SIZE;
+	hint_processor.pen_x_start = (soul_taken ? drawable_size.x * 0.5f - 11.0f * FONT_SIZE : float(FONT_SIZE));
+	hint_processor.pen_y_start = (soul_taken ? drawable_size.y * 0.5f : FONT_SIZE * 1.5f);
+	hint_processor.handle_curr_line(hint_line);
+	hint_processor.draw_curr_line(drawable_size);
 
 	GL_ERRORS();
 }

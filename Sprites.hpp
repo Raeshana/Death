@@ -30,6 +30,10 @@ struct Sprites {
 
 	void end(glm::uvec2 const &drawable_size);
 
+	//same batching, but drawing into whatever coordinate system the caller is using:
+	void begin_world(glm::mat4 const &world_to_clip);
+	void end_world();
+
 	private:
 	struct Vertex {
 		glm::vec2 pos;
@@ -46,4 +50,6 @@ struct Sprites {
 	std::vector<GLuint> loaded;
 
 	void flush();
+
+	bool snap_to_pixels = true;
 };

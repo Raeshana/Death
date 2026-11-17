@@ -142,7 +142,9 @@ void Sprites::draw(Texture const &tex, glm::vec2 pos, glm::vec2 size, glm::vec4 
 		batch_tex = tex.id;
 	}
 
-	pos = glm::floor(pos);
+	if (snap_to_pixels) {
+		pos = glm::floor(pos);
+	}
 
 	glm::vec2 center = pos + size * 0.5f;
 	glm::vec2 half = size * 0.5f;
@@ -175,6 +177,33 @@ void Sprites::end(glm::uvec2 const &drawable_size) {
 	glViewport(0, 0, drawable_size.x, drawable_size.y);
 
 	GL_ERRORS();
+}
+
+void Sprites::begin_world(glm::mat4 const &world_to_clip) {
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glUseProgram(program);
+	glUniformMatrix4fv(glGetUniformLocation(program, "OBJECT_TO_CLIP"), 1, GL_FALSE, glm::value_ptr(world_to_clip));
+	glUniform1i(glGetUniformLocation(program, "Tex"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(vao);
+
+	batch.clear();
+	batch_tex = 0;
+	snap_to_pixels = false;
+}
+
+void Sprites::end_world() {
+	flush();
+	batch_tex = 0;
+
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glDisable(GL_BLEND);
+
+	snap_to_pixels = true;
 }
 
 void Sprites::flush() {

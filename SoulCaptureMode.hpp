@@ -2,6 +2,7 @@
 
 #include "Mode.hpp"
 #include "PixelCanvas.hpp"
+#include "Sprites.hpp"
 #include "text-pipeline.hpp"
 
 #include <glm/glm.hpp>
@@ -14,14 +15,14 @@
 
 struct SoulCaptureMode : Mode {
 	struct Difficulty {
-		char const *name = "NORMAL MODE";
-		float lifeline_spin = 0.0f;
+		char const *name = "normal";
+		float lifeline_swing = 0.0f; //how far the lifeline swings to each side of its starting angle, in radians
 		float wander_radius = 0.05f;
 		float wander_speed = 0.6f;
 	};
-	static Difficulty normal() { return Difficulty{ "NORMAL MODE", 0.0f, 0.05f, 0.6f }; }
-	static Difficulty hard() { return Difficulty{ "HARD MODE", 1.2f, 0.12f, 1.3f }; }
-	static constexpr float AngleTolerance = 0.2618f;
+	static Difficulty normal() { return Difficulty{ "normal", 0.0f, 0.05f, 0.6f }; }
+	static Difficulty hard() { return Difficulty{ "hard", 0.3927f, 0.12f, 1.3f }; } //swings 22.5 degrees each way, 45 degrees in total
+	static constexpr float AngleTolerance = 0.6109f; //35 degrees
 	static constexpr uint32_t HitsNeeded = 5;
 
 	SoulCaptureMode(Difficulty const &difficulty);
@@ -47,7 +48,7 @@ struct SoulCaptureMode : Mode {
 	std::mt19937 mt;
 
 	glm::vec2 soul_center = glm::vec2(0.0f);
-	float soul_radius = 0.08f;
+	float soul_radius = 0.1f; //0.1 world units is exactly 24 canvas pixels, which is the size of soul.png
 	glm::vec2 soul_offset = glm::vec2(0.0f);
 	glm::vec2 soul_velocity = glm::vec2(0.0f);
 	glm::vec2 wander_phase = glm::vec2(0.0f);
@@ -59,6 +60,7 @@ struct SoulCaptureMode : Mode {
 	static constexpr float HomeRadius = 0.4f;
 	float keep_out_radius = 0.3f;
 	float lifeline_angle = 0.0f;
+	float lifeline_base_angle = 0.0f;
 	float lifeline_half_length = 0.25f;
 	glm::vec2 lifeline_dir() const { return glm::vec2(std::cos(lifeline_angle), std::sin(lifeline_angle)); }
 	glm::vec2 lifeline_end(float side) const { return soul_position() + side * lifeline_half_length * lifeline_dir(); }
@@ -67,10 +69,14 @@ struct SoulCaptureMode : Mode {
 	float streak_broken_time = 0.0f;
 
 	glm::vec2 mouse = glm::vec2(0.0f, -0.5f);
+	//WASD walks the scythe around, the mouse points it:
+	glm::vec2 scythe_at = glm::vec2(0.0f, -0.5f);
 	glm::vec2 pivot = glm::vec2(0.0f, -0.5f);
 	float blade_angle = 0.0f;
-	bool rotate_left = false;
-	bool rotate_right = false;
+	bool move_up = false;
+	bool move_down = false;
+	bool move_left = false;
+	bool move_right = false;
 
 	float slice_time = 10.0f;
 	static constexpr float SlashSpeed = 4.0f;
@@ -101,7 +107,7 @@ struct SoulCaptureMode : Mode {
 	uint32_t burst_pending = 0;
 	void spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, float spread, glm::vec2 push);
 
-	// const char *message;
+	std::string message;
 	float message_time = 0.0f;
 
 	float cooldown = 0.0f;
@@ -111,11 +117,17 @@ struct SoulCaptureMode : Mode {
 	PixelCanvas canvas;
 	std::shared_ptr< Mode > return_to;
 
+	TextProcessor hud;
+
+	Sprites sprites;
+	Sprites::Texture scythe_tex;
+	Sprites::Texture soul_tex;
+
 	float reach = 0.6f;
-	float rotate_speed = 3.0f;
+	float move_speed = 1.2f; //world units per second, the arena is 0.8 across its radius
 	float slice_cooldown = 0.4f;
 
-	// --------- text -----------
+	// --------- feedback text -----------
 	TextProcessor text_processor;
 	glm::uvec2 actual_mouse_pos;
 	glm::uvec2 actual_slice_pos;

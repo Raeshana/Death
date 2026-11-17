@@ -56,6 +56,9 @@ struct TextProcessor {
     float pen_x_start;
     float pen_y_start;
 
+    // drawing colour; defaults to white so existing callers are unaffected
+    glm::vec3 color = glm::vec3(1.0f);
+
     // Freetype and Harbuff 
     FT_Library ft_library = nullptr; // handle to library
     FT_Face ft_face = nullptr;       // handle to face object 
