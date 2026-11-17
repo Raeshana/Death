@@ -1,6 +1,7 @@
 #include "PlayMode.hpp"
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
+#include "Load.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -186,7 +187,20 @@ static const char **ROOM_MAPS[5] = {
 	ROOM_MAP_5,
 };
 
+Load< Sound::Sample > after_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("Hospital_Theme.wav"));
+});
+
+Load< Sound::Sample > during_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("soul_capture.wav"));
+});
+
+Load< Sound::Sample > before_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("Hospital_Theme.wav"));
+});
+
 PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
+	// sprites --------------------------------------------------------------------------------------------
 	if (room_number < 1 || room_number > 5) {
 		throw std::runtime_error("No map for room " + std::to_string(room_number));
 	}
@@ -298,6 +312,15 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	}
 
 	floor_tex = sprites.load(data_path("tiles.png"));
+
+	// text --------------------------------------------------------------------------------------------
+	// ink::compiler::run("test.json", "test.bin");
+	hint_line = "WASD MOVE   E INTERACT   Talk to the patient first.\n";
+	myInk = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
+	thread = myInk->new_runner();
+
+	// sound --------------------------------------------------------------------------------------------
+	Sound::loop(*before_soul_capture, 1.0f, 0.0f);
 }
 
 PlayMode::~PlayMode() {
@@ -382,10 +405,21 @@ bool PlayMode::can_move_to(glm::vec2 pos) {
 	return true;
 }
 
+void PlayMode::play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot) {
+	for (auto *other : { &before_soul_loop, &during_soul_loop, &after_soul_loop }) {
+		if (*other) {
+			(*other)->stop(1.0f);
+			*other = nullptr;
+		}
+	}
+	slot = Sound::loop(sample, 0.0f, 0.0f);
+	slot->set_volume(1.0f, 1.0f);
+}
+
 void PlayMode::on_interact(Interactable const &thing) {
 	if (thing.name == "patient") {
 		if (soul_taken) {
-			std::cout << "This soul has already been collected." << std::endl;
+			hint_line = "This soul has already been collected.";;
 			return;
 		}
 
@@ -395,13 +429,14 @@ void PlayMode::on_interact(Interactable const &thing) {
 
 		reset_buttons();
 		Mode::set_current(dialogue);
+
 	} else if (thing.name == "diary") {
 		diary_read = true;
-		std::cout << "You read the diary. The patient seems calmer now." << std::endl;
+		hint_line = "You read the diary. The patient seems calmer now.";
 	} else if (thing.name == "father") {
-		std::cout << "You talked to the father. (TODO: tell story)" << std::endl;
+		hint_line = "You talked to the father. (TODO: tell story)";
 	} else if (thing.name == "nurse") {
-		std::cout << "You talked to the nurse. (TODO: tell story)" << std::endl;
+		hint_line = "You talked to the nurse. (TODO: tell story)";
 	} else if (thing.name == "exit") {
 		reset_buttons();
 		std::shared_ptr< Mode > back = return_to;
@@ -411,6 +446,7 @@ void PlayMode::on_interact(Interactable const &thing) {
 
 void PlayMode::update(float elapsed) {
 
+	// change w/ patient struct to keep track of info
 	if (active_dialogue && Mode::current.get() == this) {
 		bool battle = active_dialogue->can_battle;
 		active_dialogue.reset();
@@ -476,6 +512,7 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+	// sprites --------------------------------------------------------------------------------------------
 	sprites.begin(drawable_size);
 
 	const float FloorTileSize = 32.0f;
@@ -511,6 +548,16 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	sprites.end(drawable_size);
+
+	// text --------------------------------------------------------------------------------------------
+	
+	//controls hint along the bottom of the screen:
+	hint_processor.textbox_width = float(drawable_size.x);
+	hint_processor.textbox_height = FONT_SIZE;
+	hint_processor.pen_x_start = (soul_taken ? drawable_size.x * 0.5f - 11.0f * FONT_SIZE : float(FONT_SIZE));
+	hint_processor.pen_y_start = (soul_taken ? drawable_size.y * 0.5f : FONT_SIZE * 1.5f);
+	hint_processor.handle_curr_line(hint_line);
+	hint_processor.draw_curr_line(drawable_size);
 }
 
 void PlayMode::reset_buttons() {

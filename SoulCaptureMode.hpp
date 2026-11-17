@@ -110,7 +110,6 @@ struct SoulCaptureMode : Mode {
 	void spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, float spread, glm::vec2 push);
 
 	std::string message;
-	std::string message;
 	float message_time = 0.0f;
 
 	float cooldown = 0.0f;

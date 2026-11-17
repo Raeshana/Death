@@ -8,7 +8,6 @@
 #include <cmath>
 #include <cstring>
 #include <string>
-#include "data_path.hpp"
 
 static glm::vec3 const Background = glm::vec3(0.02f, 0.02f, 0.03f);
 static glm::u8vec4 const Green = glm::u8vec4(0x44, 0xff, 0x44, 0xff);
@@ -26,9 +25,10 @@ glm::vec2 SoulCaptureMode::wander() const {
 SoulCaptureMode::SoulCaptureMode(Difficulty const &difficulty_) : difficulty(difficulty_), mt(std::random_device()()) {
 	std::uniform_real_distribution< float > turn(0.0f, 2.0f * float(M_PI));
 	wander_phase = glm::vec2(turn(mt), turn(mt));
-	lifeline_angle = 0.5f * turn(mt);
 	scythe_tex = sprites.load(data_path("scythe.png"));
 	soul_tex = sprites.load(data_path("soul.png"));
+	lifeline_base_angle = 0.5f * turn(mt);
+	lifeline_angle = lifeline_base_angle;
 }
 
 SoulCaptureMode::~SoulCaptureMode() {
@@ -94,12 +94,11 @@ void SoulCaptureMode::slice() {
 	message_time = 1.5f;
 	if (!check.crosses) {
 		message = "Missed the lifeline.";
-		message = "Missed the lifeline.";
 	} else if (!check.hit) {
 		message = "Off by " + std::to_string(int(glm::degrees(check.angle_error))) + " degrees.";
-		message = "Off by " + std::to_string(int(glm::degrees(check.angle_error))) + " degrees.";
 	}
-	if (!check.hit && hits > 0) message += " Streak reset.";
+	//a miss no longer wipes the streak, so there is nothing to announce:
+	//if (!check.hit && hits > 0) message += " Streak reset.";
 
 	if (slice_check.hit) {
 		hits += 1;
@@ -107,10 +106,8 @@ void SoulCaptureMode::slice() {
 			captured = true;
 			burst_pending = 80;
 			message = return_to ? "Soul captured! Press Space to continue." : "Soul captured!  R: retry   1: normal   2: hard";
-			message = return_to ? "Soul captured! Press Space to continue." : "Soul captured!  R: retry   1: normal   2: hard";
 		} else {
 			burst_pending = 12;
-			message = "Hit! " + std::to_string(HitsNeeded - hits) + " more to go.";
 			message = "Hit! " + std::to_string(HitsNeeded - hits) + " more to go.";
 		}
 	} else {
@@ -176,6 +173,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_MOTION) {
 		mouse = canvas.from_window(glm::vec2(evt.motion.x, evt.motion.y), window_size);
+		actual_mouse_pos = glm::vec2(evt.motion.x, evt.motion.y);
 		return true;
 	}
 
@@ -314,10 +312,6 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 			sprites.begin_world(canvas.world_to_clip());
 			sprites.draw(soul_tex, soul_position() - 0.5f * size, size);
 			sprites.end_world();
-			glm::vec2 size = glm::vec2(2.0f * soul_radius);
-			sprites.begin_world(canvas.world_to_clip());
-			sprites.draw(soul_tex, soul_position() - 0.5f * size, size);
-			sprites.end_world();
 		}
 
 		for (auto const &p : particles) {
@@ -351,7 +345,6 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 				float off = (check.angle_error - AngleTolerance) / (0.5f * float(M_PI) - AngleTolerance);
 				color = glm::u8vec4(glm::mix(glm::vec3(Orange), glm::vec3(Green), 0.7f * (1.0f - glm::clamp(off, 0.0f, 1.0f))), 0xff);
 			}
-			blade_tint = glm::vec4(glm::mix(glm::vec3(1.0f), glm::vec3(color) / 255.0f, 0.5f), 1.0f);
 			blade_tint = glm::vec4(glm::mix(glm::vec3(1.0f), glm::vec3(color) / 255.0f, 0.5f), 1.0f);
 		}
 
@@ -413,4 +406,3 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 
 	GL_ERRORS();
 }
-
