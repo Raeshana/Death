@@ -2,11 +2,8 @@
 
 #include "Mode.hpp"
 #include "PixelCanvas.hpp"
-<<<<<<< HEAD
 #include "Sprites.hpp"
 #include "text-pipeline.hpp"
-=======
->>>>>>> origin/asset-pipeline
 
 #include <glm/glm.hpp>
 
@@ -21,22 +18,13 @@
 struct SoulCaptureMode : Mode {
 	struct Difficulty {
 		char const *name = "normal";
-<<<<<<< HEAD
 		float lifeline_swing = 0.0f; //how far the lifeline swings to each side of its starting angle, in radians
-=======
-		float lifeline_spin = 0.0f;
->>>>>>> origin/asset-pipeline
 		float wander_radius = 0.05f;
 		float wander_speed = 0.6f;
 	};
 	static Difficulty normal() { return Difficulty{ "normal", 0.0f, 0.05f, 0.6f }; }
-<<<<<<< HEAD
 	static Difficulty hard() { return Difficulty{ "hard", 0.3927f, 0.12f, 1.3f }; } //swings 22.5 degrees each way, 45 degrees in total
 	static constexpr float AngleTolerance = 0.6109f; //35 degrees
-=======
-	static Difficulty hard() { return Difficulty{ "hard", 1.2f, 0.12f, 1.3f }; }
-	static constexpr float AngleTolerance = 0.2618f;
->>>>>>> origin/asset-pipeline
 	static constexpr uint32_t HitsNeeded = 5;
 
 	SoulCaptureMode(Difficulty const &difficulty);
@@ -62,11 +50,7 @@ struct SoulCaptureMode : Mode {
 	std::mt19937 mt;
 
 	glm::vec2 soul_center = glm::vec2(0.0f);
-<<<<<<< HEAD
 	float soul_radius = 0.1f; //0.1 world units is exactly 24 canvas pixels, which is the size of soul.png
-=======
-	float soul_radius = 0.12f;
->>>>>>> origin/asset-pipeline
 	glm::vec2 soul_offset = glm::vec2(0.0f);
 	glm::vec2 soul_velocity = glm::vec2(0.0f);
 	glm::vec2 wander_phase = glm::vec2(0.0f);
@@ -126,6 +110,7 @@ struct SoulCaptureMode : Mode {
 	void spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, float spread, glm::vec2 push);
 
 	std::string message;
+	std::string message;
 	float message_time = 0.0f;
 
 	float cooldown = 0.0f;
@@ -135,11 +120,8 @@ struct SoulCaptureMode : Mode {
 	PixelCanvas canvas;
 	std::shared_ptr< Mode > return_to;
 
-<<<<<<< HEAD
 	TextProcessor hud;
 
-=======
->>>>>>> origin/asset-pipeline
 	Sprites sprites;
 	Sprites::Texture scythe_tex;
 	Sprites::Texture soul_tex;
@@ -147,7 +129,6 @@ struct SoulCaptureMode : Mode {
 	float reach = 0.6f;
 	float move_speed = 1.2f; //world units per second, the arena is 0.8 across its radius
 	float slice_cooldown = 0.4f;
-<<<<<<< HEAD
 
 	// --------- feedback text -----------
 	TextProcessor text_processor;
@@ -155,6 +136,4 @@ struct SoulCaptureMode : Mode {
 	glm::uvec2 actual_slice_pos;
 	char score_data[128];
 	char message_data[128];
-=======
->>>>>>> origin/asset-pipeline
 };
