@@ -33,7 +33,7 @@
 #include "DrawLines.hpp"
 
 struct DialogueMode : Mode {
-	DialogueMode();
+	DialogueMode(std::string const &script_file);
 	virtual ~DialogueMode();
 
 	//functions called by main loop:

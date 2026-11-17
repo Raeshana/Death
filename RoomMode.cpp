@@ -258,7 +258,7 @@ void RoomMode::on_interact(Interactable const &thing) {
 		// dialogue will be handled using dialogue_started
 		if (!dialogue) {
 			auto self = shared_from_this();
-			dialogue = std::make_shared< DialogueMode >();
+			dialogue = std::make_shared< DialogueMode >("prototype_script.bin");
 			dialogue->return_to = self;
 			Mode::set_current(dialogue);
 		}

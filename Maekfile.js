@@ -93,13 +93,16 @@ if (maek.OS === "windows") {
 		`-I${NEST_LIBS}/libopus/include`,
 		`-I${NEST_LIBS}/libogg/include`,
 		`-I${NEST_LIBS}/harfbuzz/include`,
-		`-I${NEST_LIBS}/freetype/include`
+		`-I${NEST_LIBS}/freetype/include`,
+		//include paths for ink (same as the windows build):
+		`-Iink/include`,
+		`-Iink/inkcpp_compiler/include`
 	);
 	maek.options.LINKLibs.push(
 		//linker flags for nest libraries:
 		`-L${NEST_LIBS}/SDL3/lib`,  `-lSDL3`,
 		`-framework`, `OpenGL`,
- 		`-Wl,-framework,CoreMedia`,
+		`-Wl,-framework,CoreMedia`,
 		`-Wl,-framework,CoreVideo`,
 		`-Wl,-framework,Cocoa`,
 		`-Wl,-weak_framework,UniformTypeIdentifiers`,
@@ -122,7 +125,9 @@ if (maek.OS === "windows") {
 		`-L${NEST_LIBS}/libopus/lib`, `-lopus`,
 		`-L${NEST_LIBS}/libogg/lib`, `-logg`,
 		`-L${NEST_LIBS}/harfbuzz/lib`, `-lharfbuzz`,
-		`-L${NEST_LIBS}/freetype/lib`, `-lfreetype`
+		`-L${NEST_LIBS}/freetype/lib`, `-lfreetype`,
+		//ink libraries (built for mac, placed in ink/lib-macos):
+		`-Link/lib-macos`, `-linkcpp`, `-linkcpp_compiler`
 	);
 }
 //use COPY to copy a file
@@ -167,7 +172,8 @@ const game_names = [
 	//maek.CPP('ColorTextureProgram.cpp'),  //not used right now, but you might want it
 	maek.CPP('Sound.cpp'),
 	maek.CPP('load_wav.cpp'),
-	maek.CPP('load_opus.cpp')
+	maek.CPP('load_opus.cpp'),
+	maek.CPP('HallwayMode.cpp'),
 ];
 
 const common_names = [

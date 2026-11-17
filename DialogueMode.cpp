@@ -5,13 +5,12 @@
 
 // Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
 
-DialogueMode::DialogueMode() {
-	// inky
-	// ink::compiler::run("test.json", "test.bin");
-	inkDialogue = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
+
+DialogueMode::DialogueMode(std::string const &script_file) {
+	inkDialogue = ink::runtime::story::from_file(data_path(script_file).c_str());
 	thread = inkDialogue->new_runner();
 
-    can_battle = false;
+	can_battle = false;
 }
 
 DialogueMode::~DialogueMode() {
@@ -65,6 +64,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 				}
 				// iterate choices
 				int id = 0;
+				(void)id;
 				for ( const ink::runtime::choice c : *thread )
 				{
 					id++;
@@ -73,14 +73,11 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 				dialogue_processor.handle_curr_line(curr_line);
                 return true;
 			}
-			else { // at end
-				// this will be moved under the actual choices
-				// depending on tags
-				// e.g. choice 1 will end in tag "battle", triggers battle
-				// choice 2 will end in tag "acceptance", increases patient acceptance of death
-				if (can_battle) {
-					Mode::set_current(std::move(return_to));
-				}
+			else {
+				auto self = shared_from_this();
+				std::shared_ptr< Mode > back = return_to;
+				Mode::set_current(back);
+				return true;
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
