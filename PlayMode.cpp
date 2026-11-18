@@ -26,9 +26,9 @@ static const char *ROOM_MAP_1[MapHeight] = {
 	"################################",
 	"################################",
 	"#..............................#",
-	"#...........CCBBBBII...........#",
-	"#...........CCBBBBII...........#",
-	"#...........CCBBBBII...........#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
 	"#.............BBBB.............#",
 	"#.............BBBB.............#",
 	"#.............BBBB.............#",
@@ -59,9 +59,9 @@ static const char *ROOM_MAP_2[MapHeight] = {
 	"################################",
 	"################################",
 	"#..............................#",
-	"#.CCBBBBII.....................#",
-	"#.CCBBBBII.....................#",
-	"#.CCBBBBII.................TT..#",
+	"#.IIBBBBCC.....................#",
+	"#.IIBBBBCC.....................#",
+	"#.IIBBBBCC.................TT..#",
 	"#...BBBB...................TT..#",
 	"#...BBBB...................D...#",
 	"#...BBBB.......................#",
@@ -90,9 +90,9 @@ static const char *ROOM_MAP_2[MapHeight] = {
 static const char *ROOM_MAP_3[MapHeight] = {
 	"################################",
 	"#..............................#",
-	"#...........CCBBBBII...........#",
-	"#...........CCBBBBII...........#",
-	"#...........CCBBBBII...........#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
 	"#.............BBBB.............#",
 	"#.............BBBB.............#",
 	"#.............BBBB.............#",
@@ -219,6 +219,7 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 				patient.radius = 20.0f;
 				interactables.push_back(patient);
 				bed_center_x = x * TileSize;
+				soul_pos = glm::vec2(x * TileSize, y * TileSize + 36.0f);
 				lights.push_back(glm::vec2(x * TileSize, y * TileSize + 8.0f));
 
 			} else if (c == 'D') {
@@ -261,6 +262,9 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	interact_tex = sprites.load(data_path("interact.png"));
 	vignette_tex = sprites.load(data_path("vignette.png"));
 	light_tex = sprites.load(data_path("light.png"));
+	soul_tex = sprites.load(data_path("soul.png"));
+	patient_dead_tex = sprites.load(data_path("patient" + std::to_string(room_number) + "_dead.png"));
+	cardiogram_dead_tex = sprites.load(data_path("cardiogram_dead.png"));
 
 	for (int y = 0; y < MapHeight; y++) {
 		for (int x = 0; x < MapWidth; x++) {
@@ -306,6 +310,7 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 			Prop prop;
 			prop.tex = tex;
 			prop.pos = glm::vec2(x * TileSize, y * TileSize);
+			prop.kind = c;
 			props.push_back(prop);
 		}
 	}
@@ -315,6 +320,18 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	light_tex = sprites.load(data_path("light.png"));
 
 	floor_tex = sprites.load(data_path("tiles.png"));
+}
+
+Sprites::Texture PlayMode::texture_for(Prop const &prop) {
+	if (soul_taken) {
+		if (prop.kind == 'B') {
+			return patient_dead_tex;
+		}
+		if (prop.kind == 'C') {
+			return cardiogram_dead_tex;
+		}
+	}
+	return prop.tex;
 }
 
 PlayMode::~PlayMode() {
@@ -461,6 +478,10 @@ void PlayMode::update(float elapsed) {
 			std::shared_ptr< Mode > next = leaving_to;
 			leaving_to.reset();
 			fade_out = 0.0f;
+			if (soul_taking) {
+				soul_taken = true;
+				soul_taking = false;
+			}
 			Mode::set_current(next);
 		}
 		return;
@@ -530,6 +551,25 @@ void PlayMode::update(float elapsed) {
 	interact.downs = 0;
 }
 
+void PlayMode::draw_window() {
+	glm::vec4 frame_dark = glm::vec4(0x2a / 255.0f, 0x32 / 255.0f, 0x36 / 255.0f, 1.0f);
+	glm::vec4 night_sky  = glm::vec4(0x18 / 255.0f, 0x21 / 255.0f, 0x3a / 255.0f, 1.0f);
+	glm::vec4 moon_color = glm::vec4(0xd9 / 255.0f, 0xe2 / 255.0f, 0xc8 / 255.0f, 1.0f);
+	glm::vec4 star_color = glm::vec4(0x9f / 255.0f, 0xb0 / 255.0f, 0xd0 / 255.0f, 1.0f);
+	glm::vec4 sill_color = glm::vec4(0x7a / 255.0f, 0x88 / 255.0f, 0x8c / 255.0f, 1.0f);
+
+	glm::vec2 win = glm::vec2(std::floor(bed_center_x - 12.0f), 228.0f);
+	sprites.draw(sprites.white, win, glm::vec2(24.0f, 10.0f), frame_dark);
+	sprites.draw(sprites.white, win + glm::vec2(1.0f, 1.0f), glm::vec2(22.0f, 8.0f), night_sky);
+	sprites.draw(sprites.white, win + glm::vec2(16.0f, 4.0f), glm::vec2(3.0f, 3.0f), moon_color);
+	sprites.draw(sprites.white, win + glm::vec2(17.0f, 5.0f), glm::vec2(2.0f, 2.0f), night_sky);
+	sprites.draw(sprites.white, win + glm::vec2(4.0f, 6.0f), glm::vec2(1.0f, 1.0f), star_color);
+	sprites.draw(sprites.white, win + glm::vec2(8.0f, 3.0f), glm::vec2(1.0f, 1.0f), star_color);
+	sprites.draw(sprites.white, win + glm::vec2(21.0f, 2.0f), glm::vec2(1.0f, 1.0f), star_color);
+	sprites.draw(sprites.white, win + glm::vec2(11.0f, 1.0f), glm::vec2(2.0f, 8.0f), frame_dark);
+	sprites.draw(sprites.white, win + glm::vec2(-1.0f, -1.0f), glm::vec2(26.0f, 1.0f), sill_color);
+}
+
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	sprites.begin(drawable_size);
 
@@ -579,24 +619,14 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		}
 	}
 
+	if (!soul_taken) {
+		draw_window();
+	}
+
 	glm::vec4 frame_dark  = glm::vec4(0x2a / 255.0f, 0x32 / 255.0f, 0x36 / 255.0f, 1.0f);
-	glm::vec4 night_sky   = glm::vec4(0x18 / 255.0f, 0x21 / 255.0f, 0x3a / 255.0f, 1.0f);
-	glm::vec4 moon_color  = glm::vec4(0xd9 / 255.0f, 0xe2 / 255.0f, 0xc8 / 255.0f, 1.0f);
-	glm::vec4 star_color  = glm::vec4(0x9f / 255.0f, 0xb0 / 255.0f, 0xd0 / 255.0f, 1.0f);
 	glm::vec4 paper_color = glm::vec4(0xc9 / 255.0f, 0xc4 / 255.0f, 0xb4 / 255.0f, 1.0f);
 	glm::vec4 ink_color   = glm::vec4(0x7a / 255.0f, 0x74 / 255.0f, 0x66 / 255.0f, 1.0f);
 	glm::vec4 clock_face  = glm::vec4(0xd8 / 255.0f, 0xdc / 255.0f, 0xd6 / 255.0f, 1.0f);
-
-	glm::vec2 win = glm::vec2(std::floor(bed_center_x - 12.0f), 228.0f);
-	sprites.draw(sprites.white, win, glm::vec2(24.0f, 10.0f), frame_dark);
-	sprites.draw(sprites.white, win + glm::vec2(1.0f, 1.0f), glm::vec2(22.0f, 8.0f), night_sky);
-	sprites.draw(sprites.white, win + glm::vec2(16.0f, 4.0f), glm::vec2(3.0f, 3.0f), moon_color);
-	sprites.draw(sprites.white, win + glm::vec2(17.0f, 5.0f), glm::vec2(2.0f, 2.0f), night_sky);
-	sprites.draw(sprites.white, win + glm::vec2(4.0f, 6.0f), glm::vec2(1.0f, 1.0f), star_color);
-	sprites.draw(sprites.white, win + glm::vec2(8.0f, 3.0f), glm::vec2(1.0f, 1.0f), star_color);
-	sprites.draw(sprites.white, win + glm::vec2(21.0f, 2.0f), glm::vec2(1.0f, 1.0f), star_color);
-	sprites.draw(sprites.white, win + glm::vec2(11.0f, 1.0f), glm::vec2(2.0f, 8.0f), frame_dark);
-	sprites.draw(sprites.white, win + glm::vec2(-1.0f, -1.0f), glm::vec2(26.0f, 1.0f), wall_edge_color);
 
 	glm::vec2 chart = glm::vec2(std::floor(bed_center_x - 30.0f), 228.0f);
 	sprites.draw(sprites.white, chart, glm::vec2(6.0f, 9.0f), paper_color);
@@ -612,10 +642,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	sprites.draw(sprites.white, clock + glm::vec2(3.0f, 3.0f), glm::vec2(2.0f, 1.0f), frame_dark);
 
 
-	glm::vec4 light_tint = glm::vec4(1.0f, 1.0f, 1.0f, 0.35f);
-	for (size_t i = 0; i < lights.size(); i++) {
-		glm::vec2 size = glm::vec2(light_tex.size);
-		sprites.draw(light_tex, lights[i] - size * 0.5f, size, light_tint);
+	if (!soul_taken) {
+		glm::vec4 light_tint = glm::vec4(1.0f, 1.0f, 1.0f, 0.35f);
+		for (size_t i = 0; i < lights.size(); i++) {
+			glm::vec2 size = glm::vec2(light_tex.size);
+			sprites.draw(light_tex, lights[i] - size * 0.5f, size, light_tint);
+		}
 	}
 
 	float hover = 2.0f * std::sin(hover_time * 3.0f);
@@ -623,7 +655,8 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	glm::vec4 prop_shadow_color = glm::vec4(0.0f, 0.0f, 0.0f, 0.35f);
 	glm::vec2 prop_shadow_offset = glm::vec2(2.0f, -2.0f);
 	for (size_t i = 0; i < props.size(); i++) {
-		sprites.draw(props[i].tex, props[i].pos + prop_shadow_offset, glm::vec2(props[i].tex.size), prop_shadow_color);
+		Sprites::Texture t = texture_for(props[i]);
+		sprites.draw(t, props[i].pos + prop_shadow_offset, glm::vec2(t.size), prop_shadow_color);
 	}
 
 	float shadow_width = 12.0f - hover;
@@ -631,7 +664,8 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	for (size_t i = 0; i < props.size(); i++) {
 		if (props[i].pos.y >= player_at.y) {
-			sprites.draw(props[i].tex, props[i].pos, glm::vec2(props[i].tex.size));
+			Sprites::Texture t = texture_for(props[i]);
+			sprites.draw(t, props[i].pos, glm::vec2(t.size));
 		}
 	}
 
@@ -645,10 +679,36 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	glm::vec2 screen_size = glm::vec2(MapWidth * TileSize, MapHeight * TileSize);
 
+	if (soul_taken) {
+		glm::vec4 darkness = glm::vec4(0.02f, 0.03f, 0.06f, 0.45f);
+		sprites.draw(sprites.white, glm::vec2(0.0f, 0.0f), screen_size, darkness);
+	}
+
 	glm::vec4 cold_tint = glm::vec4(0.44f, 0.65f, 0.77f, 0.06f);
 	sprites.draw(sprites.white, glm::vec2(0.0f, 0.0f), screen_size, cold_tint);
 
 	sprites.draw(vignette_tex, glm::vec2(0.0f, 0.0f), screen_size);
+
+	if (soul_taken) {
+		glm::vec2 moon_size = glm::vec2(light_tex.size) * 0.5f;
+		glm::vec4 moon_tint = glm::vec4(0.6f, 0.7f, 1.0f, 0.4f);
+		sprites.draw(light_tex, glm::vec2(bed_center_x, 210.0f) - moon_size * 0.5f, moon_size, moon_tint);
+
+		draw_window();
+	}
+
+	if (!soul_taken) {
+		float pulse = 0.5f + 0.2f * std::sin(hover_time * 2.0f);
+		float bob = std::floor(1.5f * std::sin(hover_time * 1.5f));
+
+		glm::vec2 glow_size = glm::vec2(light_tex.size) * 0.2f;
+		glm::vec4 glow_tint = glm::vec4(0.56f, 0.88f, 0.84f, 0.25f + 0.25f * pulse);
+		sprites.draw(light_tex, soul_pos - glow_size * 0.5f + glm::vec2(0.0f, bob), glow_size, glow_tint);
+
+		glm::vec2 soul_size = glm::vec2(soul_tex.size) * 0.2f;
+		glm::vec4 soul_tint = glm::vec4(1.0f, 1.0f, 1.0f, 0.7f + 0.3f * pulse);
+		sprites.draw(soul_tex, soul_pos - soul_size * 0.5f + glm::vec2(0.0f, bob), soul_size, soul_tint);
+	}
 
 	if (nearby != -1) {
 		glm::vec2 marker_size = glm::vec2(interact_tex.size);
@@ -689,7 +749,7 @@ void PlayMode::start_minigame() {
 
 	std::shared_ptr< SoulCaptureMode > minigame = std::make_shared< SoulCaptureMode >(difficulty);
 	minigame->return_to = shared_from_this();
-	soul_taken = true;
+	soul_taking = true;
 
 	start_leaving(minigame);
 }

@@ -93,12 +93,19 @@ struct PlayMode : Mode {
 	Sprites::Texture vignette_tex;
 	Sprites::Texture light_tex;
 	std::vector< glm::vec2 > lights;
+	Sprites::Texture soul_tex;
+	glm::vec2 soul_pos = glm::vec2(128.0f, 200.0f);
+	Sprites::Texture patient_dead_tex;
+	Sprites::Texture cardiogram_dead_tex;
 
 	struct Prop {
 		Sprites::Texture tex;
 		glm::vec2 pos;
+		char kind = '.';
 	};
 	std::vector<Prop> props;
+	Sprites::Texture texture_for(Prop const &prop);
+	bool soul_taking = false;
 
     bool diary_read = false;         
 	bool soul_taken = false;
@@ -116,4 +123,6 @@ struct PlayMode : Mode {
 	void start_leaving(std::shared_ptr< Mode > next);
 
 	float bed_center_x = 128.0f;
+
+	void draw_window();
 };
