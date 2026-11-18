@@ -9,7 +9,6 @@
 #include "Mode.hpp"
 
 #include "Scene.hpp"
-#include "Sound.hpp"
 
 #include <deque>
 #include <runner.h>
@@ -34,6 +33,9 @@
 #include "text-pipeline.hpp"
 #include "PixelCanvas.hpp"
 #include "DrawLines.hpp"
+
+// sound
+#include "SoundManager.hpp"
 
 // #define FONT_SIZE 36
 // #define MARGIN (FONT_SIZE * 0.5)
@@ -129,9 +131,5 @@ struct PlayMode : Mode {
 	bool talked_patient = false;
 
 	//----- sound stuff -----
-	//swap the background track, fading the old one out and the new one in:
-	void play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot);
-	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
-	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
-	std::shared_ptr< Sound::PlayingSample > after_soul_loop;
+	SoundManager soundManager;
 };

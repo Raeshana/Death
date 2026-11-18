@@ -1,7 +1,6 @@
 #include "PlayMode.hpp"
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
-#include "Load.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -187,18 +186,6 @@ static const char **ROOM_MAPS[5] = {
 	ROOM_MAP_5,
 };
 
-Load< Sound::Sample > after_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("Hospital_Theme.wav"));
-});
-
-Load< Sound::Sample > during_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("soul_capture.wav"));
-});
-
-Load< Sound::Sample > before_soul_capture(LoadTagDefault, []() -> Sound::Sample const * {
-	return new Sound::Sample(data_path("Hospital_Theme.wav"));
-});
-
 PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	// sprites --------------------------------------------------------------------------------------------
 	if (room_number < 1 || room_number > 5) {
@@ -320,7 +307,7 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	thread = myInk->new_runner();
 
 	// sound --------------------------------------------------------------------------------------------
-	Sound::loop(*before_soul_capture, 1.0f, 0.0f);
+	// soundManager.play_music(soundManager.hospital_music);
 }
 
 PlayMode::~PlayMode() {
@@ -403,17 +390,6 @@ bool PlayMode::can_move_to(glm::vec2 pos) {
 		return false;
 	}
 	return true;
-}
-
-void PlayMode::play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot) {
-	for (auto *other : { &before_soul_loop, &during_soul_loop, &after_soul_loop }) {
-		if (*other) {
-			(*other)->stop(1.0f);
-			*other = nullptr;
-		}
-	}
-	slot = Sound::loop(sample, 0.0f, 0.0f);
-	slot->set_volume(1.0f, 1.0f);
 }
 
 void PlayMode::on_interact(Interactable const &thing) {
