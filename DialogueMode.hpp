@@ -57,6 +57,9 @@ struct DialogueMode : Mode {
 
 	PixelCanvas canvas;
 	TextProcessor dialogue_processor;
+	float typing_elapsed;
+	float typing_max = 2;
+
 	// textbox size scales with screen size
 	// pen position dependent on textbox
 	float textbox_width;
@@ -82,4 +85,6 @@ struct DialogueMode : Mode {
 	std::string curr_line;
 
 	std::shared_ptr< Mode > return_to;
+
+	bool is_typing = false;
 };

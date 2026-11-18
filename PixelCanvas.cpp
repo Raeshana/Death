@@ -13,7 +13,7 @@
 #include <vector>
 
 PixelCanvas::~PixelCanvas() {
-	if (framebuffer) glDeleteFramebuffers(1, &framebuffer);
+	if (framebuffer) glDeleteFramebuffers(1, &framebuffer); 
 	if (texture) glDeleteTextures(1, &texture);
 }
 
