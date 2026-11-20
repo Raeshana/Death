@@ -15,21 +15,45 @@ static glm::u8vec4 const Red = glm::u8vec4(0xff, 0x44, 0x44, 0xff);
 static glm::u8vec4 const Orange = glm::u8vec4(0xff, 0x88, 0x22, 0xff);
 static glm::u8vec4 const White = glm::vec4(0xff, 0xff, 0xff, 0xff);
 
+//a random value from -1 to 1 for every whole number x, the same every time for the same seed:
+static float noise_point(uint32_t seed, int32_t x) {
+	uint32_t h = seed ^ (uint32_t(x) * 0x9E3779B1u);
+	h ^= h >> 15; h *= 0x2C1B3C6Du;
+	h ^= h >> 12; h *= 0x297A2D39u;
+	h ^= h >> 15;
+	return float(h) / float(0xffffffffu) * 2.0f - 1.0f;
+}
+
+//a smooth random curve: random points at every whole number, joined by a Catmull-Rom
+//curve (it passes through every point). Mostly -1 to 1, sometimes a little past that:
+static float noise(uint32_t seed, float x) {
+	int32_t i = int32_t(std::floor(x));
+	float f = x - float(i);
+	float p0 = noise_point(seed, i - 1), p1 = noise_point(seed, i), p2 = noise_point(seed, i + 1), p3 = noise_point(seed, i + 2);
+	return 0.5f * (2.0f * p1 + (p2 - p0) * f + (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * f * f + (3.0f * p1 - p0 - 3.0f * p2 + p3) * f * f * f);
+}
+
 glm::vec2 SoulCaptureMode::wander() const {
-	float t = move_clock * difficulty.wander_speed;
-	glm::vec2 loop = glm::vec2(std::cos(t + wander_phase.x), std::sin(t + wander_phase.x));
-	glm::vec2 wobble = glm::vec2(std::cos(2.3f * t + wander_phase.y), std::sin(1.7f * t + wander_phase.y));
-	return difficulty.wander_radius * (loop + 0.5f * wobble) / 1.5f;
+	//0.75 here and 0.83 for the lifeline make the curves about as fast on average as
+	//sine waves at the same speed setting:
+	float t = 0.75f * move_clock * difficulty.wander_speed;
+	return difficulty.wander_radius * glm::vec2(noise(noise_seed, t), noise(noise_seed + 1, t));
 }
 
 SoulCaptureMode::Difficulty SoulCaptureMode::level(uint32_t n) {
-	Difficulty d; //every difficulty keeps the gentle soul movement unless noted, only the mechanic differs
-	if (n <= 1) {
+	Difficulty d;
+	n = std::clamp(n, 1u, Levels);
+	//each level the soul wanders further and faster, the lifeline swings wider and
+	//faster, and the cut has to be a little closer to straight across:
+	float step = float(n - 1); //0 to 4
+	d.wander_radius = 0.10f + 0.02f * step; //0.10 to 0.18, the soul is 0.1 across its radius
+	d.wander_speed = 1.0f + 0.075f * step; //1.0 to 1.3
+	d.lifeline_swing = 1.67f * (0.35f + 0.1f * step); //33 to 72 degrees to each side
+	d.swing_speed = 1.67f * (0.75f + 0.125f * step); //1.25 to 2.09
+	d.angle_tolerance = glm::radians(30.0f - 2.0f * step); //30 to 22 degrees
+	if (n == 1) {
 		d.name = "difficulty 1: pauses";
 		d.mechanic = Mechanic::Pauses;
-		//it darts around more so the sudden stops are noticeable:
-		d.wander_radius = 0.12f;
-		d.wander_speed = 1.3f;
 	} else if (n == 2) {
 		d.name = "difficulty 2: flees";
 		d.mechanic = Mechanic::Flees;
@@ -48,25 +72,13 @@ SoulCaptureMode::Difficulty SoulCaptureMode::level(uint32_t n) {
 
 SoulCaptureMode::SoulCaptureMode(Difficulty const &difficulty_) : difficulty(difficulty_), mt(std::random_device()()) {
 	std::uniform_real_distribution< float > turn(0.0f, 2.0f * float(M_PI));
-	std::uniform_real_distribution< float > unit(0.0f, 1.0f);
-	wander_phase = glm::vec2(turn(mt), turn(mt));
+	noise_seed = mt();
 	scythe_tex = sprites.load(data_path("scythe.png"));
 	soul_tex = sprites.load(data_path("soul.png"));
 	lifeline_base_angle = 0.5f * turn(mt);
 	lifeline_angle = lifeline_base_angle;
 
-	if (difficulty.mechanic == Mechanic::Planks) {
-		//three planks around the ring between the soul's home area and the arena edge,
-		//lying roughly along the circle so they block cuts from that side:
-		float start = turn(mt);
-		for (uint32_t i = 0; i < 3; ++i) {
-			float angle = start + i * 2.0f * float(M_PI) / 3.0f + 0.4f * (unit(mt) - 0.5f);
-			glm::vec2 center = glm::mix(0.5f, 0.65f, unit(mt)) * glm::vec2(std::cos(angle), std::sin(angle));
-			float tilt = angle + 0.5f * float(M_PI) + 0.6f * (unit(mt) - 0.5f);
-			glm::vec2 half = 0.195f * glm::vec2(std::cos(tilt), std::sin(tilt));
-			planks.emplace_back(Plank{ center - half, center + half });
-		}
-	}
+	if (difficulty.mechanic == Mechanic::Planks) place_planks();
 }
 
 SoulCaptureMode::~SoulCaptureMode() {
@@ -79,6 +91,8 @@ void SoulCaptureMode::restart(Difficulty const &difficulty_) {
 	next->blade_angle = blade_angle;
 	next->canvas.rect = canvas.rect;
 	next->return_to = return_to;
+	//the planks were placed for the default scythe spot, place them again for this one:
+	if (next->difficulty.mechanic == Mechanic::Planks) next->place_planks();
 	Mode::set_current(next);
 }
 
@@ -90,6 +104,39 @@ static bool segments_cross(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d, f
 	if (!(side_a * side_b < 0.0f && side(c, a, b) * side(d, a, b) < 0.0f)) return false;
 	*t = side_a / (side_a - side_b);
 	return true;
+}
+
+static float segment_distance(glm::vec2 p, glm::vec2 a, glm::vec2 b) {
+	float t = glm::clamp(glm::dot(p - a, b - a) / glm::dot(b - a, b - a), 0.0f, 1.0f);
+	return glm::length(p - (a + t * (b - a)));
+}
+
+void SoulCaptureMode::place_planks() {
+	planks.clear();
+	std::uniform_real_distribution< float > unit(0.0f, 1.0f);
+	glm::vec2 to_scythe = scythe_at - soul_center;
+	float toward_scythe = std::atan2(to_scythe.y, to_scythe.x);
+	for (uint32_t i = 0; i < PlankCount; ++i) {
+		for (uint32_t attempt = 0; attempt < 50; ++attempt) {
+			//the first plank tries to sit between the soul and the scythe, the rest go anywhere around:
+			float angle = (i == 0 && attempt < 25) ? toward_scythe + 0.4f * (unit(mt) - 0.5f) : 2.0f * float(M_PI) * unit(mt);
+			glm::vec2 center = soul_center + glm::mix(PlankNear, PlankFar, unit(mt)) * glm::vec2(std::cos(angle), std::sin(angle));
+			//lying roughly along the circle around the soul, so it blocks cuts from that side:
+			float tilt = angle + 0.5f * float(M_PI) + 0.6f * (unit(mt) - 0.5f);
+			glm::vec2 half = PlankHalfLength * glm::vec2(std::cos(tilt), std::sin(tilt));
+			Plank p{ center - half, center + half };
+			//inside the arena, not on top of the scythe, not piled on another plank:
+			bool ok = glm::length(p.a) < ArenaRadius && glm::length(p.b) < ArenaRadius
+				&& segment_distance(scythe_at, p.a, p.b) > 0.15f;
+			for (Plank const &q : planks) {
+				if (glm::length(0.5f * (q.a + q.b) - center) < 0.25f) ok = false;
+			}
+			if (ok) {
+				planks.emplace_back(p);
+				break;
+			}
+		}
+	}
 }
 
 SoulCaptureMode::SliceCheck SoulCaptureMode::check_slice(glm::vec2 a, glm::vec2 b) const {
@@ -109,7 +156,7 @@ SoulCaptureMode::SliceCheck SoulCaptureMode::check_slice(glm::vec2 a, glm::vec2 
 	float angle = std::acos(std::min(1.0f, std::abs(glm::dot(glm::normalize(b - a), lifeline_dir()))));
 	ret.angle_error = 0.5f * float(M_PI) - angle;
 	ret.shielded = shielded();
-	ret.hit = ret.crosses && ret.angle_error < AngleTolerance && !ret.shielded;
+	ret.hit = ret.crosses && ret.angle_error < difficulty.angle_tolerance && !ret.shielded;
 	return ret;
 }
 
@@ -193,7 +240,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 		} else if (evt.key.key == SDLK_S) {
 			move_down = true;
 			return true;
-		} else if (evt.key.key == SDLK_SPACE) {
+		} else if (evt.key.key == SDLK_SPACE || evt.key.key == SDLK_E) { //E like interacting in the ward
 			slice();
 			return true;
 		} else if (evt.key.key == SDLK_ESCAPE && return_to && !captured) {
@@ -245,7 +292,28 @@ void SoulCaptureMode::update(float elapsed) {
 		if (move_right) move.x += 1.0f;
 		if (move_down) move.y -= 1.0f;
 		if (move_up) move.y += 1.0f;
-		if (move != glm::vec2(0.0f)) scythe_at += glm::normalize(move) * move_speed * elapsed;
+		if (move != glm::vec2(0.0f)) {
+			glm::vec2 step = glm::normalize(move) * move_speed * elapsed;
+			//planks stop the scythe: no stepping across one or closer up to it
+			//(moving away is always fine, so it can't get stuck if it starts too close):
+			auto blocker = [&](glm::vec2 to) -> Plank const * {
+				for (Plank const &p : planks) {
+					float t = 0.0f;
+					if (segments_cross(scythe_at, to, p.a, p.b, &t)) return &p;
+					float d = segment_distance(to, p.a, p.b);
+					if (d < PlankReach && d < segment_distance(scythe_at, p.a, p.b) - 1e-5f) return &p;
+				}
+				return nullptr;
+			};
+			if (Plank const *hit = blocker(scythe_at + step)) {
+				//slide along the plank: keep only the part of the step that runs along it
+				glm::vec2 along = glm::normalize(hit->b - hit->a);
+				glm::vec2 slide = glm::dot(step, along) * along;
+				if (!blocker(scythe_at + slide)) scythe_at += slide;
+			} else {
+				scythe_at += step;
+			}
+		}
 		if (glm::length(scythe_at) > ArenaRadius) scythe_at = ArenaRadius * glm::normalize(scythe_at);
 	}
 
@@ -293,6 +361,7 @@ void SoulCaptureMode::update(float elapsed) {
 		soul_offset -= home - soul_center;
 		soul_center = home;
 		move_pending = false;
+		if (difficulty.mechanic == Mechanic::Planks) place_planks();
 	}
 
 	pivot = scythe_at;
@@ -361,8 +430,11 @@ void SoulCaptureMode::update(float elapsed) {
 
 	if (!captured) {
 		timer += elapsed;
-		//swing around the starting angle by a fixed amount instead of drifting away from it:
-		lifeline_angle = lifeline_base_angle + difficulty.lifeline_swing * std::sin(0.9f * move_clock + wander_phase.x);
+		//swing around the starting angle instead of drifting away from it, following a
+		//smooth random curve like the soul's wander, so it speeds up, slows down and
+		//turns back at random instead of ticking like a metronome:
+		float t = 0.83f * difficulty.swing_speed * move_clock;
+		lifeline_angle = lifeline_base_angle + difficulty.lifeline_swing * noise(noise_seed + 2, t);
 	}
 }
 
@@ -466,7 +538,7 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 			else if (check.crosses && check.shielded) color = Orange;
 			else if (check.hit) color = Green;
 			else if (check.crosses) {
-				float off = (check.angle_error - AngleTolerance) / (0.5f * float(M_PI) - AngleTolerance);
+				float off = (check.angle_error - difficulty.angle_tolerance) / (0.5f * float(M_PI) - difficulty.angle_tolerance);
 				color = glm::u8vec4(glm::mix(glm::vec3(Orange), glm::vec3(Green), 0.7f * (1.0f - glm::clamp(off, 0.0f, 1.0f))), 0xff);
 			}
 			blade_tint = glm::vec4(glm::mix(glm::vec3(1.0f), glm::vec3(color) / 255.0f, 0.5f), 1.0f);
@@ -544,7 +616,7 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 
 		static char const *const help[4] = {
 			"Cut ACROSS the blue lifeline.",
-			"WASD moves, mouse aims, Space cuts.",
+			"WASD moves, mouse aims, Space or E cuts.",
 			"Try exploring the room if it's too hard!",
 			"Esc steps back into the ward.",
 		};

@@ -17,13 +17,17 @@
 #include "Sprites.hpp"
 
 struct SoulCaptureMode : Mode {
-	//for playtesting, every difficulty adds one mechanic to the same soul and lifeline:
+	//for playtesting, every difficulty adds one mechanic, and the soul moves and the
+	//lifeline turns a bit more with every level. The mechanics are ordered roughly
+	//from easiest to hardest:
 	enum class Mechanic { None, Pauses, Flees, Shield, Planks, Mends };
 	struct Difficulty {
 		char const *name = "normal";
 		float lifeline_swing = 0.0f; //how far the lifeline swings to each side of its starting angle, in radians
+		float swing_speed = 0.9f; //how fast it swings back and forth
 		float wander_radius = 0.05f;
 		float wander_speed = 0.6f;
+		float angle_tolerance = 0.6109f; //how far from straight across a cut may be, in radians (0.6109 is 35 degrees)
 		Mechanic mechanic = Mechanic::None;
 	};
 	static constexpr uint32_t Levels = 5;
@@ -31,7 +35,6 @@ struct SoulCaptureMode : Mode {
 	//PlayMode asks for these two: normal after reading the diary, hard otherwise
 	static Difficulty normal() { return level(1); }
 	static Difficulty hard() { return level(3); }
-	static constexpr float AngleTolerance = 0.6109f; //35 degrees
 	static constexpr uint32_t HitsNeeded = 5;
 
 	SoulCaptureMode(Difficulty const &difficulty);
@@ -62,7 +65,7 @@ struct SoulCaptureMode : Mode {
 	float soul_radius = 0.1f; //0.1 world units is exactly 24 canvas pixels, which is the size of soul.png
 	glm::vec2 soul_offset = glm::vec2(0.0f);
 	glm::vec2 soul_velocity = glm::vec2(0.0f);
-	glm::vec2 wander_phase = glm::vec2(0.0f);
+	uint32_t noise_seed = 0; //picks the random curves the soul wanders and the lifeline swings along
 	float clock = 0.0f;
 	//drives the soul's wandering and the lifeline's swing; stops while the soul pauses:
 	float move_clock = 0.0f;
@@ -152,16 +155,23 @@ struct SoulCaptureMode : Mode {
 	float pause_left = 0.0f, next_pause = 2.0f;
 	//---- difficulty 2: the soul slowly backs away from the scythe ----
 	static constexpr float FleeRadius = 0.9f; //starts backing away when the scythe is this close
-	static constexpr float FleeSpeed = 0.5f; //world units per second when the scythe is right on it
+	static constexpr float FleeSpeed = 0.8f; //world units per second when the scythe is right on it
 	//---- difficulty 3: the soul is shielded for ShieldSeconds out of every ShieldPeriod ----
-	static constexpr float ShieldPeriod = 5.0f, ShieldSeconds = 2.0f;
+	static constexpr float ShieldPeriod = 5.0f, ShieldSeconds = 2.5f;
 	bool shielded() const { return difficulty.mechanic == Mechanic::Shield && !captured && std::fmod(clock, ShieldPeriod) > ShieldPeriod - ShieldSeconds; }
-	//---- difficulty 4: planks that stop the blade (but not the scythe walking) ----
+	//---- difficulty 4: planks that stop the blade, and the scythe walking into them ----
+	//they are placed again around the soul every time it moves, in the ring the blade
+	//has to pass through, and one of them goes between the soul and the scythe:
 	struct Plank { glm::vec2 a, b; };
 	std::vector< Plank > planks;
+	void place_planks();
+	static constexpr uint32_t PlankCount = 3;
+	static constexpr float PlankNear = 0.3f, PlankFar = 0.45f; //distance from the soul's resting spot
+	static constexpr float PlankHalfLength = 0.195f;
 	static constexpr float PlankWidth = 0.03f;
+	static constexpr float PlankReach = 0.03f; //how close the scythe's handle can walk up to a plank
 	//---- difficulty 5: the soul mends one hit for every MendSeconds without a new hit ----
-	static constexpr float MendSeconds = 4.0f;
+	static constexpr float MendSeconds = 3.0f;
 	float mend_clock = 0.0f;
 
 	PixelCanvas canvas;
