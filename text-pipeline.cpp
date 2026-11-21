@@ -150,7 +150,227 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
     hb_buffer_destroy(hb_buffer);
 }
 
-void TextProcessor:: draw_curr_line(glm::uvec2 const &drawable_size){
+void TextProcessor::draw_textbox(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size){
+	{
+		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f), // x
+			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f), // y
+			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), // z
+			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
+		);
+
+		DrawLines lines(OBJECT_TO_CLIP);
+
+		lines.fill_rect(
+			glm::vec2(textbox_x_start, textbox_y_start), // min
+			glm::vec2(textbox_x_end, textbox_y_end), // max
+			glm::u8vec4(20, 20, 30, 255) // colour
+		);
+
+		float line_thickness = 5.0f;
+
+		// bottom line
+		lines.fill_line( 
+			glm::vec2(textbox_x_start, textbox_y_start), // point a
+			glm::vec2(textbox_x_end, textbox_y_start), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// top line
+		lines.fill_line( 
+			glm::vec2(textbox_x_start, textbox_y_end), // point a
+			glm::vec2(textbox_x_end, textbox_y_end), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// left line
+		lines.fill_line( 
+			glm::vec2(textbox_x_start, textbox_y_start), // point a
+			glm::vec2(textbox_x_start, textbox_y_end), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// right line
+		lines.fill_line( 
+			glm::vec2(textbox_x_end, textbox_y_start), // point a
+			glm::vec2(textbox_x_end, textbox_y_end), // point b
+			line_thickness, // width
+			glm::u8vec4(0, 0, 0, 255) // colour
+		);
+
+		// lines.fill_rect(
+		// 	glm::vec2(textbox_x_start, textbox_y_start), // min
+		// 	glm::vec2(textbox_x_end, textbox_y_end), // max
+		// 	glm::u8vec4(0, 0, 0, 255) // colour
+		// );
+
+		// lines.fill_triangle(
+		// 	glm::vec3(speaker_x_end, speaker_processor.pen_y_start, 0), // point a
+		// 	glm::vec3(speaker_x_end + 50.0f, speaker_processor.pen_y_start, 0), // point b
+		// 	glm::vec3(speaker_x_end, speaker_y_end, 0), // point c
+		// 	glm::u8vec4(0, 0, 0, 255) // colour
+		// );
+	}
+}
+
+void TextProcessor::reset_line(glm::uvec2 const &window_size){
+	// Line texture
+	glGenTextures(1, &curr_line.tex);
+	glBindTexture(GL_TEXTURE_2D, curr_line.tex);
+
+	// Freetype's bitmap is one byte per pixel
+	// Keep in mind: 1 alpha channel
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	//passing 'nullptr' to TexImage says "allocate memory but don't store anything there":
+	// (textures will be uploaded later)
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, window_size.x, window_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	//make the texture have sharp pixels when magnified:
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//when access past the edge, clamp to the edge:
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// other Line vars
+	curr_line.is_typing = false;
+	curr_line.char_num = 0;
+	curr_line.typing_elapsed = 0;
+
+	// Line framebuffer
+	// Ref https://learnopengl.com/Advanced-OpenGL/Framebuffers
+	glGenFramebuffers(1, &curr_line.fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, curr_line.fbo);
+
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER,
+		GL_COLOR_ATTACHMENT0,
+		GL_TEXTURE_2D,
+		curr_line.tex,
+		0
+	);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    	std::cout << "Framebuffer is not complete!" << std::endl;
+	}
+
+	// clear texture
+	glViewport(0, 0, window_size.x, window_size.y);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+/// @brief Create text typing effect
+/// @param elapsed 
+void TextProcessor::draw_curr_line(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size){
+
+	if (curr_line.typing_elapsed > curr_line.typing_max &&
+		!curr_line.characters.empty() &&
+		curr_line.char_num < curr_line.characters.size()) {
+
+			// fbo
+			glBindFramebuffer(GL_FRAMEBUFFER, curr_line.fbo);
+
+			// if first character, then draw textbox
+			if (curr_line.char_num == 0) {
+				draw_textbox(textbox_x_start, textbox_y_start, textbox_x_end, textbox_y_end, drawable_size);
+			}
+			draw_curr_character(drawable_size);
+			curr_line.char_num++; // increment char num
+			curr_line.typing_elapsed = 0; // reset timer
+
+			// unbind fbo/ set drwaing back to screen
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	// draw the line to the screen
+	// code adapted from PixelCanvas commit dba4374 (Deming)
+	if (curr_line.tex == 0) return;
+
+	//one shader and one quad buffer shared by all text, made on first use:
+	static GLuint program = 0, vertex_array = 0, vertex_buffer = 0;
+	static GLint to_clip_loc = -1, image_loc = -1;
+	if (program == 0) {
+		program = gl_compile_program(
+			"#version 330\n"
+			"uniform mat4 TO_CLIP;\n"
+			"in vec2 Position;\n"
+			"in vec2 TexCoord;\n"
+			"out vec2 texCoord;\n"
+			"void main() {\n"
+			"	gl_Position = TO_CLIP * vec4(Position, 0.0, 1.0);\n"
+			"	texCoord = TexCoord;\n"
+			"}\n",
+			"#version 330\n"
+			"uniform sampler2D IMAGE;\n"
+			"in vec2 texCoord;\n"
+			"out vec4 fragColor;\n"
+			"void main() {\n"
+			"	fragColor = texture(IMAGE, texCoord);\n"
+			"}\n"
+		);
+		to_clip_loc = glGetUniformLocation(program, "TO_CLIP");
+		image_loc = glGetUniformLocation(program, "IMAGE");
+		GLint position_loc = glGetAttribLocation(program, "Position");
+		GLint texcoord_loc = glGetAttribLocation(program, "TexCoord");
+
+		glGenBuffers(1, &vertex_buffer);
+		glGenVertexArrays(1, &vertex_array);
+		glBindVertexArray(vertex_array);
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+		glVertexAttribPointer(position_loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLbyte *)0);
+		glEnableVertexAttribArray(position_loc);
+		glVertexAttribPointer(texcoord_loc, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLbyte *)0 + 2 * sizeof(float));
+		glEnableVertexAttribArray(texcoord_loc);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+
+	float const quad[6][4] = {
+		{ 0.0f, 0.0f, 0.0f, 0.0f },
+		{ float(drawable_size.x), 0.0f, 1.0f, 0.0f },
+		{ float(drawable_size.x), float(drawable_size.y), 1.0f, 1.0f },
+
+		{ 0.0f, 0.0f, 0.0f, 0.0f },
+		{ float(drawable_size.x), float(drawable_size.y), 1.0f, 1.0f },
+		{ 0.0f, float(drawable_size.y), 0.0f, 1.0f },
+	};
+	
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//drawable pixels, (0,0) at the lower left, to clip space:
+	glm::mat4 to_clip = glm::mat4(
+		2.0f / drawable_size.x, 0.0f, 0.0f, 0.0f,
+		0.0f, 2.0f / drawable_size.y, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		-1.0f, -1.0f, 0.0f, 1.0f
+	);
+
+	glUseProgram(program);
+	glUniformMatrix4fv(to_clip_loc, 1, GL_FALSE, glm::value_ptr(to_clip));
+	glUniform1i(image_loc, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, curr_line.tex);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vertex_array);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+	glDisable(GL_BLEND);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
+	GL_ERRORS();
+}
+
+void TextProcessor::draw_curr_character(glm::uvec2 const &drawable_size){
     //set up screen scaling (ref. from Sprites.cpp)
 	// float scale_x = drawable_size.x / ScreenWidth;
 	// float scale_y = drawable_size.y / ScreenHeight;
@@ -217,121 +437,126 @@ void TextProcessor:: draw_curr_line(glm::uvec2 const &drawable_size){
 		glDeleteShader(fs);
 	}
 
-    for (unsigned int i = 0; i < curr_line.characters.size(); i++) {
+	// get texture for 1 char -----------------------------------------------------------------------
 
-		auto const &character = curr_line.characters.at(i);
-		if (character.pixels.empty()) continue; 
+	auto const &character = curr_line.characters.at(curr_line.char_num);
+	if (character.pixels.empty()) return;
 
-		// // For testing
-		// printf("glyph index: %u\n", glyph_index);
-		// printf("bitmap: %d x %d\n", character.width, character.rows);
-		// printf("pitch: %d\n", slot->bitmap.pitch);
-		// printf("pixel mode: %d\n", slot->bitmap.pixel_mode);
-		// printf("bitmap_left: %d, bitmap_top: %d\n", slot->bitmap_left, slot->bitmap_top);
+	// // For testing
+	// printf("glyph index: %u\n", glyph_index);
+	// printf("bitmap: %d x %d\n", character.width, character.rows);
+	// printf("pitch: %d\n", slot->bitmap.pitch);
+	// printf("pixel mode: %d\n", slot->bitmap.pixel_mode);
+	// printf("bitmap_left: %d, bitmap_top: %d\n", slot->bitmap_left, slot->bitmap_top);
 
-		// Built off of ideas in PPU466.cpp from project 1 
-		// Create texture for glyph
-		GLuint glyph_tex = 0;
+	// Built off of ideas in PPU466.cpp from project 1 
+	// Create texture for glyph
+	GLuint glyph_tex = 0;
 
-		glGenTextures(1, &glyph_tex);
-		glBindTexture(GL_TEXTURE_2D, glyph_tex);
+	glGenTextures(1, &glyph_tex);
+	glBindTexture(GL_TEXTURE_2D, glyph_tex);
 
-		// Freetype's bitmap is one byte per pixel
-		// Keep in mind: 1 alpha channel
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	// Freetype's bitmap is one byte per pixel
+	// Keep in mind: 1 alpha channel
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		//passing 'nullptr' to TexImage says "allocate memory but don't store anything there":
-		// (textures will be uploaded later)
-		// GL_RGBA8 to GL_R8 b/c 1 colour channel instead of 4
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, character.width, character.rows, 0, GL_RED, GL_UNSIGNED_BYTE, character.pixels.data());
-		//make the texture have sharp pixels when magnified:
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		//when access past the edge, clamp to the edge:
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glBindTexture(GL_TEXTURE_2D, 0);
+	//passing 'nullptr' to TexImage says "allocate memory but don't store anything there":
+	// (textures will be uploaded later)
+	// GL_RGBA8 to GL_R8 b/c 1 colour channel instead of 4
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, character.width, character.rows, 0, GL_RED, GL_UNSIGNED_BYTE, character.pixels.data());
+	//make the texture have sharp pixels when magnified:
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//when access past the edge, clamp to the edge:
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-		// vertex
-		struct Vertex {
-			glm::vec2 Position;
-			glm::vec2 TexCoord;
-		};
+	// vertex
+	struct Vertex {
+		glm::vec2 Position;
+		glm::vec2 TexCoord;
+	};
 
-		// need to account for the bitmap starting points
-		float pen_x_offset = character.x + character.bitmap_left;
-		float pen_y_offset = character.y + character.bitmap_top - float(character.rows);
+	// need to account for the bitmap starting points
+	float pen_x_offset = character.x + character.bitmap_left;
+	float pen_y_offset = character.y + character.bitmap_top - float(character.rows);
 
-		// build rectangle representing background and sprites (of bitmap):
-		std::vector<Vertex> vertices = {
-			// triangle 1
-			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
-			{glm::vec2(pen_x_offset + character.width, pen_y_offset), glm::vec2(1.0f, 1.0f)},
-			{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)},
-			// triangle 2
-			{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
-			{glm::vec2(pen_x_offset, pen_y_offset + character.rows), glm::vec2(0.0f, 0.0f)},
-			{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)}
-		};
+	// build rectangle representing background and sprites (of bitmap):
+	std::vector<Vertex> vertices = {
+		// triangle 1
+		{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
+		{glm::vec2(pen_x_offset + character.width, pen_y_offset), glm::vec2(1.0f, 1.0f)},
+		{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)},
+		// triangle 2
+		{glm::vec2(pen_x_offset, pen_y_offset), glm::vec2(0.0f, 1.0f)},
+		{glm::vec2(pen_x_offset, pen_y_offset + character.rows), glm::vec2(0.0f, 0.0f)},
+		{glm::vec2(pen_x_offset + character.width, pen_y_offset + character.rows), glm::vec2(1.0f, 0.0f)}
+	};
 
-		//vertex_buffer will (eventually) hold vertex data for drawing:
-		GLuint vertex_buffer = 0;
-		glGenBuffers(1, &vertex_buffer);
-		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	//vertex_buffer will (eventually) hold vertex data for drawing:
+	GLuint vertex_buffer = 0;
+	glGenBuffers(1, &vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STREAM_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		// vao
-		GLuint vertex_array = 0;
-		glGenVertexArrays(1, &vertex_array);
-		glBindVertexArray(vertex_array);
+	// vao
+	GLuint vertex_array = 0;
+	glGenVertexArrays(1, &vertex_array);
+	glBindVertexArray(vertex_array);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 
-		// attribute array for position
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+	// attribute array for position
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
 
-		// attribute array for text coords
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
+	// attribute array for text coords
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
-		glUseProgram(text_program);
+	glUseProgram(text_program);
 
-		// uniforms for shader programs
-		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
-			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
-			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
-			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
-			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f)
-		);
-		GLint object_to_clip = glGetUniformLocation(text_program, "OBJECT_TO_CLIP");
-		glUniformMatrix4fv(object_to_clip, 1, GL_FALSE, glm::value_ptr(OBJECT_TO_CLIP));
+	// make text white
+	GLint text_color = glGetUniformLocation(text_program, "textColor");
+	glUniform3f(text_color, 1.0f, 1.0f, 1.0f);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, glyph_tex);
+	// uniforms for shader programs
+	glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+		glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
+		glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
+		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+		glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f)
+	);
+	GLint object_to_clip = glGetUniformLocation(text_program, "OBJECT_TO_CLIP");
+	glUniformMatrix4fv(object_to_clip, 1, GL_FALSE, glm::value_ptr(OBJECT_TO_CLIP));
 
-		GLint glyph_texture = glGetUniformLocation(text_program, "glyphTexture");
-		glUniform1i(glyph_texture, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, glyph_tex);
 
-		glBindVertexArray(vertex_array);
+	GLint glyph_texture = glGetUniformLocation(text_program, "glyphTexture");
+	glUniform1i(glyph_texture, 0);
 
-		// enable blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// actual drawing
+	glBindVertexArray(vertex_array);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+	// enable blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glDeleteVertexArrays(1, &vertex_array);
-		glDeleteBuffers(1, &vertex_buffer);
-		glDeleteTextures(1, &glyph_tex);
-    }
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteVertexArrays(1, &vertex_array);
+	glDeleteBuffers(1, &vertex_buffer);
+	glDeleteTextures(1, &glyph_tex);
+
     GL_ERRORS();
 }
 

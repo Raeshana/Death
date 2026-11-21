@@ -40,7 +40,14 @@ struct Character {
 };
 
 struct Line {
-    std::vector <Character> characters; 
+    std::vector <Character> characters;
+    float typing_elapsed = 0;
+    double typing_max = 0.04;
+    int char_num = 0;
+    bool is_typing = false;
+
+    GLuint tex = 0; // texture drawn to fbo
+    GLuint fbo = 0; // framebuffer
 };
 
 struct TextProcessor {
@@ -68,8 +75,12 @@ struct TextProcessor {
 
     // functions
     void handle_curr_line(std::string imported_line);
-    void draw_curr_line(glm::uvec2 const &drawable_size);
-    
+    void draw_curr_character(glm::uvec2 const &drawable_size);
+    void draw_curr_line(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size);
+    void update(float elapsed);
+    void draw_textbox(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size);
+    void reset_line(glm::uvec2 const &window_size);
+
     GLuint text_program = 0;
 };
 
