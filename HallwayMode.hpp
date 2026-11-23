@@ -9,6 +9,8 @@
 #include <string>
 #include <memory>
 
+struct PlayMode;
+
 struct HallwayMode : Mode {
 	HallwayMode();
 	virtual ~HallwayMode();
@@ -34,7 +36,7 @@ struct HallwayMode : Mode {
 	std::vector<Door> doors;
 	int nearby = -1;
 
-	std::shared_ptr< Mode > rooms[5];
+	std::shared_ptr< PlayMode > rooms[5];
 
 	bool tile_is_solid(int tx, int ty);
 	bool can_move_to(glm::vec2 pos);
@@ -45,4 +47,10 @@ struct HallwayMode : Mode {
 	Sprites::Texture reaper_tex;
 	Sprites::Texture floor_tex;
 	Sprites::Texture interact_tex;
+	Sprites::Texture vignette_tex;
+	Sprites::Texture light_tex;
+
+	float fade_out = 0.0f;
+	std::shared_ptr< Mode > leaving_to;
+	void start_leaving(std::shared_ptr< Mode > next);
 };

@@ -12,13 +12,6 @@
 #include "Sound.hpp"
 
 #include <deque>
-#include <runner.h>
-#include <choice.h>
-#include <memory.h>
-#include <compiler.h>
-
-#include "text-pipeline.hpp"
-#include "DialogueMode.hpp"
 
 // text pipeline
 #include <ft2build.h>
@@ -31,13 +24,12 @@
 #include <string>
 
 #include "DialogueMode.hpp"
-#include "text-pipeline.hpp"
-#include "PixelCanvas.hpp"
-#include "DrawLines.hpp"
 
 // #define FONT_SIZE 36
 // #define MARGIN (FONT_SIZE * 0.5)
 #include <string>
+
+struct SoulCaptureMode;
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -50,13 +42,11 @@ struct PlayMode : Mode {
 	static constexpr float ScreenWidth = 176.0f;
 	static constexpr float ScreenHeight = 160.0f;
 
-	//----- game state -----
 
-	//input tracking:
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up, interact;
+	} left, right, down, up, interact, advance;
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
@@ -64,7 +54,17 @@ struct PlayMode : Mode {
 	//camera:
 	Scene::Camera *camera = nullptr;
 
-	glm::vec2 player_at = glm::vec2(128.0f, 60.0f);
+	// Initialize library and load font face
+    FT_Library ft_library = nullptr; // handle to library
+    FT_Face ft_face = nullptr;       // handle to face object
+
+	// Create hb-ft font
+    hb_font_t *hb_font = nullptr;
+
+	// Story variables
+	int current_line = 0;
+
+	glm::vec2 player_at = glm::vec2(120.0f, 20.0f);
 	float hover_time = 0.0f;
 
 	std::vector<std::string> room;
@@ -81,7 +81,6 @@ struct PlayMode : Mode {
 	bool can_move_to(glm::vec2 pos);
 	void on_interact(Interactable const &thing);
 
-	//----- sprite things -----
 	Sprites sprites;
 	Sprites::Texture reaper_tex;
 	Sprites::Texture floor_tex;
@@ -93,15 +92,27 @@ struct PlayMode : Mode {
 	Sprites::Texture iv_tex;
 	Sprites::Texture desk_tex;
 	Sprites::Texture interact_tex;
+	Sprites::Texture vignette_tex;
+	Sprites::Texture light_tex;
+	std::vector< glm::vec2 > lights;
+	Sprites::Texture soul_tex;
+	glm::vec2 soul_pos = glm::vec2(128.0f, 200.0f);
+	Sprites::Texture patient_dead_tex;
+	Sprites::Texture cardiogram_dead_tex;
 
 	struct Prop {
 		Sprites::Texture tex;
 		glm::vec2 pos;
+		char kind = '.';
 	};
 	std::vector<Prop> props;
+	Sprites::Texture texture_for(Prop const &prop);
+	bool soul_taking = false;
 
     bool diary_read = false;         
 	bool soul_taken = false;
+	std::shared_ptr< DialogueMode > active_dialogue;
+	std::shared_ptr< SoulCaptureMode > active_minigame;
 	void start_minigame();
 
 	void reset_buttons();
@@ -110,28 +121,55 @@ struct PlayMode : Mode {
 	int room_number = 1;
 	std::shared_ptr< Mode > return_to;
 
-	//----- text stuff -----
-	TextProcessor hint_processor;
-	std::shared_ptr< DialogueMode > active_dialogue;
+	float fade_out = 0.0f;
+	std::shared_ptr< Mode > leaving_to;
+	void start_leaving(std::shared_ptr< Mode > next);
 
-	//tags 
-    bool pause;            // pause tag
+	float bed_center_x = 128.0f;
 
-	// Load ink binary story, generated from the inkCPP compiler
-	ink::runtime::story* myInk;
+	void draw_window();
 
-	// Create a new thread
-	ink::runtime::runner thread;
+	enum TutorialStep {
+		TUT_OFF,
+		TUT_INTRO,
+		TUT_MOVE,
+		TUT_SOUL,
+		TUT_TALK,
+		TUT_FIRST_TRY,
+		TUT_DIARY,
+		TUT_FIND_DIARY,
+		TUT_READ_DIARY,
+		TUT_EXPLAIN,
+		TUT_TALK_AGAIN,
+		TUT_SECOND_TRY,
+		TUT_FINISH,
+		TUT_DONE,
+	};
+	TutorialStep tutorial_step = TUT_OFF;
+	int tutorial_page = 0;
+	float moved_distance = 0.0f;
+	float hint_alpha = 0.0f;
+	std::string shown_hint;
+	float spotlight_alpha = 0.0f;
+	bool spotlight_on_diary = false;
+	glm::vec2 diary_pos = glm::vec2(0.0f);
 
-	std::string dialogue_line;
-	std::string hint_line;
+	bool tutorial_page_lines(int page, std::string lines[2]);
+	void finish_pages();
+	std::string tutorial_hint();
+	bool is_spotlight_step();
+	void draw_hint_box(std::string const lines[], int count, bool show_continue, float alpha);
+	void draw_tutorial();
+	void draw_soul();
+	bool in_tutorial();  
 
-	bool talked_patient = false;
-
-	//----- sound stuff -----
-	//swap the background track, fading the old one out and the new one in:
-	void play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot);
-	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
-	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
-	std::shared_ptr< Sound::PlayingSample > after_soul_loop;
+	TextProcessor hint_text;
+	unsigned int hint_font_pixels = 0;
+	struct HintLine {
+		std::string text;
+		float center_x;
+		float baseline_y;
+	};
+	std::vector< HintLine > hint_lines;
+	void draw_hint_text(glm::uvec2 const &drawable_size);
 };

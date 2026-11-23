@@ -83,6 +83,3 @@ struct TextProcessor {
 
     GLuint text_program = 0;
 };
-
-
-

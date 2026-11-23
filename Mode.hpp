@@ -27,5 +27,7 @@ struct Mode : std::enable_shared_from_this< Mode > {
 
 	//Mode::window is the (global) SDL window:
 	static SDL_Window *window;
+	
+	float fade_in = 0.0f;
 };
 
