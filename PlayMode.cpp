@@ -7,12 +7,18 @@
 #include <cstring>
 #include "SoulCaptureMode.hpp"
 
+#include "text-pipeline.hpp"
+
+
+//room size in tiles
 const int MapWidth = 32;
 const int MapHeight = 30;
 
 const float TileSize = 8.0f;
 const float ReaperSize = 16.0f;
 
+//3 thin rectangles for small oval shadow under the reaper
+//ideas for shadows and lights: https://pixel-beef.itch.io/xdasher/devlog/192949/4-things-we-did-to-add-light-and-depth-to-our-pixel-art-game
 static void draw_floor_shadow(Sprites &sprites, float center_x, float floor_y, float width) {
 	glm::vec4 shadow_color = glm::vec4(0.0f, 0.0f, 0.0f, 0.4f);
 	float narrow = width - 4.0f;
@@ -20,6 +26,40 @@ static void draw_floor_shadow(Sprites &sprites, float center_x, float floor_y, f
 	sprites.draw(sprites.white, glm::vec2(center_x - width * 0.5f, floor_y - 1.0f), glm::vec2(width, 2.0f), shadow_color);
 	sprites.draw(sprites.white, glm::vec2(center_x - narrow * 0.5f, floor_y - 2.0f), glm::vec2(narrow, 1.0f), shadow_color);
 }
+
+//room maps
+static const char *ROOM_MAP_0[MapHeight] = {
+	"################################",
+	"################################",
+	"################################",
+	"#..............................#",
+	"#..............................#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#...............P..............#",
+	"#..............................#",
+	"#.....TT.......................#",
+	"#.....TT.......................#",
+	"#.....D........................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............................#",
+	"#..............X...............#",
+	"###############==###############",
+};
 
 static const char *ROOM_MAP_1[MapHeight] = {
 	"################################",
@@ -186,7 +226,47 @@ static const char *ROOM_MAP_5[MapHeight] = {
 	"###############==###############",
 };
 
-static const char **ROOM_MAPS[5] = {
+static const int IntroPageCount = 3;
+static const std::string INTRO_LINES[IntroPageCount][2] = {
+	{"Welcome to your first day on the job.", "You are a reaper."},
+	{"Today's quota: at least one soul.", "We have stationed you in a hospital."},
+	{"Your first client is right here.", "Let's start with the basics."},
+};
+
+static const int SoulPageCount = 2;
+static const std::string SOUL_LINES[SoulPageCount][2] = {
+	{"See that light above the bed?", "That is your client's soul."},
+	{"It is already loosening from the body.", "Your job is to cut it free."},
+};
+
+static const int DiaryPageCount = 2;
+static const std::string DIARY_LINES[DiaryPageCount][2] = {
+	{"The soul fought back. It is not ready to go.", "Something is still holding it here."},
+	{"Learn about your client first.", "Their diary is on the desk."},
+};
+
+static const int DiaryTextPageCount = 2;
+static const std::string DIARY_TEXT[DiaryTextPageCount][2] = {
+	{"\"Stacy and the grandbabies visited again.\"", "\"Jack turns 14 soon. Alice loves her friends.\""},
+	{"\"Stacy looks just like Dee did.\"", "\"If only Dee could see them now.\""},
+};
+
+static const int ExplainPageCount = 3;
+static const std::string EXPLAIN_LINES[ExplainPageCount][2] = {
+	{"The better you understand someone,", "the less they resist."},
+	{"Reading diaries and talking to people", "makes their soul calmer and easier to catch."},
+	{"Now try again.", ""},
+};
+
+static const int FinishPageCount = 2;
+static const std::string FINISH_LINES[FinishPageCount][2] = {
+	{"Your first soul. Well done.", "The rest of the ward is waiting."},
+	{"Leave through the door at the bottom", "when you are ready."},
+};
+
+//all rooms
+static const char **ROOM_MAPS[6] = {
+	ROOM_MAP_0,
 	ROOM_MAP_1,
 	ROOM_MAP_2,
 	ROOM_MAP_3,
@@ -195,10 +275,12 @@ static const char **ROOM_MAPS[5] = {
 };
 
 PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
-	if (room_number < 1 || room_number > 5) {
+	if (room_number < 0 || room_number > 5) {
 		throw std::runtime_error("No map for room " + std::to_string(room_number));
 	}
-	const char **room_map = ROOM_MAPS[room_number - 1];
+
+	//read the map
+	const char **room_map = ROOM_MAPS[room_number];
 
 	room.resize(MapHeight);
 
@@ -219,7 +301,7 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 				patient.radius = 20.0f;
 				interactables.push_back(patient);
 				bed_center_x = x * TileSize;
-				soul_pos = glm::vec2(x * TileSize, y * TileSize + 36.0f);
+				soul_pos = glm::vec2(x * TileSize + 0.5f, y * TileSize + 32.0f);
 				lights.push_back(glm::vec2(x * TileSize, y * TileSize + 8.0f));
 
 			} else if (c == 'D') {
@@ -228,6 +310,7 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 				diary.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
 				diary.radius = 10.0f;
 				interactables.push_back(diary);
+				diary_pos = diary.pos;
 			} else if (c == 'F') {
 				Interactable father;
 				father.name = "father";
@@ -250,8 +333,14 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 		}
 	}
 
+	//start the tutorial intro
+	if (room_number == 0) {
+		tutorial_step = TUT_INTRO;
+		player_at = glm::vec2(MapWidth * TileSize * 0.5f - ReaperSize * 0.5f, MapHeight * TileSize * 0.5f - ReaperSize * 0.5f);
+	}
+
+	//load textures
 	reaper_tex = sprites.load(data_path("reaper.png"));
-	
 	patient1_tex = sprites.load(data_path("patient" + std::to_string(room_number) + ".png"));
 	man1_tex = sprites.load(data_path("man1.png"));
 	woman1_tex = sprites.load(data_path("woman1.png"));
@@ -266,6 +355,7 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	patient_dead_tex = sprites.load(data_path("patient" + std::to_string(room_number) + "_dead.png"));
 	cardiogram_dead_tex = sprites.load(data_path("cardiogram_dead.png"));
 
+	//build props
 	for (int y = 0; y < MapHeight; y++) {
 		for (int x = 0; x < MapWidth; x++) {
 			char c = room[y][x];
@@ -314,6 +404,8 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 			props.push_back(prop);
 		}
 	}
+
+	//one extra ceiling light in the middle of the room
 	lights.push_back(glm::vec2(MapWidth * TileSize * 0.5f, MapHeight * TileSize * 0.4f));
 
 	floor_tex = sprites.load(data_path("tiles.png"));
@@ -322,7 +414,9 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	floor_tex = sprites.load(data_path("tiles.png"));
 }
 
+//which image to draw for a prop
 Sprites::Texture PlayMode::texture_for(Prop const &prop) {
+
 	if (soul_taken) {
 		if (prop.kind == 'B') {
 			return patient_dead_tex;
@@ -336,6 +430,107 @@ Sprites::Texture PlayMode::texture_for(Prop const &prop) {
 
 PlayMode::~PlayMode() {
 }
+
+//tutorial state machine
+//reference: https://gameprogrammingpatterns.com/state.html
+bool PlayMode::tutorial_page_lines(int page, std::string lines[2]) {
+
+	if (tutorial_step == TUT_INTRO) {
+		if (page >= IntroPageCount) {
+			return false;
+		}
+		lines[0] = INTRO_LINES[page][0];
+		lines[1] = INTRO_LINES[page][1];
+		return true;
+	}
+	if (tutorial_step == TUT_SOUL) {
+		if (page >= SoulPageCount) {
+			return false;
+		}
+		lines[0] = SOUL_LINES[page][0];
+		lines[1] = SOUL_LINES[page][1];
+		return true;
+	}
+	if (tutorial_step == TUT_DIARY) {
+		if (page >= DiaryPageCount) {
+			return false;
+		}
+		lines[0] = DIARY_LINES[page][0];
+		lines[1] = DIARY_LINES[page][1];
+		return true;
+	}
+	if (tutorial_step == TUT_READ_DIARY) {
+		if (page >= DiaryTextPageCount) {
+			return false;
+		}
+		lines[0] = DIARY_TEXT[page][0];
+		lines[1] = DIARY_TEXT[page][1];
+		return true;
+	}
+	if (tutorial_step == TUT_EXPLAIN) {
+		if (page >= ExplainPageCount) {
+			return false;
+		}
+		lines[0] = EXPLAIN_LINES[page][0];
+		lines[1] = EXPLAIN_LINES[page][1];
+		return true;
+	}
+	if (tutorial_step == TUT_FINISH) {
+		if (page >= FinishPageCount) {
+			return false;
+		}
+		lines[0] = FINISH_LINES[page][0];
+		lines[1] = FINISH_LINES[page][1];
+		return true;
+	}
+	return false;
+}
+
+//go to the next step if all the lines were read
+void PlayMode::finish_pages() {
+	tutorial_page = 0;
+	if (tutorial_step == TUT_INTRO) {
+		tutorial_step = TUT_MOVE;
+	} else if (tutorial_step == TUT_SOUL) {
+		tutorial_step = TUT_TALK;
+	} else if (tutorial_step == TUT_DIARY) {
+		tutorial_step = TUT_FIND_DIARY;
+	} else if (tutorial_step == TUT_READ_DIARY) {
+		tutorial_step = TUT_EXPLAIN;
+	} else if (tutorial_step == TUT_EXPLAIN) {
+		tutorial_step = TUT_TALK_AGAIN;
+	} else if (tutorial_step == TUT_FINISH) {
+		tutorial_step = TUT_DONE;
+	}
+}
+
+//oneline hints
+std::string PlayMode::tutorial_hint() {
+
+	if (tutorial_step == TUT_MOVE) {
+		return "Use W A S D to move.";
+	}
+	if (tutorial_step == TUT_TALK) {
+		return "Walk up to the patient and press E to talk.";
+	}
+	if (tutorial_step == TUT_FIND_DIARY) {
+		return "Find the diary on the desk and press E.";
+	}
+	if (tutorial_step == TUT_TALK_AGAIN) {
+		return "Talk to the patient again.";
+	}
+	return "";
+}
+
+//room dims and items are highlighted
+bool PlayMode::is_spotlight_step() {
+
+	if (tutorial_step == TUT_SOUL || tutorial_step == TUT_DIARY) {
+		return true;
+	}
+	return false;
+}
+
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
 	(void)window_size;
@@ -361,6 +556,10 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			interact.downs += 1;
 			interact.pressed = true;
 			return true;
+		} else if (evt.key.key == SDLK_SPACE) {
+			advance.downs += 1;
+			advance.pressed = true;
+			return true;
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
 		if (evt.key.key == SDLK_A) {
@@ -378,12 +577,17 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.key == SDLK_E) {
 			interact.pressed = false;
 			return true;
+		} else if (evt.key.key == SDLK_SPACE) {
+			advance.pressed = false;
+			return true;
 		}
 	}
 
 	return false;
 }
 
+//collision
+//reference: https://jonathanwhiting.com/tutorial/collision/
 bool PlayMode::tile_is_solid(int tx, int ty) {
 	if (tx < 0 || ty < 0 || tx >= MapWidth || ty >= MapHeight) {
 		return true;
@@ -396,6 +600,7 @@ bool PlayMode::tile_is_solid(int tx, int ty) {
 }
 
 bool PlayMode::can_move_to(glm::vec2 pos) {
+	
 	float left_x = pos.x;
 	float right_x = pos.x + ReaperSize - 1.0f;
 	float bottom_y = pos.y;
@@ -416,11 +621,20 @@ bool PlayMode::can_move_to(glm::vec2 pos) {
 	return true;
 }
 
+//interaction when E is pressed
 void PlayMode::on_interact(Interactable const &thing) {
 	if (thing.name == "patient") {
+		if (in_tutorial() && tutorial_step != TUT_TALK && tutorial_step != TUT_TALK_AGAIN) {
+			return;
+		}
 		if (soul_taken) {
 			std::cout << "This soul has already been collected." << std::endl;
 			return;
+		}
+		if (tutorial_step == TUT_TALK) {
+			tutorial_step = TUT_FIRST_TRY;
+		} else if (tutorial_step == TUT_TALK_AGAIN) {
+			tutorial_step = TUT_SECOND_TRY;
 		}
 
 		std::shared_ptr< DialogueMode > dialogue = std::make_shared< DialogueMode >("prototype_script.bin");
@@ -432,15 +646,23 @@ void PlayMode::on_interact(Interactable const &thing) {
 	} else if (thing.name == "diary") {
 		diary_read = true;
 		std::cout << "You read the diary. The patient seems calmer now." << std::endl;
+		if (tutorial_step == TUT_FIND_DIARY) {
+			tutorial_step = TUT_READ_DIARY;
+			tutorial_page = 0;
+		}
 	} else if (thing.name == "father") {
 		std::cout << "You talked to the father. (TODO: tell story)" << std::endl;
 	} else if (thing.name == "nurse") {
 		std::cout << "You talked to the nurse. (TODO: tell story)" << std::endl;
 	} else if (thing.name == "exit") {
+		if (in_tutorial()) {
+			return;
+		}
 		start_leaving(return_to);
 	}
 }
 
+//drawing the walls
 static bool room_is_floor(std::vector< std::string > const &room, int x, int y) {
 	if (x < 0 || y < 0 || x >= MapWidth || y >= MapHeight) {
 		return false;
@@ -465,12 +687,40 @@ static int room_floor_distance_below(std::vector< std::string > const &room, int
 
 void PlayMode::update(float elapsed) {
 
-	const float FadeTime = 0.4f;
+	//start the minigame
+	if (active_dialogue && Mode::current.get() == this) {
+		bool battle = active_dialogue->can_battle;
+		active_dialogue.reset();
+		if (battle || tutorial_step == TUT_FIRST_TRY || tutorial_step == TUT_SECOND_TRY) {
+			start_minigame();
+			return;
+		}
+	}
+
+	if (active_minigame && Mode::current.get() == this && !leaving_to) {
+		if (active_minigame->captured) {
+			soul_taken = true;
+			if (tutorial_step == TUT_SECOND_TRY) {
+				tutorial_step = TUT_FINISH;
+				tutorial_page = 0;
+			}
+		} else if (tutorial_step == TUT_FIRST_TRY) {
+			tutorial_step = TUT_DIARY;
+			tutorial_page = 0;
+		} else if (tutorial_step == TUT_SECOND_TRY) {
+			tutorial_step = TUT_TALK_AGAIN;
+		}
+		active_minigame.reset();
+	}
+
+	//fade in after entering this room
+	const float FadeTime = 0.5f;
 	fade_in = fade_in - elapsed / FadeTime;
 	if (fade_in < 0.0f) {
 		fade_in = 0.0f;
 	}
 
+	//fading out
 	if (leaving_to) {
 		fade_out = fade_out + elapsed / FadeTime;
 		if (fade_out >= 1.0f) {
@@ -478,22 +728,9 @@ void PlayMode::update(float elapsed) {
 			std::shared_ptr< Mode > next = leaving_to;
 			leaving_to.reset();
 			fade_out = 0.0f;
-			if (soul_taking) {
-				soul_taken = true;
-				soul_taking = false;
-			}
 			Mode::set_current(next);
 		}
 		return;
-	}
-
-	if (active_dialogue && Mode::current.get() == this) {
-		bool battle = active_dialogue->can_battle;
-		active_dialogue.reset();
-		if (battle) {
-			start_minigame();
-			return;
-		}
 	}
 
 	hover_time = hover_time + elapsed;
@@ -501,6 +738,52 @@ void PlayMode::update(float elapsed) {
 		hover_time = hover_time - 1000.0f;
 	}
 
+	std::string hint = tutorial_hint();
+	if (hint != "" && spotlight_alpha <= 0.0f) {
+		shown_hint = hint;
+		hint_alpha = std::min(1.0f, hint_alpha + elapsed * 3.0f);
+	} else {
+		hint_alpha = std::max(0.0f, hint_alpha - elapsed * 2.0f);
+	}
+
+	//spotlight
+	if (tutorial_step == TUT_SOUL) {
+		spotlight_on_diary = false;
+	}
+	if (tutorial_step == TUT_DIARY) {
+		spotlight_on_diary = true;
+	}
+	if (is_spotlight_step() && hint_alpha <= 0.0f) {
+		spotlight_alpha = std::min(1.0f, spotlight_alpha + elapsed * 2.0f);
+	} else if (!is_spotlight_step()) {
+		spotlight_alpha = std::max(0.0f, spotlight_alpha - elapsed * 2.0f);
+	}
+
+	std::string page_lines[2];
+	if (tutorial_page_lines(tutorial_page, page_lines)) {
+		bool ready = true;
+		if (hint_alpha > 0.0f) {
+			ready = false;
+		}
+		if (is_spotlight_step() && spotlight_alpha < 1.0f) {
+			ready = false;
+		}
+		if (advance.downs > 0 && ready) {
+			tutorial_page = tutorial_page + 1;
+			if (!tutorial_page_lines(tutorial_page, page_lines)) {
+				finish_pages();
+			}
+		}
+		advance.downs = 0;
+		left.downs = 0;
+		right.downs = 0;
+		up.downs = 0;
+		down.downs = 0;
+		interact.downs = 0;
+		return;
+	}
+
+	//movement
 	const float PlayerSpeed = 60.0f;
 
 	glm::vec2 move = glm::vec2(0.0f);
@@ -520,6 +803,8 @@ void PlayMode::update(float elapsed) {
 		move = glm::normalize(move) * PlayerSpeed * elapsed;
 	}
 
+	glm::vec2 before_move = player_at;
+
 	glm::vec2 try_x = glm::vec2(player_at.x + move.x, player_at.y);
 	if (can_move_to(try_x)) {
 		player_at.x = try_x.x;
@@ -529,6 +814,16 @@ void PlayMode::update(float elapsed) {
 		player_at.y = try_y.y;
 	}
 
+	//go to the soul step after moving a bit
+	if (tutorial_step == TUT_MOVE) {
+		moved_distance = moved_distance + glm::length(player_at - before_move);
+		if (moved_distance > 40.0f) {
+			tutorial_step = TUT_SOUL;
+			tutorial_page = 0;
+		}
+	}
+
+	//find the closest thing in range and show the ! marker
 	nearby = -1;
 	float best_dist = 1e9f;
 	glm::vec2 player_center = player_at + glm::vec2(ReaperSize * 0.5f);
@@ -549,8 +844,10 @@ void PlayMode::update(float elapsed) {
 	up.downs = 0;
 	down.downs = 0;
 	interact.downs = 0;
+	advance.downs = 0;
 }
 
+//use rectangles to draw window above the bed
 void PlayMode::draw_window() {
 	glm::vec4 frame_dark = glm::vec4(0x2a / 255.0f, 0x32 / 255.0f, 0x36 / 255.0f, 1.0f);
 	glm::vec4 night_sky  = glm::vec4(0x18 / 255.0f, 0x21 / 255.0f, 0x3a / 255.0f, 1.0f);
@@ -568,6 +865,153 @@ void PlayMode::draw_window() {
 	sprites.draw(sprites.white, win + glm::vec2(21.0f, 2.0f), glm::vec2(1.0f, 1.0f), star_color);
 	sprites.draw(sprites.white, win + glm::vec2(11.0f, 1.0f), glm::vec2(2.0f, 8.0f), frame_dark);
 	sprites.draw(sprites.white, win + glm::vec2(-1.0f, -1.0f), glm::vec2(26.0f, 1.0f), sill_color);
+}
+
+const float HintFontSize = 8.0f;
+const float HintLineHeight = 11.0f;
+
+void PlayMode::draw_hint_box(std::string const lines[], int count, bool show_continue, float alpha) {
+	glm::vec4 border = glm::vec4(0.5f, 0.5f, 0.5f, alpha);
+	glm::vec4 inside = glm::vec4(0.00f, 0.00f, 0.00f, 0.85f * alpha);
+
+	float height = 10.0f + count * HintLineHeight;
+	glm::vec2 box_pos = glm::vec2(12.0f, 10.0f);
+	glm::vec2 box_size = glm::vec2(232.0f, height);
+
+	sprites.draw(sprites.white, box_pos - glm::vec2(1.0f), box_size + glm::vec2(2.0f), border);
+	sprites.draw(sprites.white, box_pos, box_size, inside);
+
+	if (alpha > 0.5f) {
+		for (int i = 0; i < count; i++) {
+			HintLine line;
+			line.text = lines[i];
+			line.center_x = 128.0f;
+			line.baseline_y = box_pos.y + height - 4.0f - HintFontSize - i * HintLineHeight;
+			hint_lines.push_back(line);
+		}
+	}
+
+	if (show_continue && std::sin(hover_time * 5.0f) > -0.3f) {
+		glm::vec4 arrow = glm::vec4(0.56f, 0.88f, 0.84f, alpha);
+		glm::vec2 a = box_pos + glm::vec2(box_size.x - 8.0f, 3.0f);
+		sprites.draw(sprites.white, a, glm::vec2(1.0f, 5.0f), arrow);
+		sprites.draw(sprites.white, a + glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 3.0f), arrow);
+		sprites.draw(sprites.white, a + glm::vec2(2.0f, 2.0f), glm::vec2(1.0f, 1.0f), arrow);
+	}
+}
+
+//spotlight and the text boxes
+void PlayMode::draw_tutorial() {
+	if (spotlight_alpha > 0.0f) {
+		glm::vec4 dim = glm::vec4(0.02f, 0.03f, 0.06f, 0.65f * spotlight_alpha);
+		sprites.draw(sprites.white, glm::vec2(0.0f), glm::vec2(256.0f, 240.0f), dim);
+
+		glm::vec2 arrow_target;
+		if (spotlight_on_diary) {
+			glm::vec2 size = glm::vec2(light_tex.size) * 0.4f;
+			glm::vec4 warm = glm::vec4(1.0f, 0.9f, 0.7f, 0.6f * spotlight_alpha);
+			sprites.draw(light_tex, diary_pos - size * 0.5f, size, warm);
+			arrow_target = diary_pos + glm::vec2(0.0f, 8.0f);
+		} else {
+			if (!soul_taken) {
+				draw_soul();
+			}
+			arrow_target = soul_pos + glm::vec2(0.0f, 16.0f);
+		}
+
+		float arrow_bob = std::floor(2.0f * std::sin(hover_time * 6.0f));
+		glm::vec4 arrow = glm::vec4(0.56f, 0.88f, 0.84f, spotlight_alpha);
+		glm::vec2 tip = glm::vec2(std::floor(arrow_target.x), std::floor(arrow_target.y + arrow_bob));
+		sprites.draw(sprites.white, tip + glm::vec2(-3.0f, 3.0f), glm::vec2(7.0f, 1.0f), arrow);
+		sprites.draw(sprites.white, tip + glm::vec2(-2.0f, 2.0f), glm::vec2(5.0f, 1.0f), arrow);
+		sprites.draw(sprites.white, tip + glm::vec2(-1.0f, 1.0f), glm::vec2(3.0f, 1.0f), arrow);
+		sprites.draw(sprites.white, tip, glm::vec2(1.0f, 1.0f), arrow);
+	}
+
+	std::string page_lines[2];
+	if (hint_alpha <= 0.0f && tutorial_page_lines(tutorial_page, page_lines)) {
+		float alpha = 1.0f;
+		bool can_continue = true;
+		if (is_spotlight_step()) {
+			alpha = spotlight_alpha;
+			can_continue = (spotlight_alpha >= 1.0f);
+		}
+		if (alpha > 0.0f) {
+			draw_hint_box(page_lines, 2, can_continue, alpha);
+		}
+	}
+
+	if (hint_alpha > 0.0f) {
+		std::string lines[1] = {shown_hint};
+		draw_hint_box(lines, 1, false, hint_alpha);
+	}
+}
+
+void PlayMode::draw_hint_text(glm::uvec2 const &drawable_size) {
+	if (hint_lines.empty()) {
+		return;
+	}
+
+	float scale = std::floor(std::min(drawable_size.x / 256.0f, drawable_size.y / 240.0f));
+	if (scale < 1.0f) {
+		scale = 1.0f;
+	}
+	float view_x = std::floor((drawable_size.x - 256.0f * scale) * 0.5f);
+	float view_y = std::floor((drawable_size.y - 240.0f * scale) * 0.5f);
+
+	unsigned int pixels = (unsigned int)(HintFontSize * scale);
+	if (pixels != hint_font_pixels) {
+		FT_Set_Pixel_Sizes(hint_text.ft_face, 0, pixels);
+		hb_ft_font_changed(hint_text.hb_font);
+		hint_font_pixels = pixels;
+	}
+
+	glViewport(0, 0, drawable_size.x, drawable_size.y);
+
+	for (size_t i = 0; i < hint_lines.size(); i++) {
+		hint_text.textbox_width = 100000.0f;
+		hint_text.pen_x_start = 0.0f;
+		hint_text.pen_y_start = 0.0f;
+		hint_text.handle_curr_line(hint_lines[i].text + "\n");
+
+		float width = 0.0f;
+		if (!hint_text.curr_line.characters.empty()) {
+			Character const &last = hint_text.curr_line.characters.back();
+			width = last.x + float(last.bitmap_left) + float(last.width);
+		}
+
+		float left = std::floor(view_x + hint_lines[i].center_x * scale - width * 0.5f);
+		float base = std::floor(view_y + hint_lines[i].baseline_y * scale);
+		for (size_t c = 0; c < hint_text.curr_line.characters.size(); c++) {
+			hint_text.curr_line.characters[c].x += left;
+			hint_text.curr_line.characters[c].y += base;
+		}
+
+		hint_text.draw_curr_line(drawable_size);
+	}
+
+	hint_lines.clear();
+}
+
+//the patient's soul
+void PlayMode::draw_soul() {
+	float pulse = 0.5f + 0.5f * std::sin(hover_time * 2.0f);
+	float bob = std::floor(1.5f * std::sin(hover_time * 1.5f));
+
+	glm::vec2 glow_size = glm::vec2(light_tex.size) * 0.5f;
+	glm::vec4 glow_tint = glm::vec4(0.56f, 0.88f, 0.84f, 0.25f + 0.25f * pulse);
+	sprites.draw(light_tex, soul_pos - glow_size * 0.5f + glm::vec2(0.0f, bob), glow_size, glow_tint);
+
+	glm::vec2 soul_size = glm::vec2(soul_tex.size) * 0.2f;
+	glm::vec4 soul_tint = glm::vec4(1.0f, 1.0f, 1.0f, 0.7f + 0.3f * pulse);
+	sprites.draw(soul_tex, soul_pos - soul_size * 0.5f + glm::vec2(0.0f, bob), soul_size, soul_tint);
+}
+
+bool PlayMode::in_tutorial() {
+	if (tutorial_step == TUT_OFF || tutorial_step == TUT_DONE) {
+		return false;
+	}
+	return true;
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -642,6 +1086,8 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	sprites.draw(sprites.white, clock + glm::vec2(3.0f, 3.0f), glm::vec2(2.0f, 1.0f), frame_dark);
 
 
+	//light pools
+	//reference: https://catlikecoding.com/godot/true-top-down-2d/4-light-and-shadow/
 	if (!soul_taken) {
 		glm::vec4 light_tint = glm::vec4(1.0f, 1.0f, 1.0f, 0.35f);
 		for (size_t i = 0; i < lights.size(); i++) {
@@ -650,6 +1096,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		}
 	}
 
+	//shadows
 	float hover = 2.0f * std::sin(hover_time * 3.0f);
 
 	glm::vec4 prop_shadow_color = glm::vec4(0.0f, 0.0f, 0.0f, 0.35f);
@@ -662,6 +1109,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	float shadow_width = 12.0f - hover;
 	draw_floor_shadow(sprites, player_at.x + ReaperSize * 0.5f, player_at.y - 3.0f, shadow_width);
 
+	//props and reaper
 	for (size_t i = 0; i < props.size(); i++) {
 		if (props[i].pos.y >= player_at.y) {
 			Sprites::Texture t = texture_for(props[i]);
@@ -673,12 +1121,13 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	for (size_t i = 0; i < props.size(); i++) {
 		if (props[i].pos.y < player_at.y) {
-			sprites.draw(props[i].tex, props[i].pos, glm::vec2(props[i].tex.size));
+			sprites.draw(texture_for(props[i]), props[i].pos, glm::vec2(texture_for(props[i]).size));
 		}
 	}
 
 	glm::vec2 screen_size = glm::vec2(MapWidth * TileSize, MapHeight * TileSize);
 
+	//darker room after death
 	if (soul_taken) {
 		glm::vec4 darkness = glm::vec4(0.02f, 0.03f, 0.06f, 0.45f);
 		sprites.draw(sprites.white, glm::vec2(0.0f, 0.0f), screen_size, darkness);
@@ -698,23 +1147,17 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	if (!soul_taken) {
-		float pulse = 0.5f + 0.2f * std::sin(hover_time * 2.0f);
-		float bob = std::floor(1.5f * std::sin(hover_time * 1.5f));
-
-		glm::vec2 glow_size = glm::vec2(light_tex.size) * 0.2f;
-		glm::vec4 glow_tint = glm::vec4(0.56f, 0.88f, 0.84f, 0.25f + 0.25f * pulse);
-		sprites.draw(light_tex, soul_pos - glow_size * 0.5f + glm::vec2(0.0f, bob), glow_size, glow_tint);
-
-		glm::vec2 soul_size = glm::vec2(soul_tex.size) * 0.2f;
-		glm::vec4 soul_tint = glm::vec4(1.0f, 1.0f, 1.0f, 0.7f + 0.3f * pulse);
-		sprites.draw(soul_tex, soul_pos - soul_size * 0.5f + glm::vec2(0.0f, bob), soul_size, soul_tint);
+		draw_soul();
 	}
 
+	//interact marker
 	if (nearby != -1) {
 		glm::vec2 marker_size = glm::vec2(interact_tex.size);
 		glm::vec2 marker_pos = glm::vec2(player_at.x + (ReaperSize - marker_size.x) * 0.5f, player_at.y + ReaperSize + 2.0f + hover);
 		sprites.draw(interact_tex, marker_pos, marker_size);
 	}
+
+	draw_tutorial();
 
 	float fade = fade_in;
 	if (fade_out > fade) {
@@ -726,7 +1169,14 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	sprites.end(drawable_size);
+
+	if (fade_in <= 0.0f && fade_out <= 0.0f) {
+		draw_hint_text(drawable_size);
+	} else {
+		hint_lines.clear();
+	}
 }
+
 
 void PlayMode::reset_buttons() {
 	left.pressed = false;
@@ -741,19 +1191,32 @@ void PlayMode::reset_buttons() {
 	interact.downs = 0;
 }
 
+//start the soul minigame
 void PlayMode::start_minigame() {
 	SoulCaptureMode::Difficulty difficulty = SoulCaptureMode::hard();
 	if (diary_read) {
 		difficulty = SoulCaptureMode::normal();
 	}
+	if (tutorial_step == TUT_FIRST_TRY || tutorial_step == TUT_SECOND_TRY) {
+		difficulty = SoulCaptureMode::normal();
+	}
 
 	std::shared_ptr< SoulCaptureMode > minigame = std::make_shared< SoulCaptureMode >(difficulty);
 	minigame->return_to = shared_from_this();
-	soul_taking = true;
 
+	if (tutorial_step == TUT_FIRST_TRY) {
+		minigame->tutorial = true;
+		minigame->resist_after_first_hit = true;
+	}
+	if (tutorial_step == TUT_SECOND_TRY) {
+		minigame->tutorial = true;
+	}
+
+	active_minigame = minigame;
 	start_leaving(minigame);
 }
 
+//remember where to go and start fading out
 void PlayMode::start_leaving(std::shared_ptr< Mode > next) {
 	leaving_to = next;
 	fade_out = 0.0f;

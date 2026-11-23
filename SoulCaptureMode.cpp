@@ -2,17 +2,18 @@
 
 #include "DrawLines.hpp"
 #include "gl_errors.hpp"
+#include "data_path.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <string>
-#include "data_path.hpp"
 
 static glm::vec3 const Background = glm::vec3(0.02f, 0.02f, 0.03f);
 static glm::u8vec4 const Green = glm::u8vec4(0x44, 0xff, 0x44, 0xff);
 static glm::u8vec4 const Red = glm::u8vec4(0xff, 0x44, 0x44, 0xff);
 static glm::u8vec4 const Orange = glm::u8vec4(0xff, 0x88, 0x22, 0xff);
+static glm::u8vec4 const White = glm::vec4(0xff, 0xff, 0xff, 0xff);
 
 glm::vec2 SoulCaptureMode::wander() const {
 	float t = clock * difficulty.wander_speed;
@@ -24,9 +25,10 @@ glm::vec2 SoulCaptureMode::wander() const {
 SoulCaptureMode::SoulCaptureMode(Difficulty const &difficulty_) : difficulty(difficulty_), mt(std::random_device()()) {
 	std::uniform_real_distribution< float > turn(0.0f, 2.0f * float(M_PI));
 	wander_phase = glm::vec2(turn(mt), turn(mt));
-	lifeline_angle = 0.5f * turn(mt);
 	scythe_tex = sprites.load(data_path("scythe.png"));
 	soul_tex = sprites.load(data_path("soul.png"));
+	lifeline_base_angle = 0.5f * turn(mt);
+	lifeline_angle = lifeline_base_angle;
 }
 
 SoulCaptureMode::~SoulCaptureMode() {
@@ -35,6 +37,7 @@ SoulCaptureMode::~SoulCaptureMode() {
 void SoulCaptureMode::restart(Difficulty const &difficulty_) {
 	auto next = std::make_shared< SoulCaptureMode >(difficulty_);
 	next->mouse = mouse;
+	next->scythe_at = scythe_at;
 	next->blade_angle = blade_angle;
 	next->canvas.rect = canvas.rect;
 	Mode::set_current(next);
@@ -70,6 +73,9 @@ void SoulCaptureMode::slice() {
 	slice_b = pivot + reach * blade_dir;
 
 	SliceCheck check = check_slice(slice_a, slice_b);
+	if (resisting) {
+		check.hit = false;
+	}
 	slice_check = check;
 	slice_time = 0.0f;
 	knocked = false;
@@ -87,13 +93,13 @@ void SoulCaptureMode::slice() {
 			sparks.emplace_back(s);
 		}
 	}
-	message_time = 2.5f;
+	actual_slice_pos = actual_mouse_pos;
+	message_time = 1.5f;
 	if (!check.crosses) {
 		message = "Missed the lifeline.";
 	} else if (!check.hit) {
 		message = "Off by " + std::to_string(int(glm::degrees(check.angle_error))) + " degrees.";
 	}
-	if (!check.hit && hits > 0) message += " Streak reset.";
 
 	if (slice_check.hit) {
 		hits += 1;
@@ -105,10 +111,14 @@ void SoulCaptureMode::slice() {
 			burst_pending = 12;
 			message = "Hit! " + std::to_string(HitsNeeded - hits) + " more to go.";
 		}
+		if (resist_after_first_hit && !resisting) {
+			resisting = true;
+			difficulty = impossible();
+			message = "The soul is fighting back!";
+			message_time = 3.0f;
+		}
 	} else {
 		misses += 1;
-		if (hits > 0) streak_broken_time = 0.6f;
-		hits = 0;
 	}
 	if (!captured) move_pending = true;
 }
@@ -122,13 +132,23 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 	}
 	if (evt.type == SDL_EVENT_KEY_DOWN) {
 		if (evt.key.key == SDLK_A) {
-			rotate_left = true;
+			move_left = true;
 			return true;
 		} else if (evt.key.key == SDLK_D) {
-			rotate_right = true;
+			move_right = true;
+			return true;
+		} else if (evt.key.key == SDLK_W) {
+			move_up = true;
+			return true;
+		} else if (evt.key.key == SDLK_S) {
+			move_down = true;
 			return true;
 		} else if (evt.key.key == SDLK_SPACE) {
 			slice();
+			return true;
+		} else if (evt.key.key == SDLK_ESCAPE && return_to && !captured) {
+			auto self = shared_from_this();
+			Mode::set_current(std::move(return_to));
 			return true;
 		} else if (!return_to && (evt.key.key == SDLK_R || evt.key.key == SDLK_1 || evt.key.key == SDLK_2)) {
 			auto self = shared_from_this();
@@ -137,10 +157,16 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
 		if (evt.key.key == SDLK_A) {
-			rotate_left = false;
+			move_left = false;
 			return true;
 		} else if (evt.key.key == SDLK_D) {
-			rotate_right = false;
+			move_right = false;
+			return true;
+		} else if (evt.key.key == SDLK_W) {
+			move_up = false;
+			return true;
+		} else if (evt.key.key == SDLK_S) {
+			move_down = false;
 			return true;
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -150,6 +176,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 		}
 	} else if (evt.type == SDL_EVENT_MOUSE_MOTION) {
 		mouse = canvas.from_window(glm::vec2(evt.motion.x, evt.motion.y), window_size);
+		actual_mouse_pos = glm::vec2(evt.motion.x, evt.motion.y);
 		return true;
 	}
 
@@ -157,8 +184,15 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 }
 
 void SoulCaptureMode::update(float elapsed) {
-	if (rotate_left) blade_angle += rotate_speed * elapsed;
-	if (rotate_right) blade_angle -= rotate_speed * elapsed;
+	{
+		glm::vec2 move = glm::vec2(0.0f);
+		if (move_left) move.x -= 1.0f;
+		if (move_right) move.x += 1.0f;
+		if (move_down) move.y -= 1.0f;
+		if (move_up) move.y += 1.0f;
+		if (move != glm::vec2(0.0f)) scythe_at += glm::normalize(move) * move_speed * elapsed;
+		if (glm::length(scythe_at) > ArenaRadius) scythe_at = ArenaRadius * glm::normalize(scythe_at);
+	}
 
 	clock += elapsed;
 
@@ -171,11 +205,17 @@ void SoulCaptureMode::update(float elapsed) {
 		move_pending = false;
 	}
 
-	pivot = mouse;
+	pivot = scythe_at;
 	glm::vec2 away = pivot - soul_position();
 	if (glm::length(away) < keep_out_radius) {
 		if (glm::length(away) < 1e-4f) away = glm::vec2(0.0f, -1.0f);
 		pivot = soul_position() + keep_out_radius * glm::normalize(away);
+	}
+
+	{
+		glm::vec2 aim = mouse - pivot;
+		if (glm::length(aim) < 1e-3f) aim = soul_position() - pivot;
+		if (glm::length(aim) > 1e-6f) blade_angle = std::atan2(aim.y, aim.x);
 	}
 
 	cooldown = std::max(0.0f, cooldown - elapsed);
@@ -222,7 +262,7 @@ void SoulCaptureMode::update(float elapsed) {
 
 	if (!captured) {
 		timer += elapsed;
-		lifeline_angle += difficulty.lifeline_spin * std::sin(0.9f * clock + wander_phase.x) * elapsed;
+		lifeline_angle = lifeline_base_angle + difficulty.lifeline_swing * std::sin(0.9f * clock + wander_phase.x);
 	}
 }
 
@@ -243,7 +283,6 @@ void SoulCaptureMode::spawn_particles(uint32_t count, glm::vec2 a, glm::vec2 b, 
 
 void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 	canvas.begin(Background);
-	float aspect = PixelCanvas::Aspect;
 	glm::vec4 blade_tint = glm::vec4(1.0f);
 	{
 		DrawLines lines(canvas.world_to_clip());
@@ -317,22 +356,6 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 			lines.fill_circle(s.position, s.radius * (1.0f - 0.6f * t), fade(slice_check.hit ? Green : Red, t * t), 8);
 		}
 
-		constexpr float H = 0.08f;
-		auto text = [&](std::string const &str, float y, glm::u8vec4 color) {
-			lines.draw_text(str, glm::vec3(-aspect + 0.1f, y, 0.0f), glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f), color);
-		};
-		char buf[128];
-		snprintf(buf, sizeof(buf), "%s soul  misses %u  time %.1fs", difficulty.name, misses, timer);
-		text(buf, 1.0f - 1.5f * H, glm::u8vec4(0xff, 0xff, 0xff, 0xff));
-		snprintf(buf, sizeof(buf), "hits %u/%u", hits, HitsNeeded);
-		lines.draw_text(buf, glm::vec3(aspect - 0.1f - 0.55f * H * std::strlen(buf), 1.0f - 1.5f * H, 0.0f), glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f), streak_broken_time > 0.0f ? Red : Green);
-		if (captured || message_time > 0.0f) {
-			glm::u8vec4 color = slice_check.hit ? Green : Orange;
-			if (!captured) color = fade(color, 1.0f - message_time / 0.5f);
-			text(message, 1.0f - 3.0f * H, color);
-		}
-		//text("Cut ACROSS the yellow lifeline. Mouse moves the scythe, A/D rotate it.", -1.0f + 2.0f * H, glm::u8vec4(0xaa, 0xaa, 0xaa, 0xff));
-		//text("The blade turns green when a slice would hit: then press Space or click.", -1.0f + 0.5f * H, glm::u8vec4(0xaa, 0xaa, 0xaa, 0xff));
 	}
 
 	if (!captured) {
@@ -346,5 +369,46 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	canvas.end(drawable_size);
+
+	{
+		float left = canvas.rect.x * drawable_size.x;
+		float bottom = canvas.rect.y * drawable_size.y;
+		float high = canvas.rect.w * drawable_size.y;
+		auto hud_text = [&](std::string const &str, float x, float y, glm::vec3 const &color) {
+			hud.color = color;
+			hud.textbox_width = canvas.rect.z * drawable_size.x;
+			hud.textbox_height = FONT_SIZE;
+			hud.pen_x_start = x;
+			hud.pen_y_start = y;
+			hud.handle_curr_line(str + "\n");
+			hud.draw_curr_line(drawable_size);
+		};
+		
+		glm::vec3 const grey = glm::vec3(0.67f);
+		(void)grey;
+		glm::vec3 const green = glm::vec3(Green) / 255.0f;
+		glm::vec3 const orange = glm::vec3(Orange) / 255.0f;
+
+		char buf[128];
+		snprintf(buf, sizeof(buf), "%s  misses %u  %.1fs", difficulty.name, misses, timer);
+		hud_text(buf, left + FONT_SIZE, bottom + high - 1.4f * FONT_SIZE, glm::vec3(1.0f));
+		snprintf(buf, sizeof(buf), "hits %u/%u", hits, HitsNeeded);
+		hud_text(buf, left + FONT_SIZE, bottom + high - 2.8f * FONT_SIZE, green);
+		if (captured || message_time > 0.0f) {
+			glm::vec3 color = slice_check.hit ? green : orange;
+			hud_text(message, (float)actual_slice_pos.x, (float)actual_slice_pos.y, color);
+		}
+		if (resisting) {
+			hud_text("This soul is too strong for you right now.", left + FONT_SIZE, bottom + 2.3f * FONT_SIZE, orange);
+			hud_text("Press Esc to step back into the ward.", left + FONT_SIZE, bottom + 1.0f * FONT_SIZE, orange);
+		} else {
+			hud_text("Cut ACROSS the yellow lifeline.", left + FONT_SIZE, bottom + 3.6f * FONT_SIZE, White);
+			hud_text("WASD moves, mouse aims, Space cuts.", left + FONT_SIZE, bottom + 2.3f * FONT_SIZE, White);
+			if (!captured && !tutorial) {
+				hud_text("Try exploring the room if it's too hard! Esc steps back into the ward.", left + FONT_SIZE, bottom + 1.0f * FONT_SIZE, White);
+			}
+		}
+	}
+
 	GL_ERRORS();
 }

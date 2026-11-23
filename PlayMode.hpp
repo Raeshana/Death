@@ -29,6 +29,8 @@
 // #define MARGIN (FONT_SIZE * 0.5)
 #include <string>
 
+struct SoulCaptureMode;
+
 struct PlayMode : Mode {
 	PlayMode();
 	virtual ~PlayMode();
@@ -44,7 +46,7 @@ struct PlayMode : Mode {
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up, interact;
+	} left, right, down, up, interact, advance;
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
@@ -110,6 +112,7 @@ struct PlayMode : Mode {
     bool diary_read = false;         
 	bool soul_taken = false;
 	std::shared_ptr< DialogueMode > active_dialogue;
+	std::shared_ptr< SoulCaptureMode > active_minigame;
 	void start_minigame();
 
 	void reset_buttons();
@@ -125,4 +128,48 @@ struct PlayMode : Mode {
 	float bed_center_x = 128.0f;
 
 	void draw_window();
+
+	enum TutorialStep {
+		TUT_OFF,
+		TUT_INTRO,
+		TUT_MOVE,
+		TUT_SOUL,
+		TUT_TALK,
+		TUT_FIRST_TRY,
+		TUT_DIARY,
+		TUT_FIND_DIARY,
+		TUT_READ_DIARY,
+		TUT_EXPLAIN,
+		TUT_TALK_AGAIN,
+		TUT_SECOND_TRY,
+		TUT_FINISH,
+		TUT_DONE,
+	};
+	TutorialStep tutorial_step = TUT_OFF;
+	int tutorial_page = 0;
+	float moved_distance = 0.0f;
+	float hint_alpha = 0.0f;
+	std::string shown_hint;
+	float spotlight_alpha = 0.0f;
+	bool spotlight_on_diary = false;
+	glm::vec2 diary_pos = glm::vec2(0.0f);
+
+	bool tutorial_page_lines(int page, std::string lines[2]);
+	void finish_pages();
+	std::string tutorial_hint();
+	bool is_spotlight_step();
+	void draw_hint_box(std::string const lines[], int count, bool show_continue, float alpha);
+	void draw_tutorial();
+	void draw_soul();
+	bool in_tutorial();  
+
+	TextProcessor hint_text;
+	unsigned int hint_font_pixels = 0;
+	struct HintLine {
+		std::string text;
+		float center_x;
+		float baseline_y;
+	};
+	std::vector< HintLine > hint_lines;
+	void draw_hint_text(glm::uvec2 const &drawable_size);
 };

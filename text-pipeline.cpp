@@ -192,12 +192,13 @@ void TextProcessor:: draw_curr_line(glm::uvec2 const &drawable_size){
         in vec2 texCoord;
 
         uniform sampler2D glyphTexture;
+		uniform vec3 textColor;
 
         out vec4 fragColor;
 
         void main() {
             float alpha = texture(glyphTexture, texCoord).r;
-            fragColor = vec4(1.0, 1.0, 1.0, alpha);
+            fragColor = vec4(textColor, alpha);
         }
     )";
 
@@ -317,6 +318,9 @@ void TextProcessor:: draw_curr_line(glm::uvec2 const &drawable_size){
 		GLint glyph_texture = glGetUniformLocation(text_program, "glyphTexture");
 		glUniform1i(glyph_texture, 0);
 
+		GLint text_color = glGetUniformLocation(text_program, "textColor");
+		glUniform3f(text_color, color.r, color.g, color.b);
+
 		glBindVertexArray(vertex_array);
 
 		// enable blending
@@ -333,4 +337,3 @@ void TextProcessor:: draw_curr_line(glm::uvec2 const &drawable_size){
     }
     GL_ERRORS();
 }
-
