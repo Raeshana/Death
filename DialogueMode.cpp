@@ -22,6 +22,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
             talk.pressed = true;
 
 			curr_line = ""; // restart line
+			dialogue_processor.reset_line(window_size);
             
 			// can the runner continue?
 			// yes - get the next line
@@ -44,6 +45,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 					}
 				}
 				dialogue_processor.handle_curr_line(curr_line);
+				// std::cout << "dialogue mode: " << dialogue_processor.curr_line.characters.empty() << std::endl;
                 return true;
 			}
 			else if (thread->has_choices()) { // display as 3 different choices
@@ -118,120 +120,144 @@ void DialogueMode::update(float elapsed) {
 
 	// keep ghost floating
 	return_to->update(elapsed);
+
+	// timer for text effect
+	dialogue_processor.curr_line.typing_elapsed += elapsed;
+	// std::cout << "dialogue_processor.curr_line.typing_elapsed = " << dialogue_processor.curr_line.typing_elapsed << std::endl;
+		
 }
 
 void DialogueMode::draw(glm::uvec2 const &drawable_size) {	
 	// background --------------------------------------------------------------------------------------------
 	if (!can_battle) return_to->draw(drawable_size);
 
-	// dialogue --------------------------------------------------------------------------------------------
+	// textbox dimensions
 	float textbox_x_start = MARGIN;
 	float textbox_y_start = MARGIN;
 	float textbox_x_end = textbox_x_start + drawable_size.x - 2*MARGIN;
 	float textbox_y_end = textbox_y_start + drawable_size.y/4;
-	{
-		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
-			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f), // x
-			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f), // y
-			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), // z
-			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
-		);
 
-		DrawLines lines(OBJECT_TO_CLIP);
+	// // speaker dimensions
+	// speaker_processor.textbox_width = 10*FONT_SIZE;
+	// speaker_processor.textbox_height = 2*FONT_SIZE;
+	// speaker_processor.pen_x_start = textbox_x_start;
+	// speaker_processor.pen_y_start = textbox_y_end;
 
-		lines.fill_rect(
-			glm::vec2(textbox_x_start, textbox_y_start), // min
-			glm::vec2(textbox_x_end, textbox_y_end), // max
-			glm::u8vec4(20, 20, 30, 255) // colour
-		);
-
-		float line_thickness = 5.0f;
-
-		// bottom line
-		lines.fill_line( 
-			glm::vec2(textbox_x_start, textbox_y_start), // point a
-			glm::vec2(textbox_x_end, textbox_y_start), // point b
-			line_thickness, // width
-			glm::u8vec4(0, 0, 0, 255) // colour
-		);
-
-		// top line
-		lines.fill_line( 
-			glm::vec2(textbox_x_start, textbox_y_end), // point a
-			glm::vec2(textbox_x_end, textbox_y_end), // point b
-			line_thickness, // width
-			glm::u8vec4(0, 0, 0, 255) // colour
-		);
-
-		// left line
-		lines.fill_line( 
-			glm::vec2(textbox_x_start, textbox_y_start), // point a
-			glm::vec2(textbox_x_start, textbox_y_end), // point b
-			line_thickness, // width
-			glm::u8vec4(0, 0, 0, 255) // colour
-		);
-
-		// right line
-		lines.fill_line( 
-			glm::vec2(textbox_x_end, textbox_y_start), // point a
-			glm::vec2(textbox_x_end, textbox_y_end), // point b
-			line_thickness, // width
-			glm::u8vec4(0, 0, 0, 255) // colour
-		);
-	}
-
-	// we can put all of this into one texture :3
-
-	// draw dialogue line
 	dialogue_processor.textbox_width = textbox_x_end - textbox_x_start;
 	dialogue_processor.textbox_height = textbox_y_end - textbox_y_start;
 	dialogue_processor.pen_x_start = textbox_x_start + MARGIN;
 	dialogue_processor.pen_y_start = textbox_y_end - MARGIN;
-	dialogue_processor.draw_curr_line(drawable_size);
+	dialogue_processor.draw_curr_line(textbox_x_start, textbox_y_start, textbox_x_end, textbox_y_end, drawable_size);
+	dialogue_processor.curr_line.is_typing = true;
 
-	// draw current speaker
-	speaker_processor.textbox_width = 10*FONT_SIZE;
-	speaker_processor.textbox_height = 2*FONT_SIZE;
-	speaker_processor.pen_x_start = textbox_x_start;
-	speaker_processor.pen_y_start = textbox_y_end;
+	// // dialogue --------------------------------------------------------------------------------------------
+	// float textbox_x_start = MARGIN;
+	// float textbox_y_start = MARGIN;
+	// float textbox_x_end = textbox_x_start + drawable_size.x - 2*MARGIN;
+	// float textbox_y_end = textbox_y_start + drawable_size.y/4;
+	// {
+	// 	glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+	// 		glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f), // x
+	// 		glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f), // y
+	// 		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), // z
+	// 		glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
+	// 	);
 
-	{
-		glm::mat4 OBJECT_TO_CLIP = glm::mat4(
-			glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
-			glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
-			glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
-			glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
-		);
+	// 	DrawLines lines(OBJECT_TO_CLIP);
 
-		DrawLines lines(OBJECT_TO_CLIP);
+	// 	lines.fill_rect(
+	// 		glm::vec2(textbox_x_start, textbox_y_start), // min
+	// 		glm::vec2(textbox_x_end, textbox_y_end), // max
+	// 		glm::u8vec4(20, 20, 30, 255) // colour
+	// 	);
 
-		float speaker_x_end = speaker_processor.pen_x_start + speaker_processor.textbox_width;
-		float speaker_y_end = speaker_processor.pen_y_start + speaker_processor.textbox_height;
+	// 	float line_thickness = 5.0f;
 
-		lines.fill_rect(
-			glm::vec2(speaker_processor.pen_x_start, speaker_processor.pen_y_start), // min
-			glm::vec2(speaker_x_end, speaker_y_end), // max
-			glm::u8vec4(0, 0, 0, 255) // colour
-		);
+	// 	// bottom line
+	// 	lines.fill_line( 
+	// 		glm::vec2(textbox_x_start, textbox_y_start), // point a
+	// 		glm::vec2(textbox_x_end, textbox_y_start), // point b
+	// 		line_thickness, // width
+	// 		glm::u8vec4(0, 0, 0, 255) // colour
+	// 	);
 
-		lines.fill_triangle(
-			glm::vec3(speaker_x_end, speaker_processor.pen_y_start, 0), // point a
-			glm::vec3(speaker_x_end + 50.0f, speaker_processor.pen_y_start, 0), // point b
-			glm::vec3(speaker_x_end, speaker_y_end, 0), // point c
-			glm::u8vec4(0, 0, 0, 255) // colour
-		);
-	}
+	// 	// top line
+	// 	lines.fill_line( 
+	// 		glm::vec2(textbox_x_start, textbox_y_end), // point a
+	// 		glm::vec2(textbox_x_end, textbox_y_end), // point b
+	// 		line_thickness, // width
+	// 		glm::u8vec4(0, 0, 0, 255) // colour
+	// 	);
+
+	// 	// left line
+	// 	lines.fill_line( 
+	// 		glm::vec2(textbox_x_start, textbox_y_start), // point a
+	// 		glm::vec2(textbox_x_start, textbox_y_end), // point b
+	// 		line_thickness, // width
+	// 		glm::u8vec4(0, 0, 0, 255) // colour
+	// 	);
+
+	// 	// right line
+	// 	lines.fill_line( 
+	// 		glm::vec2(textbox_x_end, textbox_y_start), // point a
+	// 		glm::vec2(textbox_x_end, textbox_y_end), // point b
+	// 		line_thickness, // width
+	// 		glm::u8vec4(0, 0, 0, 255) // colour
+	// 	);
+	// }
+
+	// // we can put all of this into one texture :3
+
+	// // draw dialogue line
+	// dialogue_processor.textbox_width = textbox_x_end - textbox_x_start;
+	// dialogue_processor.textbox_height = textbox_y_end - textbox_y_start;
+	// dialogue_processor.pen_x_start = textbox_x_start + MARGIN;
+	// dialogue_processor.pen_y_start = textbox_y_end - MARGIN;
+	// dialogue_processor.draw_curr_line(drawable_size);
+
+	// // draw current speaker
+	// speaker_processor.textbox_width = 10*FONT_SIZE;
+	// speaker_processor.textbox_height = 2*FONT_SIZE;
+	// speaker_processor.pen_x_start = textbox_x_start;
+	// speaker_processor.pen_y_start = textbox_y_end;
+
+	// {
+	// 	glm::mat4 OBJECT_TO_CLIP = glm::mat4(
+	// 		glm::vec4(2.0f / float(drawable_size.x), 0.0f, 0.0f, 0.0f),
+	// 		glm::vec4(0.0f, 2.0f / float(drawable_size.y), 0.0f, 0.0f),
+	// 		glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+	// 		glm::vec4(-1.0f, -1.0f, 0.0f, 1.0f) // bottom-left
+	// 	);
+
+	// 	DrawLines lines(OBJECT_TO_CLIP);
+
+	// 	float speaker_x_end = speaker_processor.pen_x_start + speaker_processor.textbox_width;
+	// 	float speaker_y_end = speaker_processor.pen_y_start + speaker_processor.textbox_height;
+
+	// 	lines.fill_rect(
+	// 		glm::vec2(speaker_processor.pen_x_start, speaker_processor.pen_y_start), // min
+	// 		glm::vec2(speaker_x_end, speaker_y_end), // max
+	// 		glm::u8vec4(0, 0, 0, 255) // colour
+	// 	);
+
+	// 	lines.fill_triangle(
+	// 		glm::vec3(speaker_x_end, speaker_processor.pen_y_start, 0), // point a
+	// 		glm::vec3(speaker_x_end + 50.0f, speaker_processor.pen_y_start, 0), // point b
+	// 		glm::vec3(speaker_x_end, speaker_y_end, 0), // point c
+	// 		glm::u8vec4(0, 0, 0, 255) // colour
+	// 	);
+	// }
 	
-	speaker_processor.pen_x_start = textbox_x_start + MARGIN/2;
-	speaker_processor.pen_y_start = textbox_y_end + MARGIN/4;
-	speaker_processor.handle_curr_line("SOMEBODY\n"); 
-	speaker_processor.draw_curr_line(drawable_size);
+	// speaker_processor.pen_x_start = textbox_x_start + MARGIN/2;
+	// speaker_processor.pen_y_start = textbox_y_end + MARGIN/4;
+	// speaker_processor.handle_curr_line("SOMEBODY\n"); 
+	// speaker_processor.draw_curr_line(drawable_size);
 
-	// draw hint (bottom-right)
-	hint_processor.textbox_width = 10*FONT_SIZE;
-	hint_processor.textbox_height = FONT_SIZE;
-	hint_processor.pen_x_start = textbox_x_end - hint_processor.textbox_width;
-	hint_processor.pen_y_start = textbox_y_start + hint_processor.textbox_height;
-	hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); 
-	hint_processor.draw_curr_line(drawable_size);
+	// // draw hint (bottom-right)
+	// hint_processor.textbox_width = 10*FONT_SIZE;
+	// hint_processor.textbox_height = FONT_SIZE;
+	// hint_processor.pen_x_start = textbox_x_end - hint_processor.textbox_width;
+	// hint_processor.pen_y_start = textbox_y_start + hint_processor.textbox_height;
+	// hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); 
+	// hint_processor.draw_curr_line(drawable_size);
 }

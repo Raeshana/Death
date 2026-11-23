@@ -552,12 +552,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	// text --------------------------------------------------------------------------------------------
 	
 	//controls hint along the bottom of the screen:
-	hint_processor.textbox_width = float(drawable_size.x);
-	hint_processor.textbox_height = FONT_SIZE;
-	hint_processor.pen_x_start = (soul_taken ? drawable_size.x * 0.5f - 11.0f * FONT_SIZE : float(FONT_SIZE));
-	hint_processor.pen_y_start = (soul_taken ? drawable_size.y * 0.5f : FONT_SIZE * 1.5f);
-	hint_processor.handle_curr_line(hint_line);
-	hint_processor.draw_curr_line(drawable_size);
+	// hint_processor.textbox_width = float(drawable_size.x);
+	// hint_processor.textbox_height = FONT_SIZE;
+	// hint_processor.pen_x_start = (soul_taken ? drawable_size.x * 0.5f - 11.0f * FONT_SIZE : float(FONT_SIZE));
+	// hint_processor.pen_y_start = (soul_taken ? drawable_size.y * 0.5f : FONT_SIZE * 1.5f);
+	// hint_processor.handle_curr_line(hint_line);
+	// hint_processor.draw_curr_line(drawable_size);
 }
 
 void PlayMode::reset_buttons() {
