@@ -151,6 +151,19 @@ struct SoulCaptureMode : Mode {
 	float timer = 0.0f;
 	bool captured = false;
 
+	bool tutorial = false;
+	bool resist_after_first_hit = false;
+	bool resisting = false;
+	static Difficulty impossible() {
+		Difficulty d = level(Levels);
+		d.name = "resisting";
+		d.lifeline_swing = 1.2f;
+		d.swing_speed = 4.0f;
+		d.wander_radius = 0.3f;
+		d.wander_speed = 3.0f;
+		return d;
+	}
+
 	//---- difficulty 1: the soul freezes for a moment now and then ----
 	float pause_left = 0.0f, next_pause = 2.0f;
 	//---- difficulty 2: the soul slowly backs away from the scythe ----

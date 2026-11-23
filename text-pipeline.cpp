@@ -94,6 +94,10 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
     float pen_x = pen_x_start;
     float pen_y = pen_y_start;
 
+	float line_height = ft_face->size->metrics.height / 64.0f;
+    float right_edge = pen_x_start + textbox_width;
+    size_t word_start = 0;
+
     for (unsigned int i = 0; i < num_chars; i++) { 
         // ignoring the null character
         // if i make i < num_chars-1 in the loopguard it crashes on comments in the ink file. 
@@ -146,6 +150,22 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
 
         pen_x += pos[i].x_advance/64.0f;
         pen_y += pos[i].y_advance/64.0f;
+
+		//word wrap
+        Character const &added = curr_line.characters.back();
+        if (added.character == ' ') {
+            word_start = curr_line.characters.size();
+        } else if (pen_x > right_edge
+                   && word_start < curr_line.characters.size()
+                   && curr_line.characters[word_start].x > pen_x_start + 1.0f) {
+            float shift_x = pen_x_start - curr_line.characters[word_start].x;
+            for (size_t c = word_start; c < curr_line.characters.size(); c++) {
+                curr_line.characters[c].x += shift_x;
+                curr_line.characters[c].y -= line_height;
+            }
+            pen_x += shift_x;
+            pen_y -= line_height;
+        }
     }
     hb_buffer_destroy(hb_buffer);
 }
@@ -217,6 +237,10 @@ void TextProcessor::draw_textbox(float textbox_x_start, float textbox_y_start, f
 }
 
 void TextProcessor::reset_line(glm::uvec2 const &window_size){
+	//free the previous line's texture and framebuffer
+	if (curr_line.tex != 0) { glDeleteTextures(1, &curr_line.tex); curr_line.tex = 0; }
+	if (curr_line.fbo != 0) { glDeleteFramebuffers(1, &curr_line.fbo); curr_line.fbo = 0; }
+	
 	// Line texture
 	glGenTextures(1, &curr_line.tex);
 	glBindTexture(GL_TEXTURE_2D, curr_line.tex);
@@ -269,6 +293,7 @@ void TextProcessor::reset_line(glm::uvec2 const &window_size){
 /// @brief Create text typing effect
 /// @param elapsed 
 void TextProcessor::draw_curr_line(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size){
+	glViewport(0, 0, drawable_size.x, drawable_size.y);
 
 	if (curr_line.typing_elapsed > curr_line.typing_max &&
 		!curr_line.characters.empty() &&

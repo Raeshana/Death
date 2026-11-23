@@ -30,8 +30,6 @@ VAR diary_twins = false
 
 
 
-
-
 VAR battle_difficulty = 3
 
 
@@ -307,7 +305,6 @@ Good luck.
         # battle
         ~ complete_david = true
         -> home
-    
     
 
 === twins ===

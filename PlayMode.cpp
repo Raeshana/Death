@@ -881,14 +881,13 @@ void PlayMode::draw_hint_box(std::string const lines[], int count, bool show_con
 	sprites.draw(sprites.white, box_pos - glm::vec2(1.0f), box_size + glm::vec2(2.0f), border);
 	sprites.draw(sprites.white, box_pos, box_size, inside);
 
-	if (alpha > 0.5f) {
-		for (int i = 0; i < count; i++) {
-			HintLine line;
-			line.text = lines[i];
-			line.center_x = 128.0f;
-			line.baseline_y = box_pos.y + height - 4.0f - HintFontSize - i * HintLineHeight;
-			hint_lines.push_back(line);
-		}
+	for (int i = 0; i < count; i++) {
+		HintLine line;
+		line.text = lines[i];
+		line.center_x = 128.0f;
+		line.baseline_y = box_pos.y + height - 4.0f - HintFontSize - i * HintLineHeight;
+		line.alpha = alpha;
+		hint_lines.push_back(line);
 	}
 
 	if (show_continue && std::sin(hover_time * 5.0f) > -0.3f) {
@@ -959,35 +958,26 @@ void PlayMode::draw_hint_text(glm::uvec2 const &drawable_size) {
 	float view_x = std::floor((drawable_size.x - 256.0f * scale) * 0.5f);
 	float view_y = std::floor((drawable_size.y - 240.0f * scale) * 0.5f);
 
-	unsigned int pixels = (unsigned int)(HintFontSize * scale);
-	if (pixels != hint_font_pixels) {
-		FT_Set_Pixel_Sizes(hint_text.ft_face, 0, pixels);
-		hb_ft_font_changed(hint_text.hb_font);
-		hint_font_pixels = pixels;
+	uint32_t pixels = uint32_t(HintFontSize * scale);
+	if (!hint_font || hint_font->pixel_size != pixels) {
+		hint_font = std::make_unique< Font >(data_path("LowresPixel-Regular.otf"), pixels);
+		hint_cache.clear();
 	}
 
 	glViewport(0, 0, drawable_size.x, drawable_size.y);
 
 	for (size_t i = 0; i < hint_lines.size(); i++) {
-		hint_text.textbox_width = 100000.0f;
-		hint_text.pen_x_start = 0.0f;
-		hint_text.pen_y_start = 0.0f;
-		hint_text.handle_curr_line(hint_lines[i].text + "\n");
+		HintLine const &line = hint_lines[i];
 
-		float width = 0.0f;
-		if (!hint_text.curr_line.characters.empty()) {
-			Character const &last = hint_text.curr_line.characters.back();
-			width = last.x + float(last.bitmap_left) + float(last.width);
+		auto found = hint_cache.find(line.text);
+		if (found == hint_cache.end()) {
+			found = hint_cache.emplace(line.text, render_text(*hint_font, line.text)).first;
 		}
+		TextImage const &image = found->second;
 
-		float left = std::floor(view_x + hint_lines[i].center_x * scale - width * 0.5f);
-		float base = std::floor(view_y + hint_lines[i].baseline_y * scale);
-		for (size_t c = 0; c < hint_text.curr_line.characters.size(); c++) {
-			hint_text.curr_line.characters[c].x += left;
-			hint_text.curr_line.characters[c].y += base;
-		}
-
-		hint_text.draw_curr_line(drawable_size);
+		float left = std::floor(view_x + line.center_x * scale - image.advance * 0.5f);
+		float base = std::floor(view_y + line.baseline_y * scale);
+		draw_text(image, glm::vec2(left, base), glm::vec4(1.0f, 1.0f, 1.0f, line.alpha), drawable_size);
 	}
 
 	hint_lines.clear();

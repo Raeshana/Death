@@ -25,6 +25,10 @@
 
 #include "DialogueMode.hpp"
 
+#include "PixelCanvas.hpp"
+#include <map>
+#include <memory>
+
 // #define FONT_SIZE 36
 // #define MARGIN (FONT_SIZE * 0.5)
 #include <string>
@@ -163,12 +167,13 @@ struct PlayMode : Mode {
 	void draw_soul();
 	bool in_tutorial();  
 
-	TextProcessor hint_text;
-	unsigned int hint_font_pixels = 0;
+	std::unique_ptr< Font > hint_font;
+	std::map< std::string, TextImage > hint_cache;
 	struct HintLine {
 		std::string text;
 		float center_x;
 		float baseline_y;
+		float alpha;
 	};
 	std::vector< HintLine > hint_lines;
 	void draw_hint_text(glm::uvec2 const &drawable_size);

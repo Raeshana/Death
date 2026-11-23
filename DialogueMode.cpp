@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 
+#include <cmath>
+#include <algorithm>
+
 // Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
 
 
@@ -22,7 +25,7 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
             talk.pressed = true;
 
 			curr_line = ""; // restart line
-			dialogue_processor.reset_line(window_size);
+			dialogue_processor.reset_line(last_drawable_size);
             
 			// can the runner continue?
 			// yes - get the next line
@@ -132,10 +135,26 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 	if (!can_battle) return_to->draw(drawable_size);
 
 	// textbox dimensions
-	float textbox_x_start = MARGIN;
-	float textbox_y_start = MARGIN;
-	float textbox_x_end = textbox_x_start + drawable_size.x - 2*MARGIN;
-	float textbox_y_end = textbox_y_start + drawable_size.y/4;
+	last_drawable_size = drawable_size;
+
+	float scale = std::floor(std::min(drawable_size.x / 256.0f, drawable_size.y / 240.0f));
+	if (scale < 1.0f) {
+		scale = 1.0f;
+	}
+	float view_x = std::floor((drawable_size.x - 256.0f * scale) * 0.5f);
+	float view_y = std::floor((drawable_size.y - 240.0f * scale) * 0.5f);
+
+	unsigned int font_pixels = (unsigned int)(9.0f * scale);
+	if (font_pixels != dialogue_font_pixels) {
+		FT_Set_Pixel_Sizes(dialogue_processor.ft_face, 0, font_pixels);
+		hb_ft_font_changed(dialogue_processor.hb_font);
+		dialogue_font_pixels = font_pixels;
+	}
+
+	float textbox_x_start = view_x + 8.0f * scale;
+	float textbox_y_start = view_y + 8.0f * scale;
+	float textbox_x_end = view_x + (256.0f - 8.0f) * scale;
+	float textbox_y_end = view_y + 64.0f * scale;
 
 	// // speaker dimensions
 	// speaker_processor.textbox_width = 10*FONT_SIZE;
@@ -143,12 +162,12 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 	// speaker_processor.pen_x_start = textbox_x_start;
 	// speaker_processor.pen_y_start = textbox_y_end;
 
-	dialogue_processor.textbox_width = textbox_x_end - textbox_x_start;
+	dialogue_processor.textbox_width = (textbox_x_end - textbox_x_start) - 16.0f * scale;
 	dialogue_processor.textbox_height = textbox_y_end - textbox_y_start;
-	dialogue_processor.pen_x_start = textbox_x_start + MARGIN;
-	dialogue_processor.pen_y_start = textbox_y_end - MARGIN;
-	dialogue_processor.draw_curr_line(textbox_x_start, textbox_y_start, textbox_x_end, textbox_y_end, drawable_size);
+	dialogue_processor.pen_x_start = textbox_x_start + 8.0f * scale;
+	dialogue_processor.pen_y_start = textbox_y_end - 14.0f * scale;
 	dialogue_processor.curr_line.is_typing = true;
+	dialogue_processor.draw_curr_line(textbox_x_start, textbox_y_start, textbox_x_end, textbox_y_end, drawable_size);
 
 	// // dialogue --------------------------------------------------------------------------------------------
 	// float textbox_x_start = MARGIN;

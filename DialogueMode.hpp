@@ -87,4 +87,7 @@ struct DialogueMode : Mode {
 	std::shared_ptr< Mode > return_to;
 
 	bool is_typing = false;
+
+	glm::uvec2 last_drawable_size = glm::uvec2(1, 1);
+	unsigned int dialogue_font_pixels = 0;
 };

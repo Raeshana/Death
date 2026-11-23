@@ -169,6 +169,9 @@ void SoulCaptureMode::slice() {
 	slice_b = pivot + reach * blade_dir;
 
 	SliceCheck check = check_slice(slice_a, slice_b);
+	if (resisting) {
+		check.hit = false;
+	}
 	slice_check = check;
 	slice_time = 0.0f;
 	knocked = false;
@@ -197,6 +200,9 @@ void SoulCaptureMode::slice() {
 	} else if (!check.hit) {
 		message = "Off by " + std::to_string(int(glm::degrees(check.angle_error))) + " degrees.";
 	}
+	if (resisting) {
+		message = "The soul slips away!";
+	}
 	//a miss no longer wipes the streak, so there is nothing to announce:
 	//if (!check.hit && hits > 0) message += " Streak reset.";
 
@@ -210,6 +216,12 @@ void SoulCaptureMode::slice() {
 		} else {
 			burst_pending = 12;
 			message = "Hit! " + std::to_string(HitsNeeded - hits) + " more to go.";
+		}
+		if (resist_after_first_hit && !resisting) {
+			resisting = true;
+			difficulty = impossible();
+			message = "The soul is fighting back!";
+			message_time = 3.0f;
 		}
 	} else {
 		misses += 1;
@@ -248,7 +260,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 			auto self = shared_from_this();
 			Mode::set_current(std::move(return_to));
 			return true;
-		} else if (evt.key.key >= SDLK_1 && evt.key.key < SDLK_1 + Levels) {
+		} else if (!return_to && evt.key.key >= SDLK_1 && evt.key.key < SDLK_1 + Levels) {
 			//playtest: jump to a difficulty and start over
 			auto self = shared_from_this();
 			restart(level(uint32_t(evt.key.key - SDLK_1) + 1));
@@ -620,10 +632,24 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 			"Try exploring the room if it's too hard!",
 			"Esc steps back into the ward.",
 		};
-		uint32_t help_count = captured ? 2 : 4;
-		for (uint32_t i = 0; i < help_count; ++i) {
-			set_text(help_lines[i], help[i]);
-			draw_line(help_lines[i], glm::vec2(margin, margin + (help_count - 1 - i) * 1.2f * line_height), White);
+		if (resisting) {
+			static char const *const resist_help[2] = {
+				"This soul is too strong for you right now.",
+				"Press Esc to step back into the ward.",
+			};
+			for (uint32_t i = 0; i < 2; ++i) {
+				set_text(help_lines[i], resist_help[i]);
+				draw_line(help_lines[i], glm::vec2(margin, margin + (1 - i) * 1.2f * line_height), Orange);
+			}
+		} else {
+			uint32_t help_count = captured ? 2 : 4;
+			if (tutorial && !captured) {
+				help_count = 2;
+			}
+			for (uint32_t i = 0; i < help_count; ++i) {
+				set_text(help_lines[i], help[i]);
+				draw_line(help_lines[i], glm::vec2(margin, margin + (help_count - 1 - i) * 1.2f * line_height), White);
+			}
 		}
 	}
 
