@@ -114,15 +114,6 @@ struct PlayMode : Mode {
 	TextProcessor hint_processor;
 	std::shared_ptr< DialogueMode > active_dialogue;
 
-	//tags 
-    bool pause;            // pause tag
-
-	// Load ink binary story, generated from the inkCPP compiler
-	ink::runtime::story* myInk;
-
-	// Create a new thread
-	ink::runtime::runner thread;
-
 	std::string dialogue_line;
 	std::string hint_line;
 

@@ -316,8 +316,6 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	// text --------------------------------------------------------------------------------------------
 	// ink::compiler::run("test.json", "test.bin");
 	hint_line = "WASD MOVE   E INTERACT   Talk to the patient first.\n";
-	myInk = ink::runtime::story::from_file(data_path("prototype_script.bin").c_str());
-	thread = myInk->new_runner();
 
 	// sound --------------------------------------------------------------------------------------------
 	Sound::loop(*before_soul_capture, 1.0f, 0.0f);
@@ -421,6 +419,20 @@ void PlayMode::on_interact(Interactable const &thing) {
 		if (soul_taken) {
 			hint_line = "This soul has already been collected.";;
 			return;
+		}
+
+		// tell the story which patient we are talking to before it resumes
+		static const char *patients[5] = { "abigail", "sherry", "keith", "david", "twins" };
+		std::string patient = patients[room_number - 1];
+
+		std::shared_ptr< InkStory > story = InkStory::get("prototype_script.bin");
+		if (patient != "henry") { 
+			for (const char *other : patients) {
+				story->set_var< bool >(("start_" + std::string(other)).c_str(), patient == other);
+			}
+		}
+		if (diary_read) {
+			story->set_var< bool >(("diary_" + patient).c_str(), true);
 		}
 
 		std::shared_ptr< DialogueMode > dialogue = std::make_shared< DialogueMode >("prototype_script.bin");
