@@ -35,7 +35,7 @@
 #include <memory>
 #include <functional>
 
-
+struct SoulCaptureMode;
 
 // the ink story for the entire game. 
 struct InkStory {
@@ -137,7 +137,7 @@ struct DialogueMode : Mode {
 	bool battle_captured = false; //...and whether the soul was captured
 	//called when a soul is captured (PlayMode uses it to set soul_taken)
 	std::function< void() > on_capture;
-
+	std::function< void(SoulCaptureMode &) > setup_minigame;
 	//----- story stuff -----
 
 	std::shared_ptr<InkStory> ink;

@@ -92,6 +92,7 @@ void DialogueMode::start_battle() {
 	auto minigame = std::make_shared<SoulCaptureMode>(SoulCaptureMode::level(uint32_t(level)));
 	//come back to this dialogue
 	minigame->return_to = shared_from_this();
+	if (setup_minigame) setup_minigame(*minigame);
 
 	// the minigame calls this right before handing control back; update() acts on it
 	std::weak_ptr<Mode> weak_self = shared_from_this();

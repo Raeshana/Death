@@ -155,7 +155,7 @@ VAR battle_difficulty = 3
         -> fight
     
     = fight
-        Starting collection... # battle
+        Collection Complete # battle
         ~ complete_sherry = true
         -> home
 
@@ -197,7 +197,7 @@ VAR battle_difficulty = 3
     * "I can't reap you." 
         -> reject
     = fight 
-        Starting collection... # battle
+        - Collection Complete # battle
         ~ complete_keith = true
         -> home
 
@@ -262,7 +262,7 @@ VAR battle_difficulty = 3
         -> fight
     
     = fight
-         Starting collection... # battle
+         Collection Complete # battle
         ~ complete_david = true
         -> home
     
@@ -410,7 +410,7 @@ VAR battle_difficulty = 3
         
     
     = fight
-        Starting collection... # battle
+        Collection Complete # battle
         ~ complete_twins = true
         -> home
 

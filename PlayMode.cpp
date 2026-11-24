@@ -129,6 +129,9 @@ static const char *ROOM_MAP_2[MapHeight] = {
 
 static const char *ROOM_MAP_3[MapHeight] = {
 	"################################",
+	"################################",
+	"################################",
+	"#..............................#",
 	"#..............................#",
 	"#...........IIBBBBCC...........#",
 	"#...........IIBBBBCC...........#",
@@ -153,33 +156,30 @@ static const char *ROOM_MAP_3[MapHeight] = {
 	"#..............................#",
 	"#..............................#",
 	"#..............................#",
-	"#..............................#",
-	"#..............................#",
-	"#..............................#",
 	"#..............X...............#",
 	"###############==###############",
 };
 
 static const char *ROOM_MAP_4[MapHeight] = {
 	"################################",
-	"#..............................#",
-	"#.CCBBBBII.....................#",
-	"#.CCBBBBII.....................#",
-	"#.CCBBBBII.................TT..#",
-	"#...BBBB...................TT..#",
-	"#...BBBB...................D...#",
-	"#...BBBB.......................#",
-	"#.....P........................#",
+	"################################",
+	"################################",
 	"#..............................#",
 	"#..............................#",
-	"#....................MMM.......#",
-	"#....................MMM.......#",
-	"#....................MMM.......#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
+	"#...........IIBBBBCC...........#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#.............BBBB.............#",
+	"#...............P..............#",
+	"#..............................#",
+	"#.....TT.......................#",
+	"#.....TT.......................#",
+	"#.....D........................#",
 	"#..............................#",
 	"#..............................#",
-	"#....................WWW.......#",
-	"#....................WWW.......#",
-	"#....................WWW.......#",
+	"#..............................#",
 	"#..............................#",
 	"#..............................#",
 	"#..............................#",
@@ -195,16 +195,16 @@ static const char *ROOM_MAP_4[MapHeight] = {
 
 static const char *ROOM_MAP_5[MapHeight] = {
 	"################################",
+	"################################",
+	"################################",
 	"#..............................#",
-	"#.CCBBBBII.....................#",
-	"#.CCBBBBII.....................#",
-	"#.CCBBBBII.................TT..#",
-	"#...BBBB...................TT..#",
-	"#...BBBB...................D...#",
-	"#...BBBB.......................#",
-	"#.....P........................#",
-	"#..............................#",
-	"#..............................#",
+	"#.IIBBBBCC.IIbbbbCC............#",
+	"#.IIBBBBCC.IIbbbbCC............#",
+	"#.IIBBBBCC.IIbbbbCC........TT..#",
+	"#...BBBB.....bbbb..........TT..#",
+	"#...BBBB.....bbbb..........D...#",
+	"#...BBBB.....bbbb..............#",
+	"#.....P.........Q..............#",
 	"#....................MMM.......#",
 	"#....................MMM.......#",
 	"#....................MMM.......#",
@@ -329,6 +329,13 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 				exit.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
 				exit.radius = 20.0f;
 				interactables.push_back(exit);
+			} else if (c == 'Q') {
+				Interactable twin;
+				twin.name = "patient";
+				twin.pos = glm::vec2(x * TileSize + 4.0f, y * TileSize + 4.0f);
+				twin.radius = 20.0f;
+				interactables.push_back(twin);
+				lights.push_back(glm::vec2(x * TileSize, y * TileSize + 8.0f));
 			}
 		}
 	}
@@ -355,6 +362,10 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 	patient_dead_tex = sprites.load(data_path("patient" + std::to_string(room_number) + "_dead.png"));
 	cardiogram_dead_tex = sprites.load(data_path("cardiogram_dead.png"));
 
+	if (room_number == 5) {
+		twin_tex = sprites.load(data_path("patient5b.png"));
+	}
+
 	//build props
 	for (int y = 0; y < MapHeight; y++) {
 		for (int x = 0; x < MapWidth; x++) {
@@ -375,6 +386,8 @@ PlayMode::PlayMode(int room_number_) : room_number(room_number_) {
 				tex = iv_tex;
 			} else if (c == 'T') {
 				tex = desk_tex;
+			} else if (c == 'b') {
+				tex = twin_tex;
 			} else {
 				continue;
 			}
@@ -667,6 +680,22 @@ void PlayMode::on_interact(Interactable const &thing) {
 			auto room = std::static_pointer_cast< PlayMode >(weak_room.lock());
 			if (room) room->soul_taken = true;
 		};
+
+		// //the dialogue starts the battle; in the tutorial we set up its minigame
+		// PlayMode *r = this;
+		// dialogue->setup_minigame = [r](SoulCaptureMode &minigame) {
+		// 	r->minigame_seen = true;
+		// 	if (r->tutorial_step == TUT_FIRST_TRY) {
+		// 		minigame.difficulty = SoulCaptureMode::level(1);
+		// 		minigame.tutorial = true;
+		// 		minigame.resist_after_first_hit = true;
+		// 	}
+		// 	if (r->tutorial_step == TUT_SECOND_TRY) {
+		// 		minigame.difficulty = SoulCaptureMode::level(1);
+		// 		minigame.tutorial = true;
+		// 	}
+		// };
+
 		active_dialogue = dialogue;
 
 		reset_buttons();
@@ -719,8 +748,6 @@ static int room_floor_distance_below(std::vector< std::string > const &room, int
 }
 
 void PlayMode::update(float elapsed) {
-
-	//start the minigame
 	if (active_dialogue && Mode::current.get() == this) {
 		active_dialogue.reset();
 		// if (battle || tutorial_step == TUT_FIRST_TRY || tutorial_step == TUT_SECOND_TRY) {
@@ -728,7 +755,6 @@ void PlayMode::update(float elapsed) {
 		// 	return;
 		// }
 	}
-
 	if (active_minigame && Mode::current.get() == this && !leaving_to) {
 		if (active_minigame->captured) {
 			soul_taken = true;
