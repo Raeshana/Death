@@ -1,41 +1,26 @@
 // TAG LIST:
 // pause: stop until prompted to.
 // battle: start the soul capture minigame when this dialogue closes.
-
 // IDEAS: 
 // can the patient talk to the player during minigame? 
-
-
 VAR speaker = "Someone"
-
 VAR start_abigail = false
 VAR start_sherry = false
 VAR start_keith = false
 VAR start_david = false
 VAR start_twins = false
-
-
-
 VAR complete_abigail = false
 VAR complete_sherry = false
 VAR complete_keith = false
 VAR complete_david = false
 VAR complete_twins = false
-
 VAR diary_henry = false
 VAR diary_abigail = false
 VAR diary_sherry = false
 VAR diary_keith = false
 VAR diary_david = false
 VAR diary_twins = false
-
-
-
-
-
 VAR battle_difficulty = 3
-
-
 Welcome to your first day on the job.
 To make things easy for you, we have stationed you in a hospital.
 In order to make today's quota, you must reap at least 1 (one) soul.
@@ -331,8 +316,7 @@ Good luck.
             -> confirmation
         * It is inevitable.
             -> confirmation
-        ~ battle_difficulty = 1
-        -> fight
+        
     = confirmation
         "No!"
         "Who says he has to?"

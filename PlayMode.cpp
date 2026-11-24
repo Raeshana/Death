@@ -425,7 +425,7 @@ void PlayMode::on_interact(Interactable const &thing) {
 		static const char *patients[5] = { "abigail", "sherry", "keith", "david", "twins" };
 		std::string patient = patients[room_number - 1];
 
-		std::shared_ptr< InkStory > story = InkStory::get("prototype_script.bin");
+		std::shared_ptr< InkStory > story = InkStory::get("final_script.bin");
 		if (patient != "henry") { 
 			for (const char *other : patients) {
 				story->set_var< bool >(("start_" + std::string(other)).c_str(), patient == other);
@@ -435,8 +435,14 @@ void PlayMode::on_interact(Interactable const &thing) {
 			story->set_var< bool >(("diary_" + patient).c_str(), true);
 		}
 
-		std::shared_ptr< DialogueMode > dialogue = std::make_shared< DialogueMode >("prototype_script.bin");
+		std::shared_ptr< DialogueMode > dialogue = std::make_shared< DialogueMode >("final_script.bin");
 		dialogue->return_to = shared_from_this();
+		// the dialogue starts the battle itself when it reads "# battle"; we just hear about the capture
+		std::weak_ptr<Mode> weak_room = shared_from_this();
+		dialogue->on_capture = [weak_room]() {
+			auto room = std::static_pointer_cast< PlayMode >(weak_room.lock());
+			if (room) room->soul_taken = true;
+		};
 		active_dialogue = dialogue;
 
 		reset_buttons();
@@ -459,13 +465,9 @@ void PlayMode::on_interact(Interactable const &thing) {
 void PlayMode::update(float elapsed) {
 
 	// change w/ patient struct to keep track of info
+	// dialogue closed (battles now start inside the dialogue when "# battle" is read)
 	if (active_dialogue && Mode::current.get() == this) {
-		bool battle = active_dialogue->can_battle;
 		active_dialogue.reset();
-		if (battle) {
-			start_minigame();
-			return;
-		}
 	}
 
 	hover_time = hover_time + elapsed;

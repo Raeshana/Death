@@ -33,6 +33,7 @@
 #include "DrawLines.hpp"
 
 #include <memory>
+#include <functional>
 
 
 
@@ -45,6 +46,9 @@ struct InkStory {
 	ink::runtime::runner runner;
 	// handling the pause tag.
 	bool paused = false;
+	// a "# battle" tag was read but the soul hasn't been captured yet (e.g. the player
+	// retreated with Escape). the next dialogue that opens goes straight into the battle.
+	bool battle_pending = false;
 	//the knot that handles the next patient
 	std::string next_patient = "next_patient";
 
@@ -104,7 +108,7 @@ struct DialogueMode : Mode {
 	TextProcessor speaker_processor;
 
 	//----- tags stuff -----
-	bool can_battle = false;
+	bool can_battle = false;    //the line on screen has "# battle": next input starts the minigame
 	bool pause_pending = false; //next input closes dialogue
 
 	//read the current line's tags (call after every getline())
@@ -113,6 +117,15 @@ struct DialogueMode : Mode {
 	void choose(int i);
 	//close dialogue
 	void leave();
+
+	//----- battle stuff -----
+	//switch to the soul capture minigame, difficulty from the ink VAR battle_difficulty
+	void start_battle();
+	bool resume_battle = false;   //opened while ink->battle_pending: start the battle on first update
+	bool battle_finished = false; //minigame just handed control back (handled in update)
+	bool battle_captured = false; //...and whether the soul was captured
+	//called when a soul is captured (PlayMode uses it to set soul_taken)
+	std::function< void() > on_capture;
 
 	//----- story stuff -----
 

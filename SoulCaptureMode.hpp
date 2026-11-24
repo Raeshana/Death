@@ -9,6 +9,7 @@
 
 #include <cmath>
 
+#include <functional>
 #include <memory>
 #include <random>
 #include <string>
@@ -166,6 +167,8 @@ struct SoulCaptureMode : Mode {
 
 	PixelCanvas canvas;
 	std::shared_ptr< Mode > return_to;
+	//called right before going back to return_to: true = soul captured, false = retreated (Escape)
+	std::function< void(bool captured) > did_retreat;
 
 	//text is drawn at screen resolution on top of the canvas. The font size follows the
 	//size of the canvas on screen, so text keeps its size relative to the pixel art:
