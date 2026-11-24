@@ -9,7 +9,6 @@
 
 #include "text-pipeline.hpp"
 
-
 //room size in tiles
 const int MapWidth = 32;
 const int MapHeight = 30;

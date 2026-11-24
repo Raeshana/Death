@@ -9,6 +9,8 @@
 #include <cstring>
 #include <string>
 
+#include "SoundManager.hpp"
+
 static glm::vec3 const Background = glm::vec3(0.02f, 0.02f, 0.03f);
 static glm::u8vec4 const Green = glm::u8vec4(0x44, 0xff, 0x44, 0xff);
 static glm::u8vec4 const Red = glm::u8vec4(0xff, 0x44, 0x44, 0xff);
@@ -79,6 +81,7 @@ SoulCaptureMode::SoulCaptureMode(Difficulty const &difficulty_) : difficulty(dif
 	lifeline_angle = lifeline_base_angle;
 
 	if (difficulty.mechanic == Mechanic::Planks) place_planks();
+	SoundManager::play_music(*SoundManager::soul_capture);
 }
 
 SoulCaptureMode::~SoulCaptureMode() {
@@ -176,6 +179,9 @@ void SoulCaptureMode::slice() {
 	slice_check = check;
 	slice_time = 0.0f;
 	knocked = false;
+	SoundManager::play_sfx(*SoundManager::slash_sfx);
+	if (check.hit) SoundManager::play_sfx(*SoundManager::hit_sfx);
+	else SoundManager::play_sfx(*SoundManager::miss_sfx);
 
 	{
 		constexpr uint32_t Count = 24;
@@ -238,6 +244,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 	if (captured && return_to && go_on && slice_time > 1.0f) {
 		auto self = shared_from_this();
 		if (did_retreat) did_retreat(true);
+		SoundManager::play_music(*SoundManager::hospital_music);
 		Mode::set_current(std::move(return_to));
 		return true;
 	}
@@ -261,6 +268,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 			//step back into the ward: the player may want to look around before trying again
 			auto self = shared_from_this();
 			if (did_retreat) did_retreat(false);
+			SoundManager::play_music(*SoundManager::hospital_music);
 			Mode::set_current(std::move(return_to));
 			return true;
 		} else if (!return_to && evt.key.key >= SDLK_1 && evt.key.key < SDLK_1 + Levels) {

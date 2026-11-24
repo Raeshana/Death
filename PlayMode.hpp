@@ -28,8 +28,7 @@
 #include <map>
 #include <memory>
 
-// sound
-#include "SoundManager.hpp"
+#include "patient.hpp"
 
 // #define FONT_SIZE 36
 // #define MARGIN (FONT_SIZE * 0.5)
@@ -187,7 +186,4 @@ struct PlayMode : Mode {
 	std::string hint_line;
 
 	bool talked_patient = false;
-
-	//----- sound stuff -----
-	SoundManager soundManager;
 };

@@ -29,6 +29,7 @@
 #include <algorithm>
 #include "HallwayMode.hpp"
 #include "PlayMode.hpp"
+#include "SoundManager.hpp"
 
 
 #ifdef _WIN32
@@ -117,6 +118,12 @@ int main(int argc, char **argv) {
 
 	//------------ load assets --------------
 	call_load_functions();
+
+	// sound
+	std::cout << "Hospital music loaded: "
+          << static_cast<bool>(SoundManager::hospital_music)
+          << std::endl;
+	SoundManager::play_music(*SoundManager::hospital_music);
 
 	//------------ create game mode + make current --------------
 	std::shared_ptr< HallwayMode > hallway = std::make_shared< HallwayMode >();
