@@ -175,8 +175,12 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 			}
 
 			if (thread->has_choices()) {
+				// one choice per line, numbered to match the 1/2/3 keys
+				curr_line = "";
+				int number = 1;
 				for ( const ink::runtime::choice c : *thread ) {
-					curr_line.append(c.text());
+					curr_line.append(std::to_string(number) + ". " + c.text() + "\n");
+					number++;
 				}
 				dialogue_processor.handle_curr_line(curr_line);
 				return true;

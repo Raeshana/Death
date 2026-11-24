@@ -104,6 +104,14 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
         
         if (i == num_chars-1) continue;
 
+        // a newline in the middle of the text starts a new line (used for the choice list)
+        if (imported_line[info[i].cluster] == '\n') {
+            pen_x = pen_x_start;
+            pen_y -= line_height;
+            word_start = curr_line.characters.size();
+            continue;
+        }
+
         Character character;
         if (i == 0){
             // if guard for parsing 
