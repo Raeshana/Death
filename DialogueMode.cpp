@@ -118,6 +118,8 @@ void DialogueMode::choose(int i) {
 		return;
 	}
 
+	// clear the old text (the choice list) before showing the next line
+	dialogue_processor.reset_line(last_drawable_size);
 	dialogue_processor.handle_curr_line(curr_line);
 }
 
