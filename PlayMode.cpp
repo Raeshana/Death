@@ -639,17 +639,19 @@ void PlayMode::on_interact(Interactable const &thing) {
 		}
 
 		// tell the story which patient we are talking to before it resumes
-		static const char *patients[5] = { "abigail", "sherry", "keith", "david", "twins" };
-		std::string patient = patients[room_number - 1];
+		static const char *patients[6] = { "henry", "abigail", "sherry", "keith", "david", "twins" };
+		std::string patient = patients[room_number];
 
 		std::shared_ptr< InkStory > story = InkStory::get("final_script.bin");
-		if (patient != "henry") { 
-			for (const char *other : patients) {
-				story->set_var< bool >(("start_" + std::string(other)).c_str(), patient == other);
-			}
+		for (int i = 1; i < 6; i++) {
+			story->set_var< bool >(("start_" + std::string(patients[i])).c_str(), patient == patients[i]);
 		}
 		if (diary_read) {
 			story->set_var< bool >(("diary_" + patient).c_str(), true);
+		}
+
+		if (tutorial_step == TUT_FIRST_TRY && !minigame_seen) {
+			story->runner->move_to("henry");
 		}
 
 		std::shared_ptr< DialogueMode > dialogue = std::make_shared< DialogueMode >("final_script.bin");
@@ -660,6 +662,22 @@ void PlayMode::on_interact(Interactable const &thing) {
 			auto room = std::static_pointer_cast< PlayMode >(weak_room.lock());
 			if (room) room->soul_taken = true;
 		};
+
+		//the dialogue starts the battle; in the tutorial we set up its minigame
+		PlayMode *room = this;
+		dialogue->setup_minigame = [room](SoulCaptureMode &minigame) {
+			room->minigame_seen = true;
+			if (room->tutorial_step == TUT_FIRST_TRY) {
+				minigame.difficulty = SoulCaptureMode::level(1);
+				minigame.tutorial = true;
+				minigame.resist_after_first_hit = true;
+			}
+			if (room->tutorial_step == TUT_SECOND_TRY) {
+				minigame.difficulty = SoulCaptureMode::level(1);
+				minigame.tutorial = true;
+			}
+		};
+
 		active_dialogue = dialogue;
 
 		reset_buttons();
@@ -708,29 +726,23 @@ static int room_floor_distance_below(std::vector< std::string > const &room, int
 
 void PlayMode::update(float elapsed) {
 
-	//start the minigame
 	if (active_dialogue && Mode::current.get() == this) {
 		active_dialogue.reset();
-		if (battle || tutorial_step == TUT_FIRST_TRY || tutorial_step == TUT_SECOND_TRY) {
-			start_minigame();
-			return;
-		}
-	}
-
-	if (active_minigame && Mode::current.get() == this && !leaving_to) {
-		if (active_minigame->captured) {
-			soul_taken = true;
-			if (tutorial_step == TUT_SECOND_TRY) {
-				tutorial_step = TUT_FINISH;
-				tutorial_page = 0;
+		if (tutorial_step == TUT_FIRST_TRY) {
+			if (minigame_seen) {
+				tutorial_step = TUT_DIARY;
+			} else {
+				tutorial_step = TUT_TALK;
 			}
-		} else if (tutorial_step == TUT_FIRST_TRY) {
-			tutorial_step = TUT_DIARY;
 			tutorial_page = 0;
 		} else if (tutorial_step == TUT_SECOND_TRY) {
-			tutorial_step = TUT_TALK_AGAIN;
+			if (soul_taken) {
+				tutorial_step = TUT_FINISH;
+			} else {
+				tutorial_step = TUT_TALK_AGAIN;
+			}
+			tutorial_page = 0;
 		}
-		active_minigame.reset();
 	}
 
 	//fade in after entering this room

@@ -150,6 +150,7 @@ struct PlayMode : Mode {
 		TUT_DONE,
 	};
 	TutorialStep tutorial_step = TUT_OFF;
+	bool minigame_seen = false;
 	int tutorial_page = 0;
 	float moved_distance = 0.0f;
 	float hint_alpha = 0.0f;
