@@ -90,7 +90,7 @@ VAR battle_difficulty = 3
 
     { diary_abigail:
         DIARY CONTENTS:
-        This hurts!
+        This hurts! # pause
     }
     ~ speaker = "Abigail"
 
@@ -117,7 +117,7 @@ VAR battle_difficulty = 3
         but unto all them also that love his appearing.
         \-- 2 Timothy 4:7-8.
         Every day I grow more weary. 
-        It may be time for this ol' Sherry to join the rest of my friends.
+        It may be time for this ol' Sherry to join the rest of my friends. # pause
     }
     ~ speaker = "Sherry"
 
@@ -164,6 +164,7 @@ VAR battle_difficulty = 3
     ~ speaker = "Notebook"
 
     { diary_keith:
+        ~ battle_difficulty = 1
         DIARY CONTENTS: 
         "finally an escape from my suffering
         an excuse from everything in my life
@@ -174,8 +175,8 @@ VAR battle_difficulty = 3
         im done 
         im done im doneimdoneimdone 
         imdoneimdoneimdoneiwanttodisappear
-        its time to disappear"
-        ~ battle_difficulty = 1
+        its time to disappear" # pause
+        
     }
     ~ speaker = "Keith"
 
@@ -218,7 +219,7 @@ VAR battle_difficulty = 3
     { diary_david: 
        DIARY CONTENTS:
        I knew I shouldnt have drank and drove.
-       I deserve this.
+       I deserve this. # pause
     }
     ~ speaker = "David"
 
@@ -272,7 +273,7 @@ VAR battle_difficulty = 3
     ~ speaker = "Notebook"
     { diary_twins: 
         DIARY CONTENTS:
-        \-- The diary is empty \--
+        \-- The diary is empty \-- # pause
     }
     
     * "It is time." 

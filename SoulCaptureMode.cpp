@@ -613,8 +613,8 @@ void SoulCaptureMode::draw(glm::uvec2 const &drawable_size) {
 		snprintf(buf, sizeof(buf), "hits %u/%u", hits, HitsNeeded);
 		set_text(hits_line, buf);
 		draw_line(hits_line, glm::vec2(margin, PixelCanvas::Height - 2.4f * line_height), Green);
-		set_text(keys_line, "playtest: keys 1-5 switch the difficulty");
-		draw_line(keys_line, glm::vec2(margin, PixelCanvas::Height - 3.6f * line_height), glm::u8vec4(0x99, 0x99, 0xaa, 0xff));
+		// set_text(keys_line, "playtest: keys 1-5 switch the difficulty");
+		// draw_line(keys_line, glm::vec2(margin, PixelCanvas::Height - 3.6f * line_height), glm::u8vec4(0x99, 0x99, 0xaa, 0xff));
 
 		if (captured || message_time > 0.0f) {
 			//show the result just above where the cut started, kept inside the canvas

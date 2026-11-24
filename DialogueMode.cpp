@@ -321,6 +321,16 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 	dialogue_processor.curr_line.is_typing = true;
 	dialogue_processor.draw_curr_line(textbox_x_start, textbox_y_start, textbox_x_end, textbox_y_end, drawable_size);
 
+	//a little hack to make emulate the space being triggered so that the dialogue pops up
+	//without hitting it again.
+	if (dialogue_processor.curr_line.tex == 0) {
+		SDL_Event space{};
+		space.type = SDL_EVENT_KEY_DOWN;
+		space.key.key = SDLK_SPACE;
+		space.key.repeat = false;
+		handle_event(space, drawable_size);
+	}
+
 	// // dialogue --------------------------------------------------------------------------------------------
 	// float textbox_x_start = MARGIN;
 	// float textbox_y_start = MARGIN;
@@ -429,6 +439,6 @@ void DialogueMode::draw(glm::uvec2 const &drawable_size) {
 	// hint_processor.textbox_height = FONT_SIZE;
 	// hint_processor.pen_x_start = textbox_x_end - hint_processor.textbox_width;
 	// hint_processor.pen_y_start = textbox_y_start + hint_processor.textbox_height;
-	// hint_processor.handle_curr_line("SPACE TO CONTINUE\n"); 
+	// hint_processor.handle_curr_line("SPACE TO CONTINUE\n");
 	// hint_processor.draw_curr_line(drawable_size);
 }

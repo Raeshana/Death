@@ -635,6 +635,9 @@ bool PlayMode::can_move_to(glm::vec2 pos) {
 	return true;
 }
 
+//moving the patients out here bc theres no need to define it multiple times.
+static const char *patients[5] = { "abigail", "sherry", "keith", "david", "twins" };
+
 //interaction when E is pressed
 void PlayMode::on_interact(Interactable const &thing) {
 	if (thing.name == "patient") {
@@ -658,8 +661,9 @@ void PlayMode::on_interact(Interactable const &thing) {
 			return;
 		}
 
-		// tell the story which patient we are talking to before it resumes
-		static const char *patients[5] = { "abigail", "sherry", "keith", "david", "twins" };
+		//block diary reading after minigame start.
+		talked_patient = true;
+
 		std::string patient = patients[room_number - 1];
 
 		std::shared_ptr< InkStory > story = InkStory::get("final_script.bin");
@@ -701,12 +705,33 @@ void PlayMode::on_interact(Interactable const &thing) {
 		reset_buttons();
 		Mode::set_current(dialogue);
 	} else if (thing.name == "diary") {
+		bool first_read = !diary_read;
 		diary_read = true;
 		std::cout << "You read the diary. The patient seems calmer now." << std::endl;
 		if (tutorial_step == TUT_FIND_DIARY) {
 			tutorial_step = TUT_READ_DIARY;
 			tutorial_page = 0;
 		}
+
+		//diary text box.
+		//only show it before the minigame has stared
+		if (room_number == 0 || !first_read || talked_patient) {
+			return;
+		}
+		std::string patient = patients[room_number - 1];
+
+		std::shared_ptr<InkStory> story = InkStory::get("final_script.bin");
+		for (const char *other : patients) {
+			story->set_var<bool >(("start_" + std::string(other)).c_str(), patient == other);
+		}
+		story->set_var<bool>(("diary_" + patient).c_str(), true);
+
+		std::shared_ptr<DialogueMode> dialogue = std::make_shared<DialogueMode >("final_script.bin");
+		dialogue->return_to = shared_from_this();
+		active_dialogue = dialogue;
+
+		reset_buttons();
+		Mode::set_current(dialogue);
 	} else if (thing.name == "father") {
 		std::cout << "You talked to the father. (TODO: tell story)" << std::endl;
 	} else if (thing.name == "nurse") {
