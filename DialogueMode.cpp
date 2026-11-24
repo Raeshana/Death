@@ -1,7 +1,10 @@
 #include "DialogueMode.hpp"
+#include "SoulCaptureMode.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 #include <cmath>
 #include <algorithm>
@@ -9,20 +12,132 @@
 // Referenced https://github.com/JBenda/inkcpp for inky-c++ integration [RAHHH!]
 
 
-DialogueMode::DialogueMode(std::string const &script_file) {
-	inkDialogue = ink::runtime::story::from_file(data_path(script_file).c_str());
-	thread = inkDialogue->new_runner();
+std::shared_ptr<InkStory> InkStory::get(std::string const &script_file) {
+	static std::unordered_map< std::string, std::shared_ptr<InkStory> > stories;
 
-	can_battle = false;
+	auto found = stories.find(script_file);
+	if (found != stories.end()) return found->second;
+
+	auto s = std::make_shared<InkStory>();
+	s->story = ink::runtime::story::from_file(data_path(script_file).c_str());
+	s->globals = s->story->new_globals();
+	s->runner = s->story->new_runner(s->globals); // also initializes the globals
+	stories.emplace(script_file, s);
+	return s;
+}
+
+// strip leading/trailing whitespace
+static std::string trim(std::string const &s) {
+	size_t begin = s.find_first_not_of(" \t\r\n");
+	if (begin == std::string::npos) return "";
+	size_t end = s.find_last_not_of(" \t\r\n");
+	return s.substr(begin, end - begin + 1);
+}
+
+DialogueMode::DialogueMode(std::string const &script_file) {
+	ink = InkStory::get(script_file);
+	ink->paused = false;
+
+	// player decided to retreat.
+	// story stays where it is until battle is done.
+	resume_battle = ink->battle_pending;
+
+	auto &thread = ink->runner;
+	if (!resume_battle && !thread->can_continue() && !thread->has_choices()) {
+		if (!thread->move_to(ink->next_patient.c_str())) {
+			std::cerr << "DialogueMode: resume knot '" << ink->next_patient << "' not found in " << script_file << std::endl;
+		}
+	}
 }
 
 DialogueMode::~DialogueMode() {
 }
 
+//parse the tags and sets the variables for control flow. 
+void DialogueMode::process_tags() {
+	auto &thread = ink->runner;
+	for (ink::size_t i = 0; i < thread->num_tags(); ++i) {
+		std::string tag = trim(thread->get_tag(i));
+		std::cout << "tag: " << tag << std::endl;
+
+		if (tag == "battle") {
+			can_battle = true;
+		} else if (tag == "pause") {
+			pause_pending = true;
+		}
+	}
+}
+
+void DialogueMode::leave() {
+	auto self = shared_from_this();
+	std::shared_ptr<Mode> back = return_to;
+	Mode::set_current(back);
+}
+
+void DialogueMode::start_battle() {
+	//the soul is currently being captured so the battle counts as unfinished
+	ink->battle_pending = true;
+
+	// difficulty comes from the script 
+	//ink doesnt use unsigned so casting hell is below. 
+	//for a failsafe, lets make 3 be the default
+	int32_t level = 3; 
+	auto difficulty = ink->get_var<int32_t>("battle_difficulty");
+	if (difficulty.has_value()) level = *difficulty;
+	level = std::max<int32_t>(1, std::min<int32_t>(int32_t(SoulCaptureMode::Levels), level));
+
+	auto minigame = std::make_shared<SoulCaptureMode>(SoulCaptureMode::level(uint32_t(level)));
+	//come back to this dialogue
+	minigame->return_to = shared_from_this();
+
+	// the minigame calls this right before handing control back; update() acts on it
+	std::weak_ptr<Mode> weak_self = shared_from_this();
+	minigame->did_retreat = [weak_self](bool captured) {
+		auto self = std::static_pointer_cast< DialogueMode >(weak_self.lock());
+		if (!self) return;
+		self->battle_finished = true;
+		self->battle_captured = captured;
+	};
+
+	Mode::set_current(minigame);
+}
+
+void DialogueMode::choose(int i) {
+	auto &thread = ink->runner;
+	if (!thread->has_choices() || i >= int(thread->num_choices())) return;
+
+	thread->choose(i);
+	curr_line = thread->can_continue() ? thread->getline() : "";
+	process_tags();
+
+	//handles battles right after a choice is made. 
+	if (can_battle && trim(curr_line).empty()) {
+		can_battle = false;
+		start_battle();
+		return;
+	}
+
+	dialogue_processor.handle_curr_line(curr_line);
+}
+
 bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+	auto &thread = ink->runner;
+
 	if (evt.type == SDL_EVENT_KEY_DOWN) {
 		if (evt.key.key == SDLK_SPACE){ // process dialogue
-            talk.pressed = true;
+			talk.pressed = true;
+			if (can_battle) {
+				can_battle = false;
+				start_battle();
+				return true;
+			}
+
+			if (pause_pending) {
+				pause_pending = false;
+				ink->paused = true;
+				leave(); //close the dialogue
+				return true;
+			}
 
 			curr_line = ""; // restart line
 			dialogue_processor.reset_line(last_drawable_size);
@@ -30,88 +145,62 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 			// can the runner continue?
 			// yes - get the next line
 			// no - at choice or end
-			if ( thread->can_continue() ){ 
+			if ( thread->can_continue() ){
 				curr_line = thread->getline();
-				// check for tags
-				if (thread->has_tags()){
-					std::cout << "tag avalible: " << "\n" << std::endl;
+				process_tags();
 
-					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
-						std::string tag = thread->get_tag(i);
-						std::cout << "tag: " << tag << "\n" << std::endl;
-
-                        // set can battle status to true
-                        if (tag == "battle") {
-                            can_battle = true;
-							std::cout << "can battle: " << can_battle << std::endl;
-                        }
-					}
+				//handles if the battle tag isnt attached to text
+				if (can_battle && trim(curr_line).empty()) {
+					can_battle = false;
+					start_battle();
+					return true;
 				}
-				dialogue_processor.handle_curr_line(curr_line);
-				// std::cout << "dialogue mode: " << dialogue_processor.curr_line.characters.empty() << std::endl;
-                return true;
+
+				// nothing to show: either a pause tag with no text, or the story
+				// close right away when hit ->DONE or ->END
+				bool stopped = !thread->can_continue() && !thread->has_choices();
+				if (trim(curr_line).empty() && (pause_pending || stopped)) {
+					pause_pending = false;
+					ink->paused = true;
+					leave();
+					return true;
+				}
+
+				//if there is an empty line before choice  show the choices instead of a blank box
+				if (!(trim(curr_line).empty() && thread->has_choices())) {
+					dialogue_processor.handle_curr_line(curr_line);
+					return true;
+				}
 			}
-			else if (thread->has_choices()) { // display as 3 different choices
-				// check for tags
-				if (thread->has_tags()){
-					std::cout << "tag avalible: " << "\n" << std::endl;
 
-					for (ink::size_t i = 0; i < thread->num_tags(); ++i){
-						std::string tag = thread->get_tag(i);
-						std::cout << "tag: " << tag << "\n" << std::endl;
-
-                        // set can battle status to true
-                        if (tag == "battle") {
-                            can_battle = true;
-							std::cout << "can battle: " << can_battle << std::endl;
-                        }
-					}
-				}
-				// iterate choices
-				int id = 0;
-				(void)id;
-				for ( const ink::runtime::choice c : *thread )
-				{
-					id++;
+			if (thread->has_choices()) {
+				for ( const ink::runtime::choice c : *thread ) {
 					curr_line.append(c.text());
 				}
 				dialogue_processor.handle_curr_line(curr_line);
-                return true;
+				return true;
 			}
 			else {
-				auto self = shared_from_this();
-				std::shared_ptr< Mode > back = return_to;
-				Mode::set_current(back);
+				leave();
 				return true;
 			}
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
-        // use this for choice stuff instead of hard coding?
-        if (evt.key.key ==SDLK_SPACE) {
-            talk.pressed = false;
+		if (evt.key.key == SDLK_SPACE) {
+			talk.pressed = false;
 			return true;
-        }
-	    if (evt.key.key == SDLK_1) { // choice 1
-			if(thread->has_choices()){
-				thread->choose(0);
-				curr_line = thread->getline();
-				dialogue_processor.handle_curr_line(curr_line);
-			}
-            return true;
-		} else if (evt.key.key == SDLK_2) { // choice 2
-			if(thread->has_choices()){
-				thread->choose(1);
-				curr_line = thread->getline();
-				dialogue_processor.handle_curr_line(curr_line);
-			}
-            return true;
-		} else if (evt.key.key == SDLK_3) { // choice 3
-			if(thread->has_choices()){
-				thread->choose(2);
-				curr_line = thread->getline();
-				dialogue_processor.handle_curr_line(curr_line);
-			}
-            return true;
+		}
+		if (evt.key.key == SDLK_1) { 
+			choose(0);
+			return true;
+		}
+		if (evt.key.key == SDLK_2) { 
+			choose(1);
+			return true; 
+		}
+		if (evt.key.key == SDLK_3) { 
+			choose(2);
+			return true;
 		}
 	}
 	return false;
@@ -120,6 +209,26 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 void DialogueMode::update(float elapsed) {
 	//reset button press counters:
 	talk.downs = 0;
+
+	if (resume_battle) {
+		resume_battle = false;
+		start_battle();
+		return;
+	}
+
+	// back from the minigame
+	if (battle_finished) {
+		battle_finished = false;
+		if (battle_captured) {
+			ink->battle_pending = false;
+			if (on_capture) on_capture();
+		} 
+		else {
+			//retreat
+			leave();
+		}
+		return;
+	}
 
 	// keep ghost floating
 	return_to->update(elapsed);
@@ -132,7 +241,7 @@ void DialogueMode::update(float elapsed) {
 
 void DialogueMode::draw(glm::uvec2 const &drawable_size) {	
 	// background --------------------------------------------------------------------------------------------
-	if (!can_battle) return_to->draw(drawable_size);
+	return_to->draw(drawable_size);
 
 	// textbox dimensions
 	last_drawable_size = drawable_size;

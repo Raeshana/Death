@@ -32,6 +32,43 @@
 #include "PixelCanvas.hpp"
 #include "DrawLines.hpp"
 
+#include <memory>
+#include <functional>
+
+
+
+// the ink story for the entire game. 
+struct InkStory {
+	ink::runtime::story *story = nullptr;
+	//variables set in the story
+	ink::runtime::globals globals;
+	//the story thread
+	ink::runtime::runner runner;
+	// handling the pause tag.
+	bool paused = false;
+	// a "# battle" tag was read but the soul hasn't been captured yet (e.g. the player
+	// retreated with Escape). the next dialogue that opens goes straight into the battle.
+	bool battle_pending = false;
+	//the knot that handles the next patient
+	std::string next_patient = "next_patient";
+
+	// script loading. 
+	static std::shared_ptr<InkStory> get(std::string const &script_file);
+
+	// reading and writing the ink variables
+	// InkStory::get("prototype_script.bin")->set_var<bool>("start_abigail", true);
+	template<typename T>
+	bool set_var(const char *name, T const &val) {
+		bool ok = globals->set<T>(name, val);
+		if (!ok) std::cerr << "InkStory: could not set ink variable '" << name << "' (missing or wrong type)" << std::endl;
+		return ok;
+	}
+	template<typename T>
+	ink::optional<T> get_var(const char *name) const {
+		return globals->get<T>(name);
+	}
+};
+
 struct DialogueMode : Mode {
 	DialogueMode(std::string const &script_file);
 	virtual ~DialogueMode();
@@ -71,15 +108,28 @@ struct DialogueMode : Mode {
 	TextProcessor speaker_processor;
 
 	//----- tags stuff -----
-	bool can_battle;
+	bool can_battle = false;    //the line on screen has "# battle": next input starts the minigame
+	bool pause_pending = false; //next input closes dialogue
+
+	//read the current line's tags (call after every getline())
+	void process_tags();
+	//pick choice i, then show the line that follows it
+	void choose(int i);
+	//close dialogue
+	void leave();
+
+	//----- battle stuff -----
+	//switch to the soul capture minigame, difficulty from the ink VAR battle_difficulty
+	void start_battle();
+	bool resume_battle = false;   //opened while ink->battle_pending: start the battle on first update
+	bool battle_finished = false; //minigame just handed control back (handled in update)
+	bool battle_captured = false; //...and whether the soul was captured
+	//called when a soul is captured (PlayMode uses it to set soul_taken)
+	std::function< void() > on_capture;
 
 	//----- story stuff -----
 
-	// Load ink binary story, generated from the inkCPP compiler
-	ink::runtime::story* inkDialogue;
-
-	// Create a new thread
-	ink::runtime::runner thread;
+	std::shared_ptr<InkStory> ink;
 
 	// Keep track of current line
 	std::string curr_line;

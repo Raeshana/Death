@@ -91,6 +91,7 @@ void SoulCaptureMode::restart(Difficulty const &difficulty_) {
 	next->blade_angle = blade_angle;
 	next->canvas.rect = canvas.rect;
 	next->return_to = return_to;
+	next->did_retreat = did_retreat;
 	//the planks were placed for the default scythe spot, place them again for this one:
 	if (next->difficulty.mechanic == Mechanic::Planks) next->place_planks();
 	Mode::set_current(next);
@@ -236,6 +237,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 	bool go_on = evt.type == SDL_EVENT_MOUSE_BUTTON_DOWN || (evt.type == SDL_EVENT_KEY_DOWN && (evt.key.key == SDLK_SPACE || evt.key.key == SDLK_E));
 	if (captured && return_to && go_on && slice_time > 1.0f) {
 		auto self = shared_from_this();
+		if (did_retreat) did_retreat(true);
 		Mode::set_current(std::move(return_to));
 		return true;
 	}
@@ -258,6 +260,7 @@ bool SoulCaptureMode::handle_event(SDL_Event const &evt, glm::uvec2 const &windo
 		} else if (evt.key.key == SDLK_ESCAPE && return_to && !captured) {
 			//step back into the ward: the player may want to look around before trying again
 			auto self = shared_from_this();
+			if (did_retreat) did_retreat(false);
 			Mode::set_current(std::move(return_to));
 			return true;
 		} else if (!return_to && evt.key.key >= SDLK_1 && evt.key.key < SDLK_1 + Levels) {

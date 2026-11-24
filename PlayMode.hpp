@@ -177,4 +177,17 @@ struct PlayMode : Mode {
 	};
 	std::vector< HintLine > hint_lines;
 	void draw_hint_text(glm::uvec2 const &drawable_size);
+	//----- text stuff -----
+	TextProcessor hint_processor;
+	std::string dialogue_line;
+	std::string hint_line;
+
+	bool talked_patient = false;
+
+	//----- sound stuff -----
+	//swap the background track, fading the old one out and the new one in:
+	void play_music(Sound::Sample const &sample, std::shared_ptr< Sound::PlayingSample > &slot);
+	std::shared_ptr< Sound::PlayingSample > before_soul_loop;
+	std::shared_ptr< Sound::PlayingSample > during_soul_loop;
+	std::shared_ptr< Sound::PlayingSample > after_soul_loop;
 };

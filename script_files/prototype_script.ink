@@ -1,38 +1,26 @@
 // TAG LIST:
-// pause: stop until prompted to. 
-
+// pause: stop until prompted to.
+// battle: start the soul capture minigame when this dialogue closes.
 // IDEAS: 
 // can the patient talk to the player during minigame? 
-
-
 VAR speaker = "Someone"
-
 VAR start_abigail = false
 VAR start_sherry = false
 VAR start_keith = false
 VAR start_david = false
 VAR start_twins = false
-
-
-
 VAR complete_abigail = false
 VAR complete_sherry = false
 VAR complete_keith = false
 VAR complete_david = false
 VAR complete_twins = false
-
 VAR diary_henry = false
 VAR diary_abigail = false
 VAR diary_sherry = false
 VAR diary_keith = false
 VAR diary_david = false
 VAR diary_twins = false
-
-
-
 VAR battle_difficulty = 3
-
-
 Welcome to your first day on the job.
 To make things easy for you, we have stationed you in a hospital.
 In order to make today's quota, you must reap at least 1 (one) soul.
@@ -94,11 +82,12 @@ Good luck.
 
 -> home 
 === home ===
--> abigail
 { complete_abigail && complete_keith && complete_sherry && complete_david && complete_twins:
     -> END
 }
-# pause
+-> DONE
+
+=== next_patient ===
 { 
     - start_abigail && not complete_abigail:
         -> abigail
@@ -112,8 +101,6 @@ Good luck.
         -> twins
 }
 
-
--> abigail
 
 === abigail ===
     ~ battle_difficulty = 3
@@ -161,7 +148,6 @@ Good luck.
     - "The way you are dressed..."
     - "... and that ferioucios weapon..!"
     - "You... must be Satan. God cannot look like this"
-    
     * { diary_sherry } [You cannot see my face...] -> success
     * { diary_sherry } [The Lord may take many forms...] -> weak
     * { diary_sherry } [I am both, yet neither...] -> fail
@@ -172,14 +158,12 @@ Good luck.
         "I understand that is is you my Lord,"
         "and that I was wrong to doubt you."
         ~ battle_difficulty = 1
-        # battle 
         -> fight
 
     = weak
         "The form for me? That is peculiar."
         "But I shouldn't doubt God's plan..."
         ~ battle_difficulty = 3
-        # battle
         -> fight
 
         
@@ -187,7 +171,6 @@ Good luck.
         "That is absolutely sacriligious."
         "Only a demon of Satan would conflate God and the Devil."
         ~ battle_difficulty = 5
-        # battle
         -> fight
     
     = fight
@@ -225,7 +208,7 @@ Good luck.
     { diary_keith: 
         -> diary
         - else: 
-        # battle
+        -> fight
     }
     = diary
     * "Whatever you wish."
@@ -234,6 +217,7 @@ Good luck.
         -> reject
     = fight 
         # battle
+        ~ complete_keith = true
         -> home
 
     = reject
@@ -242,8 +226,8 @@ Good luck.
         * "Well - no - you're just unwell, and need help and I cannot give you that."
         - "... how persumptuous of you to think you know what I need."
         - "Just leave me be."
-    ~ complete_keith = true
-    -> home
+        ~ complete_keith = true
+        -> home
 
 
 === david ===
@@ -262,8 +246,6 @@ Good luck.
     "Who're youse?"
     * "You must depart from this world"
     - "this aint an airport."
-    
-    
     { diary_david: 
         * "Your body is weak from poison, so this will be rather trivial."
             -> weak
@@ -279,7 +261,6 @@ Good luck.
         "Perrrrrrrrfect lets fuckin go"
         "Im always ready for a time in Cancun"
         ~ battle_difficulty = 1
-        # battle 
         -> fight
 
     = weak
@@ -289,7 +270,6 @@ Good luck.
         "fuck"
         "IthinkINeedToFindMyCarToSeeIfITotalledIt."
         ~ battle_difficulty = 2
-        # battle
         -> fight
 
         
@@ -298,7 +278,6 @@ Good luck.
         "Reminds me of the time I had my stomach pumped."
         "I gotta get outta here"
         ~ battle_difficulty = 4
-        # battle
         -> fight
     
     = fight
@@ -322,8 +301,6 @@ Good luck.
     - "............."
     ~ speaker = "Matteo"
     - "Hello? Who're you?"
-    
-    
     * The one that will pass this one on to the next world.
         -> pass_on
     * You shouldn't concern yourself with me.
@@ -338,8 +315,7 @@ Good luck.
             -> confirmation
         * It is inevitable.
             -> confirmation
-        ~ battle_difficulty = 1
-        -> fight
+        
     = confirmation
         "No!"
         "Who says he has to?"
