@@ -1,5 +1,7 @@
 #include "SoundManager.hpp"
 
+std::shared_ptr<Sound::PlayingSample> SoundManager::current_bg_music = nullptr;
+
 SoundManager::SoundManager() :
     // load background music
     hospital_music(LoadTagDefault, []() -> Sound::Sample const * {
