@@ -9,16 +9,16 @@ struct SoundManager{
     ~SoundManager();
 
     // current bg music slot
-    static std::shared_ptr< Sound::PlayingSample > &current_bg_music;
+    static std::shared_ptr< Sound::PlayingSample > current_bg_music;
 
     // all background music
-    const Sound::Sample hospital_music;
-    const Sound::Sample soul_capture;
+    Load <Sound::Sample> hospital_music;
+    Load <Sound::Sample> soul_capture;
 
     // all sfx
-    const Sound::Sample &hit_sfx;
-    const Sound::Sample &miss_sfx;
-    const Sound::Sample &slash_sfx;
+    Load <Sound::Sample> hit_sfx;
+    Load <Sound::Sample> miss_sfx;
+    Load <Sound::Sample> slash_sfx;
 
     // swap the background track, fading the old one out and the new one in:
     void play_music(Sound::Sample const &sample);
