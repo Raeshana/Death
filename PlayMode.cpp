@@ -425,6 +425,7 @@ Sprites::Texture PlayMode::texture_for(Prop const &prop) {
 			return cardiogram_dead_tex;
 		}
 	}
+	
 	return prop.tex;
 }
 
@@ -630,6 +631,11 @@ void PlayMode::on_interact(Interactable const &thing) {
 		if (soul_taken) {
 			std::cout << "This soul has already been collected." << std::endl;
 			return;
+		}
+		if (tutorial_step == TUT_TALK) {
+			tutorial_step = TUT_FIRST_TRY;
+		} else if (tutorial_step == TUT_TALK_AGAIN) {
+			tutorial_step = TUT_SECOND_TRY;
 		}
 
 		// tell the story which patient we are talking to before it resumes
