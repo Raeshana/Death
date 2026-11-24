@@ -40,14 +40,17 @@ DialogueMode::DialogueMode(std::string const &script_file) {
 
 	// player decided to retreat.
 	// story stays where it is until battle is done.
-	resume_battle = ink->battle_pending;
+	resume_battle = ink->battle_yet_to_start;
 
 	auto &thread = ink->runner;
-	if (!resume_battle && !thread->can_continue() && !thread->has_choices()) {
+
+	bool stopped = !thread->can_continue() && !thread->has_choices();
+	if (!resume_battle && (!ink->started || stopped)) {
 		if (!thread->move_to(ink->next_patient.c_str())) {
 			std::cerr << "DialogueMode: resume knot '" << ink->next_patient << "' not found in " << script_file << std::endl;
 		}
 	}
+	ink->started = true;
 }
 
 DialogueMode::~DialogueMode() {
@@ -76,7 +79,7 @@ void DialogueMode::leave() {
 
 void DialogueMode::start_battle() {
 	//the soul is currently being captured so the battle counts as unfinished
-	ink->battle_pending = true;
+	ink->battle_yet_to_start = true;
 
 	// difficulty comes from the script 
 	//ink doesnt use unsigned so casting hell is below. 
@@ -105,6 +108,7 @@ void DialogueMode::start_battle() {
 void DialogueMode::choose(int i) {
 	auto &thread = ink->runner;
 	if (!thread->has_choices() || i >= int(thread->num_choices())) return;
+	choices_available = false;
 
 	thread->choose(i);
 	curr_line = thread->can_continue() ? thread->getline() : "";
@@ -117,7 +121,17 @@ void DialogueMode::choose(int i) {
 		return;
 	}
 
+	dialogue_processor.reset_line(last_drawable_size);
 	dialogue_processor.handle_curr_line(curr_line);
+}
+
+void DialogueMode::highlight_choice() {
+	const glm::vec3 HighlightColor = glm::vec3(1.0f, 0.85f, 0.0f);
+	for (size_t i = 0; i < choice_bytes.size(); i++) {
+		glm::vec3 color = glm::vec3(1.0f);
+		if (int(i) == selected_choice) color = HighlightColor;
+		dialogue_processor.set_color(choice_bytes[i].first, choice_bytes[i].second, color);
+	}
 }
 
 bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
@@ -126,6 +140,11 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 	if (evt.type == SDL_EVENT_KEY_DOWN) {
 		if (evt.key.key == SDLK_SPACE){ // process dialogue
 			talk.pressed = true;
+			//ignore repeat key events
+			if (evt.key.repeat) {
+				return true;
+			}
+
 			if (can_battle) {
 				can_battle = false;
 				start_battle();
@@ -136,6 +155,10 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 				pause_pending = false;
 				ink->paused = true;
 				leave(); //close the dialogue
+				return true;
+			}
+			if (choices_available) {
+				choose(selected_choice);
 				return true;
 			}
 
@@ -174,16 +197,35 @@ bool DialogueMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_s
 			}
 
 			if (thread->has_choices()) {
+				int32_t choice_num = 1;
+				choice_bytes.clear();
 				for ( const ink::runtime::choice c : *thread ) {
-					curr_line.append(c.text());
+					size_t begin = curr_line.size();
+					curr_line.append(std::to_string(choice_num) + ". " + c.text() + "\n");
+					choice_bytes.emplace_back(begin, curr_line.size() - 1); // without the '\n'
+					choice_num++;
 				}
 				dialogue_processor.handle_curr_line(curr_line);
+
+				//first choice starts highlighted
+				choices_available = true;
+				selected_choice = 0;
+				highlight_choice();
 				return true;
 			}
 			else {
 				leave();
 				return true;
 			}
+		}
+		//choose the next choice
+		if (choices_available && !choice_bytes.empty()
+			&& (evt.key.key == SDLK_W || evt.key.key == SDLK_S)) {
+			int count = int(choice_bytes.size());
+			if (evt.key.key == SDLK_W) selected_choice = (selected_choice - 1 + count) % count;
+			else selected_choice = (selected_choice + 1) % count;
+			highlight_choice();
+			return true;
 		}
 	} else if (evt.type == SDL_EVENT_KEY_UP) {
 		if (evt.key.key == SDLK_SPACE) {
@@ -220,7 +262,7 @@ void DialogueMode::update(float elapsed) {
 	if (battle_finished) {
 		battle_finished = false;
 		if (battle_captured) {
-			ink->battle_pending = false;
+			ink->battle_yet_to_start = false;
 			if (on_capture) on_capture();
 		} 
 		else {

@@ -46,9 +46,11 @@ struct InkStory {
 	ink::runtime::runner runner;
 	// handling the pause tag.
 	bool paused = false;
-	// a "# battle" tag was read but the soul hasn't been captured yet (e.g. the player
-	// retreated with Escape). the next dialogue that opens goes straight into the battle.
-	bool battle_pending = false;
+	//battle tag is read, hasnt started battle yet
+	bool battle_yet_to_start = false;
+	// bool that controls when the script starts
+	// (the tutorial doesn't use int).
+	bool started = false;
 	//the knot that handles the next patient
 	std::string next_patient = "next_patient";
 
@@ -115,13 +117,22 @@ struct DialogueMode : Mode {
 	void process_tags();
 	//pick choice i, then show the line that follows it
 	void choose(int i);
+
+	//----- choice selection -----
+	//the text box is showing the choices
+	bool choices_available = false;
+	int selected_choice = 0;
+	//the bytes to highlight
+	std::vector< std::pair< size_t, size_t > > choice_bytes;
+	//coloring of the choices based on what is selected
+	void highlight_choice();
 	//close dialogue
 	void leave();
 
 	//----- battle stuff -----
 	//switch to the soul capture minigame, difficulty from the ink VAR battle_difficulty
 	void start_battle();
-	bool resume_battle = false;   //opened while ink->battle_pending: start the battle on first update
+	bool resume_battle = false;   //opened while ink->battle_yet_to_start: start the battle on first update
 	bool battle_finished = false; //minigame just handed control back (handled in update)
 	bool battle_captured = false; //...and whether the soul was captured
 	//called when a soul is captured (PlayMode uses it to set soul_taken)

@@ -104,6 +104,14 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
         
         if (i == num_chars-1) continue;
 
+       	// handle `\n`
+        if (imported_line.at(info[i].cluster) == '\n') {
+            pen_x = pen_x_start;
+            pen_y -= line_height;
+            word_start = curr_line.characters.size();
+            continue;
+        }
+
         Character character;
         if (i == 0){
             // if guard for parsing 
@@ -126,6 +134,7 @@ void TextProcessor::handle_curr_line(std::string imported_line) {
 
         // Get the character
         character.character = imported_line.at(i);
+        character.byte = info[i].cluster;
         character.width = slot->bitmap.width;
         character.rows = slot->bitmap.rows;
         character.bitmap_left = slot->bitmap_left;
@@ -295,6 +304,23 @@ void TextProcessor::reset_line(glm::uvec2 const &window_size){
 void TextProcessor::draw_curr_line(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size){
 	glViewport(0, 0, drawable_size.x, drawable_size.y);
 
+
+	//if a color changes from the highlight moving, we have to clear and redraw
+	//the new characters. 
+	if (curr_line.redraw && curr_line.fbo != 0) {
+		curr_line.redraw = false;
+		glBindFramebuffer(GL_FRAMEBUFFER, curr_line.fbo);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		if (curr_line.char_num > 0) {
+			draw_textbox(textbox_x_start, textbox_y_start, textbox_x_end, textbox_y_end, drawable_size);
+			for (int i = 0; i < curr_line.char_num && i < int(curr_line.characters.size()); i++) {
+				draw_curr_character(drawable_size, i);
+			}
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 	if (curr_line.typing_elapsed > curr_line.typing_max &&
 		!curr_line.characters.empty() &&
 		curr_line.char_num < curr_line.characters.size()) {
@@ -395,7 +421,14 @@ void TextProcessor::draw_curr_line(float textbox_x_start, float textbox_y_start,
 	GL_ERRORS();
 }
 
-void TextProcessor::draw_curr_character(glm::uvec2 const &drawable_size){
+void TextProcessor::set_color(size_t byte_begin, size_t byte_end, glm::vec3 c) {
+	for (Character &ch : curr_line.characters) {
+		if (ch.byte >= byte_begin && ch.byte < byte_end) ch.color = c;
+	}
+	curr_line.redraw = true;
+}
+
+void TextProcessor::draw_curr_character(glm::uvec2 const &drawable_size, int index){
     //set up screen scaling (ref. from Sprites.cpp)
 	// float scale_x = drawable_size.x / ScreenWidth;
 	// float scale_y = drawable_size.y / ScreenHeight;
@@ -464,7 +497,8 @@ void TextProcessor::draw_curr_character(glm::uvec2 const &drawable_size){
 
 	// get texture for 1 char -----------------------------------------------------------------------
 
-	auto const &character = curr_line.characters.at(curr_line.char_num);
+	if (index < 0) index = curr_line.char_num;
+	auto const &character = curr_line.characters.at(index);
 	if (character.pixels.empty()) return;
 
 	// // For testing
@@ -546,10 +580,8 @@ void TextProcessor::draw_curr_character(glm::uvec2 const &drawable_size){
 	glBindVertexArray(0);
 
 	glUseProgram(text_program);
-
-	// make text white
 	GLint text_color = glGetUniformLocation(text_program, "textColor");
-	glUniform3f(text_color, 1.0f, 1.0f, 1.0f);
+	glUniform3f(text_color, character.color.r, character.color.g, character.color.b);
 
 	// uniforms for shader programs
 	glm::mat4 OBJECT_TO_CLIP = glm::mat4(

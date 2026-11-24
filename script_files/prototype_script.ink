@@ -21,25 +21,14 @@ VAR diary_keith = false
 VAR diary_david = false
 VAR diary_twins = false
 VAR battle_difficulty = 3
-Welcome to your first day on the job.
-To make things easy for you, we have stationed you in a hospital.
-In order to make today's quota, you must reap at least 1 (one) soul.
-As you may or may not know, 
-reapers have the flexibility to choose their own method of collection. 
-When you attempt to collect their souls,
-Humans on the verge of death are acutely aware of your presence.
-Therefore, you may chose to drag your target to the depths
-or convince your target to be collected. 
-What you choose is up to you. # pause
+
 
 -> henry
 
 
 === henry ===
     ~ battle_difficulty = 3
-    This is your first client.
-    If you're in a rush, you may directly apporoach to reap his soul
-    Or, you may choose to know more about him to make it easier. 
+   
     ~ speaker = "Henry"
     { diary_henry:
         DIARY CONTENTS: 

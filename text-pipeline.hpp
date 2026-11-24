@@ -37,6 +37,11 @@ struct Character {
     float x = 0.0f;   
     float y = 0.0f;
     char character;     // sanity check (is the char the same?)
+
+    //where the char starts in the string
+    size_t byte = 0; 
+    //char color
+    glm::vec3 color = glm::vec3(1.0f);
 };
 
 struct Line {
@@ -45,6 +50,7 @@ struct Line {
     double typing_max = 0.04;
     int char_num = 0;
     bool is_typing = false;
+    bool redraw = false; // a color changed: draw the already-typed characters again
 
     GLuint tex = 0; // texture drawn to fbo
     GLuint fbo = 0; // framebuffer
@@ -75,7 +81,8 @@ struct TextProcessor {
 
     // functions
     void handle_curr_line(std::string imported_line);
-    void draw_curr_character(glm::uvec2 const &drawable_size);
+    void draw_curr_character(glm::uvec2 const &drawable_size, int index = -1);
+    void set_color(size_t byte_begin, size_t byte_end, glm::vec3 color);
     void draw_curr_line(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size);
     void update(float elapsed);
     void draw_textbox(float textbox_x_start, float textbox_y_start, float textbox_x_end, float textbox_y_end, glm::uvec2 const &drawable_size);

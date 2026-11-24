@@ -638,6 +638,13 @@ void PlayMode::on_interact(Interactable const &thing) {
 			tutorial_step = TUT_SECOND_TRY;
 		}
 
+		//ignore inky for tutorial
+		if (room_number == 0) {
+			reset_buttons();
+			start_minigame();
+			return;
+		}
+
 		// tell the story which patient we are talking to before it resumes
 		static const char *patients[5] = { "abigail", "sherry", "keith", "david", "twins" };
 		std::string patient = patients[room_number - 1];
@@ -679,6 +686,11 @@ void PlayMode::on_interact(Interactable const &thing) {
 		if (in_tutorial()) {
 			return;
 		}
+		//lets just block people in until they do it
+		if (InkStory::get("final_script.bin")->battle_yet_to_start){
+			std::cout<<"The soul has not been captured yet. You can't leave."<<std::endl;
+			return;
+		}
 		start_leaving(return_to);
 	}
 }
@@ -711,10 +723,10 @@ void PlayMode::update(float elapsed) {
 	//start the minigame
 	if (active_dialogue && Mode::current.get() == this) {
 		active_dialogue.reset();
-		if (battle || tutorial_step == TUT_FIRST_TRY || tutorial_step == TUT_SECOND_TRY) {
-			start_minigame();
-			return;
-		}
+		// if (battle || tutorial_step == TUT_FIRST_TRY || tutorial_step == TUT_SECOND_TRY) {
+		// 	start_minigame();
+		// 	return;
+		// }
 	}
 
 	if (active_minigame && Mode::current.get() == this && !leaving_to) {
@@ -995,9 +1007,9 @@ void PlayMode::draw_hint_text(glm::uvec2 const &drawable_size) {
 		}
 		TextImage const &image = found->second;
 
-		float left = std::floor(view_x + line.center_x * scale - image.advance * 0.5f);
+		float left_f = std::floor(view_x + line.center_x * scale - image.advance * 0.5f);
 		float base = std::floor(view_y + line.baseline_y * scale);
-		draw_text(image, glm::vec2(left, base), glm::vec4(1.0f, 1.0f, 1.0f, line.alpha), drawable_size);
+		draw_text(image, glm::vec2(left_f, base), glm::vec4(1.0f, 1.0f, 1.0f, line.alpha), drawable_size);
 	}
 
 	hint_lines.clear();
