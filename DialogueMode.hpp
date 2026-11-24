@@ -151,4 +151,8 @@ struct DialogueMode : Mode {
 
 	glm::uvec2 last_drawable_size = glm::uvec2(1, 1);
 	unsigned int dialogue_font_pixels = 0;
+
+	std::unique_ptr< Font > name_font;
+	std::string name_text;
+	TextImage name_image;
 };
