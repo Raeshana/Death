@@ -123,6 +123,8 @@ struct PlayMode : Mode {
 
 	void reset_buttons();
 
+	PlayMode(int room_number);
+	int room_number = 1;
 	std::shared_ptr< Mode > return_to;
 
 	float fade_out = 0.0f;
@@ -184,7 +186,4 @@ struct PlayMode : Mode {
 	std::string hint_line;
 
 	bool talked_patient = false;
-
-	//----- patient stuff -----
-	Patient patients[5];
 };
