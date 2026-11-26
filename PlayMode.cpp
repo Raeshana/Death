@@ -20,16 +20,9 @@ PlayMode::PlayMode(){
 	// Assign patient rooms
 	for(int i = 0; i < 5; i++){
 		patients[i].difficulty = i+1; // temp
-		patients[i].room_num = i+2;
-		patients[i].room = std::make_shared<RoomMode>(i+1);
+		patients[i].room_num = i;
+		patients[i].room = std::make_shared<RoomMode>(i);
 	}
-
-	// Start Tutorial
-	std::shared_ptr<RoomMode> curr_mode = std::make_shared<RoomMode>(0);
-
-	// Then we go to hallway mode
-	// Hallway mode needs to accept patients as a parameter
-	// so it can load the right pointers
 }
 
 PlayMode::~PlayMode() {
