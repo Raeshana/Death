@@ -161,8 +161,8 @@ if (maek.OS === 'windows') {
 const game_names = [
 	maek.CPP('DialogueMode.cpp'),
 	maek.CPP('SoulCaptureMode.cpp'),
-	maek.CPP('RoomMode.cpp'),
 	maek.CPP('PlayMode.cpp'),
+	maek.CPP('patient.cpp'),
 	maek.CPP('PPU466.cpp'),
 	maek.CPP('PixelCanvas.cpp'),
 	maek.CPP('main.cpp'),

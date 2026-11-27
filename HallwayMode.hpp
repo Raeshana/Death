@@ -9,10 +9,12 @@
 #include <string>
 #include <memory>
 
+#include "patient.hpp"
+
 struct PlayMode;
 
-struct HallwayMode : Mode {
-	HallwayMode();
+struct HallwayMode: Mode {
+	HallwayMode(PatientList patientList);
 	virtual ~HallwayMode();
 
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;

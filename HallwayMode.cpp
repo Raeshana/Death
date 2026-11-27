@@ -62,7 +62,7 @@ static bool is_door_char(char c) {
 	return false;
 }
 
-HallwayMode::HallwayMode() {
+HallwayMode::HallwayMode(PatientList patientList) {
 	hallway.resize(MapHeight);
 	for (int row = 0; row < MapHeight; row++) {
 		if (std::strlen(HALLWAY_MAP[row]) != MapWidth) {

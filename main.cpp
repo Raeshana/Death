@@ -2,7 +2,6 @@
 #include "Mode.hpp"
 
 // The 'RoomMode' mode starts the game in a patient room:
-#include "RoomMode.hpp"
 #include "PlayMode.hpp"
 
 //For asset loading:
@@ -27,9 +26,10 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
+
 #include "HallwayMode.hpp"
-#include "PlayMode.hpp"
 #include "SoundManager.hpp"
+#include "patient.hpp"
 
 
 #ifdef _WIN32
@@ -125,8 +125,15 @@ int main(int argc, char **argv) {
           << std::endl;
 	SoundManager::play_music(*SoundManager::hospital_music);
 
+
+	// ------------------- create patients ----------------------
+	PatientList patientList("abigail", "sherry", "keith", "david", "twins");
+	for (int i = 0; i < 5; i++){
+		std::cout << "Patient " << i << ": " + (patientList.patients.at(i).name) << std::endl;
+	}
+
 	//------------ create game mode + make current --------------
-	std::shared_ptr< HallwayMode > hallway = std::make_shared< HallwayMode >();
+	std::shared_ptr< HallwayMode > hallway = std::make_shared< HallwayMode >(patientList);
 	std::shared_ptr< PlayMode > tutorial_room = std::make_shared< PlayMode >(0);
 	tutorial_room->return_to = hallway;
 	Mode::set_current(tutorial_room);
